@@ -37,7 +37,7 @@ const Footer: React.FC = () => {
               <a href="#" className="w-10 h-10 rounded-full glass flex items-center justify-center text-slate-400 hover:text-white transition-colors">
                 <Icons.Github />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full glass flex items-center justify-center text-slate-400 hover:text-white transition-colors">
+              <a href="https://instagram.com/4amhustles" className="w-10 h-10 rounded-full glass flex items-center justify-center text-slate-400 hover:text-white transition-colors">
                 <Icons.Instagram />
               </a>
             </div>

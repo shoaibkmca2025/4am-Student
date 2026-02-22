@@ -1,5 +1,6 @@
 
 import React from 'react';
+import logoImage from '../4am logo.jpeg';
 
 const About: React.FC = () => {
   return (
@@ -8,9 +9,9 @@ const About: React.FC = () => {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="relative order-2 lg:order-1">
             <img 
-              src="https://picsum.photos/seed/tech/800/600" 
-              alt="Team collaboration" 
-              className="rounded-3xl shadow-2xl border border-white/10"
+              src={logoImage}
+              alt="4AM Global Media"
+              className="rounded-3xl shadow-2xl border border-white/10 object-contain bg-slate-950"
             />
             <div className="absolute -bottom-8 -left-8 glass p-8 rounded-3xl border border-white/10 hidden md:block">
               <div className="text-4xl font-extrabold text-sky-400 mb-1">5+</div>

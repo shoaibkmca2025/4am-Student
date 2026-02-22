@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { NAV_LINKS } from '../constants';
+import logoImage from '../4am logo.jpeg';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -37,10 +38,16 @@ const Navbar: React.FC = () => {
         <div className="flex justify-between items-center">
           <button 
             onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className="flex items-center space-x-2 group focus:outline-none"
+            className="flex items-center space-x-3 group focus:outline-none"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-sky-400 to-purple-600 rounded-lg flex items-center justify-center font-bold text-xl group-hover:scale-110 transition-transform">4</div>
-            <span className="text-xl font-extrabold tracking-tight">4AM <span className="text-sky-400">Global Media</span></span>
+            <img
+              src={logoImage}
+              alt="4AM Global Media"
+              className="h-10 w-10 rounded-lg object-cover group-hover:scale-110 transition-transform"
+            />
+            <span className="text-xl font-extrabold tracking-tight">
+              4AM <span className="text-sky-400">Global Media</span>
+            </span>
           </button>
 
           <div className="hidden md:flex items-center space-x-8">
