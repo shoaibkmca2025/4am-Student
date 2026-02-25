@@ -110,13 +110,13 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-slate-900 border-b border-slate-800 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 transition-all duration-300">
+      <header className="sticky top-0 z-40 bg-slate-950/60 backdrop-blur-xl border-b border-white/5 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 transition-all duration-300">
       
       {/* Mobile Toggle & Logo */}
       <div className="flex items-center lg:hidden">
         <button 
           onClick={toggleSidebar}
-          className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition-colors"
+          className="p-2 text-slate-400 hover:text-slate-200 hover:bg-white/10 rounded-lg transition-colors"
         >
           {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
@@ -132,7 +132,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Search jobs, skills, mentors..." 
-          className={`saas-input w-full pl-10 ${
+          className={`w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all ${
             isSearchActive ? 'opacity-100 w-full' : 'hidden lg:block opacity-100 w-full'
           }`}
           onFocus={() => setIsSearchActive(true)}
@@ -146,7 +146,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
         </button>
         
         {/* Search Suggestions Dropdown */}
-        <div className={`absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-700 rounded-lg shadow-xl p-2 z-50 transform origin-top transition-all duration-200 ${isSearchActive ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}>
+        <div className={`absolute top-full left-0 right-0 mt-2 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-lg shadow-2xl p-2 z-50 transform origin-top transition-all duration-200 ${isSearchActive ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}>
             {searchQuery === '' ? (
               <>
                 <p className="px-3 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Recent Searches</p>

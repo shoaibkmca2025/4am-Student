@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, useSpring, useTransform } from 'framer-motion';
 import { Info, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
+import TiltCard from './TiltCard';
 
 interface StatsCardProps {
   title: string;
@@ -173,22 +174,21 @@ const StatsCard: React.FC<StatsCardProps> = ({
   }
 
   return (
-    <motion.div 
-      whileHover={{ y: -5 }}
+    <TiltCard 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`saas-card p-6 relative overflow-hidden group h-full flex flex-col justify-between hover:shadow-lg transition-all duration-300`}
+      className={`bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 relative overflow-hidden group h-full flex flex-col justify-between hover:shadow-2xl hover:bg-slate-800/60 transition-all duration-300`}
     >
       {/* Background Gradient Splash */}
-      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${theme.gradient} rounded-full blur-2xl -mr-10 -mt-10 opacity-50 group-hover:opacity-100 transition-opacity duration-500`}></div>
+      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${theme.gradient} rounded-full blur-2xl -mr-10 -mt-10 opacity-30 group-hover:opacity-60 transition-opacity duration-500`} style={{ transform: 'translateZ(-20px)' }}></div>
 
-      <div className="relative z-10 w-full h-full flex flex-col">
+      <div className="relative z-10 w-full h-full flex flex-col" style={{ transform: 'translateZ(20px)' }}>
         <div className="flex justify-between items-start mb-4">
-          <div className={`p-2.5 rounded-xl ${theme.bg} ${theme.text} ring-1 ring-inset ${theme.border} transition-colors group-hover:scale-110 duration-300`}>
+          <div className={`p-2.5 rounded-xl ${theme.bg} ${theme.text} ring-1 ring-inset ${theme.border} transition-all duration-300 group-hover:scale-110 group-hover:-translate-y-0.5 shadow-lg shadow-indigo-500/10`}>
             <Icon className="w-5 h-5" />
           </div>
           {trend && (
-            <div className={`flex items-center space-x-1 px-2 py-1 rounded-lg text-xs font-medium border ${trendUp ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'}`}>
+            <div className={`flex items-center space-x-1 px-2 py-1 rounded-lg text-xs font-medium border ${trendUp ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'} group-hover:scale-105 transition-transform duration-300`}>
               <span>{trend}</span>
               {trendUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
             </div>
@@ -197,7 +197,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
 
         <div className="space-y-1 flex-1">
             {variant === 'circular' ? (
-                <div className="flex flex-col items-center justify-center py-2">
+                <div className="flex flex-col items-center justify-center py-2 group-hover:scale-105 transition-transform duration-300">
                      <CircleProgress value={currentProgress} theme={theme} />
                      <p className="text-sm font-medium text-slate-400 mt-2">{title}</p>
                 </div>
@@ -266,7 +266,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
             )}
         </div>
       </div>
-    </motion.div>
+    </TiltCard>
   );
 };
 

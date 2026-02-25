@@ -62,10 +62,17 @@ const StudentDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-200 font-sans selection:bg-primary/30">
+    <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-indigo-500/30 relative overflow-hidden">
       
+      {/* Liquid Glass Background Elements */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/20 blur-[120px] animate-blob"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/20 blur-[120px] animate-blob animation-delay-2000"></div>
+        <div className="absolute top-[20%] right-[20%] w-[30%] h-[30%] rounded-full bg-pink-500/10 blur-[100px] animate-blob animation-delay-4000"></div>
+      </div>
+
       {/* Sidebar */}
-      <div className="hidden lg:block">
+      <div className="hidden lg:block relative z-20">
         <Sidebar 
           activeTab={activeTab} 
           setActiveTab={setActiveTab} 

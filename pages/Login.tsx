@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, ArrowLeft, User, Briefcase } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import { motion } from 'framer-motion';
 import logoImage from '../4am logo.jpeg';
 
 const Login: React.FC = () => {
@@ -11,7 +12,6 @@ const Login: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate login
     if (email && password) {
       localStorage.setItem('isAuthenticated', 'true');
       localStorage.setItem('userEmail', email);
@@ -21,117 +21,196 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 relative overflow-hidden font-sans">
+      
+      {/* Background Gradients for 'Overall Project' Feel */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-purple-500/10 rounded-full blur-[100px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-indigo-500/10 rounded-full blur-[100px]" />
       </div>
 
-      <div className="w-full max-w-md relative z-10">
-        <button 
-          onClick={() => navigate('/')} 
-          className="flex items-center text-slate-400 hover:text-white mb-8 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Home
-        </button>
+      {/* Back Button */}
+      <button 
+        onClick={() => navigate('/')} 
+        className="absolute top-8 left-8 flex items-center text-slate-500 hover:text-white transition-colors z-50"
+      >
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Back to Home
+      </button>
 
-        <div className="glass p-8 rounded-2xl border border-white/10 shadow-2xl">
-          <div className="text-center mb-8">
-            <div className="inline-block p-3 rounded-xl bg-white/5 border border-white/10 mb-4">
-              <img src={logoImage} alt="Logo" className="w-12 h-12 rounded-lg object-cover" />
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-2">Welcome Back</h2>
-            <p className="text-slate-400">Sign in to access your dashboard</p>
+      {/* Main Container */}
+      <motion.div 
+        className="relative w-full max-w-[420px] aspect-square flex items-center justify-center group"
+        initial="initial"
+        whileHover="hover"
+      >
+        
+        {/* ANIMATED RINGS CONTAINER */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+           
+           {/* Ring 1 - Outer (Indigo) */}
+           <motion.div 
+             animate={{ rotate: 360 }}
+             variants={{
+                initial: { boxShadow: '0 0 40px rgba(99, 102, 241, 0.1)', borderColor: 'rgba(99, 102, 241, 0.3)' },
+                hover: { boxShadow: '0 0 60px rgba(99, 102, 241, 0.6)', borderColor: 'rgba(99, 102, 241, 0.8)', scale: 1.05 }
+             }}
+             transition={{ 
+                rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+                boxShadow: { duration: 0.5 },
+                borderColor: { duration: 0.5 },
+                scale: { duration: 0.5 }
+             }}
+             className="absolute w-[130%] h-[130%] rounded-full border"
+             style={{ borderWidth: '1px' }}
+           />
+           {/* Ring 1 Decorative Dot */}
+           <motion.div 
+             animate={{ rotate: 360 }}
+             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+             className="absolute w-[130%] h-[130%] rounded-full"
+           >
+              <div className="absolute top-1/2 left-0 w-2 h-2 bg-indigo-400 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.8)]" />
+           </motion.div>
+
+
+           {/* Ring 2 - Middle (Purple) */}
+           <motion.div 
+             animate={{ rotate: -360 }}
+             variants={{
+                initial: { boxShadow: '0 0 30px rgba(168, 85, 247, 0.1)', borderColor: 'rgba(168, 85, 247, 0.3)' },
+                hover: { boxShadow: '0 0 50px rgba(168, 85, 247, 0.6)', borderColor: 'rgba(168, 85, 247, 0.8)', scale: 1.05 }
+             }}
+             transition={{ 
+                rotate: { duration: 15, repeat: Infinity, ease: "linear" },
+                boxShadow: { duration: 0.5 },
+                borderColor: { duration: 0.5 },
+                scale: { duration: 0.5 }
+             }}
+             className="absolute w-[100%] h-[100%] rounded-full border"
+             style={{ borderWidth: '1px' }}
+           />
+           {/* Ring 2 Decorative Dot */}
+           <motion.div 
+             animate={{ rotate: -360 }}
+             transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+             className="absolute w-[100%] h-[100%] rounded-full"
+           >
+              <div className="absolute bottom-0 left-1/2 w-2 h-2 bg-purple-400 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
+           </motion.div>
+
+
+           {/* Ring 3 - Inner (Pink) */}
+           <motion.div 
+             animate={{ rotate: 360 }}
+             variants={{
+                initial: { boxShadow: '0 0 20px rgba(236, 72, 153, 0.1)', borderColor: 'rgba(236, 72, 153, 0.3)' },
+                hover: { boxShadow: '0 0 40px rgba(236, 72, 153, 0.6)', borderColor: 'rgba(236, 72, 153, 0.8)', scale: 1.05 }
+             }}
+             transition={{ 
+                rotate: { duration: 10, repeat: Infinity, ease: "linear" },
+                boxShadow: { duration: 0.5 },
+                borderColor: { duration: 0.5 },
+                scale: { duration: 0.5 }
+             }}
+             className="absolute w-[70%] h-[70%] rounded-full border"
+             style={{ borderWidth: '1px' }}
+           />
+           
+           {/* Hover Effect Ring - Glows on interaction */}
+           <motion.div 
+             className="absolute w-[85%] h-[85%] rounded-full border border-cyan-500/0"
+             whileHover={{ borderColor: 'rgba(6, 182, 212, 0.5)', scale: 1.05 }}
+             transition={{ duration: 0.3 }}
+           />
+        </div>
+
+        {/* Login Form Card */}
+        <div className="relative z-10 w-full p-8 flex flex-col justify-center items-center">
+          
+          <div className="text-center mb-10">
+            <h2 className="text-4xl font-bold text-white tracking-tight drop-shadow-lg">Login</h2>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-slate-500" />
-                </div>
-                <input
-                  type="email"
-                  required
-                  className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-xl focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 text-white placeholder-slate-500 transition-all"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Password</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-slate-500" />
-                </div>
-                <input
-                  type="password"
-                  required
-                  className="w-full pl-10 pr-4 py-3 bg-slate-900/50 border border-slate-700 rounded-xl focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 text-white placeholder-slate-500 transition-all"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                type="button"
-                onClick={() => setRole('student')}
-                className={`p-4 rounded-xl border flex flex-col items-center justify-center transition-all ${
-                  role === 'student' 
-                    ? 'bg-sky-500/10 border-sky-500 text-sky-400' 
-                    : 'bg-slate-900/50 border-slate-700 text-slate-400 hover:border-slate-600'
+          <form onSubmit={handleLogin} className="w-full space-y-8">
+            
+            {/* Email Input */}
+            <div className="relative group">
+              <input
+                type="email"
+                required
+                className="w-full px-6 py-3.5 bg-slate-900/80 border border-slate-700 rounded-full focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 text-white placeholder-transparent transition-all text-center peer shadow-lg backdrop-blur-sm"
+                placeholder="Username"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <label 
+                className={`absolute left-1/2 -translate-x-1/2 transition-all pointer-events-none ${
+                  email || document.activeElement === document.querySelector('input[type="email"]') 
+                    ? '-top-6 text-xs text-indigo-400 font-semibold' 
+                    : 'top-3.5 text-slate-400 text-sm peer-focus:-top-6 peer-focus:text-xs peer-focus:text-indigo-400 peer-focus:font-semibold'
                 }`}
               >
-                <User className="w-6 h-6 mb-2" />
-                <span className="text-sm font-semibold">Student</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole('company')}
-                className={`p-4 rounded-xl border flex flex-col items-center justify-center transition-all ${
-                  role === 'company' 
-                    ? 'bg-purple-500/10 border-purple-500 text-purple-400' 
-                    : 'bg-slate-900/50 border-slate-700 text-slate-400 hover:border-slate-600'
-                }`}
-              >
-                <Briefcase className="w-6 h-6 mb-2" />
-                <span className="text-sm font-semibold">Company</span>
-              </button>
-            </div>
-
-            <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center text-slate-400 cursor-pointer">
-                <input type="checkbox" className="mr-2 rounded border-slate-700 bg-slate-800 text-sky-500 focus:ring-offset-slate-900" />
-                Remember me
+                Username
               </label>
-              <a href="#" className="text-sky-400 hover:text-sky-300 font-medium">Forgot password?</a>
             </div>
 
+            {/* Password Input */}
+            <div className="relative group">
+              <input
+                type="password"
+                required
+                className="w-full px-6 py-3.5 bg-slate-900/80 border border-slate-700 rounded-full focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500/50 text-white placeholder-transparent transition-all text-center peer shadow-lg backdrop-blur-sm"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <label 
+                className={`absolute left-1/2 -translate-x-1/2 transition-all pointer-events-none ${
+                  password 
+                    ? '-top-6 text-xs text-purple-400 font-semibold' 
+                    : 'top-3.5 text-slate-400 text-sm peer-focus:-top-6 peer-focus:text-xs peer-focus:text-purple-400 peer-focus:font-semibold'
+                }`}
+              >
+                Password
+              </label>
+            </div>
+
+            {/* Role Selection Toggle */}
+            <div className="flex justify-center items-center gap-3 py-2">
+                <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setRole('student')}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${role === 'student' ? 'bg-indigo-400 scale-125 shadow-[0_0_8px_rgba(129,140,248,0.8)]' : 'bg-slate-700 hover:bg-slate-600'}`}
+                      title="Student"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setRole('company')}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${role === 'company' ? 'bg-purple-400 scale-125 shadow-[0_0_8px_rgba(192,132,252,0.8)]' : 'bg-slate-700 hover:bg-slate-600'}`}
+                      title="Company"
+                    />
+                </div>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">{role}</span>
+            </div>
+
+            {/* Gradient Sign In Button */}
             <button
               type="submit"
-              className="w-full py-3 px-4 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold rounded-xl shadow-lg shadow-sky-500/20 transition-all transform hover:scale-[1.02]"
+              className="w-full py-4 px-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-500 text-white font-bold rounded-full shadow-[0_10px_20px_rgba(168,85,247,0.2)] hover:shadow-[0_10px_30px_rgba(168,85,247,0.4)] transition-all transform hover:scale-[1.02] active:scale-[0.98] border border-white/10"
             >
               Sign In
             </button>
-          </form>
 
-          <div className="mt-8 text-center text-slate-400 text-sm">
-            Don't have an account?{' '}
-            <button onClick={() => navigate('/register')} className="text-sky-400 hover:text-sky-300 font-bold">
-              Sign up
-            </button>
-          </div>
+            {/* Footer Links */}
+            <div className="flex justify-between text-xs text-slate-400 px-6">
+              <button type="button" className="hover:text-white transition-colors">Forget Password</button>
+              <button type="button" onClick={() => navigate('/register')} className="hover:text-white transition-colors">Signup</button>
+            </div>
+          </form>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

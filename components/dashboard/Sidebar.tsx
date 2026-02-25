@@ -33,10 +33,10 @@ const Sidebar: React.FC<SidebarProps> = ({
       initial={{ width: 280 }}
       animate={{ width: isCollapsed ? 80 : 280 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="h-screen bg-[#0F172A] border-r border-slate-800 flex flex-col fixed left-0 top-0 z-50 shadow-xl"
+      className="h-screen bg-slate-950/60 backdrop-blur-xl border-r border-white/10 flex flex-col fixed left-0 top-0 z-50 shadow-2xl"
     >
       {/* Logo Section */}
-      <div className={`flex items-center h-20 px-6 border-b border-slate-800/50 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+      <div className={`flex items-center h-20 px-6 border-b border-white/5 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
         <div className="flex items-center space-x-3 overflow-hidden">
           <div className="relative group">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg blur opacity-30 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
@@ -60,7 +60,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         {!isCollapsed && (
           <button 
             onClick={() => setIsCollapsed(true)}
-            className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all"
+            className="p-1.5 rounded-lg text-slate-400 hover:bg-white/10 hover:text-white transition-all"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -78,16 +78,16 @@ const Sidebar: React.FC<SidebarProps> = ({
               key={item.id}
               onClick={() => setActiveTab(item.id)}
               className={`
-                relative w-full flex items-center p-3 rounded-xl transition-all duration-200 group overflow-hidden
+                relative w-full flex items-center p-3 rounded-xl transition-all duration-300 group overflow-hidden
                 ${isActive 
-                  ? 'bg-gradient-to-r from-indigo-500/10 to-blue-500/5 text-white shadow-[0_0_20px_rgba(99,102,241,0.15)] border border-indigo-500/20' 
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border border-transparent'
+                  ? 'bg-white/10 backdrop-blur-md text-white shadow-[0_4px_20px_-2px_rgba(99,102,241,0.2)] border border-white/10' 
+                  : 'text-slate-400 hover:text-white hover:bg-white/5 border border-transparent'
                 } 
                 ${isCollapsed ? 'justify-center' : 'space-x-3'}
               `}
             >
               {isActive && (
-                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-500 rounded-r-full shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
+                <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-indigo-500 rounded-r-full shadow-[0_0_15px_rgba(99,102,241,0.8)]" />
               )}
               
               <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-indigo-400' : 'group-hover:text-slate-200'} transition-colors`} />

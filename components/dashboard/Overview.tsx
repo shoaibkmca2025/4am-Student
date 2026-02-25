@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import StatsCard from './StatsCard';
+import TiltCard from './TiltCard';
 import SkillRadar from './widgets/SkillRadar';
 import ActivityHeatmap from './widgets/ActivityHeatmap';
 import JobMatches from './widgets/JobMatches';
@@ -63,49 +64,49 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="saas-card relative overflow-hidden group"
+        className="bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl relative overflow-hidden group"
       >
         {/* Animated Background Mesh */}
-        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-blue-500/10 opacity-50 group-hover:opacity-70 transition-opacity duration-1000"></div>
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl -mr-20 -mt-20 animate-pulse"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-blue-500/10 opacity-30 group-hover:opacity-50 transition-opacity duration-1000"></div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl -mr-20 -mt-20 animate-pulse"></div>
         
-        <div className="relative z-10 p-8 md:p-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-          <div className="space-y-4 max-w-2xl">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold flex items-center gap-1.5">
+        <div className="relative z-10 p-4 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="space-y-2 max-w-2xl">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="px-2 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-semibold flex items-center gap-1.5">
                 <Crown className="w-3 h-3" />
                 Premium Member
               </span>
-              <span className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold flex items-center gap-1.5">
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-semibold flex items-center gap-1.5">
                 <TrendingUp className="w-3 h-3" />
                 Top 10%
               </span>
             </div>
             
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white">
               {greeting}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">{userName}</span>
             </h1>
             
-            <p className="text-slate-300 text-lg leading-relaxed max-w-xl font-medium">
+            <p className="text-slate-300 text-sm leading-relaxed max-w-xl font-medium">
               {motivation}
             </p>
 
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-               <div className="flex items-center gap-3 bg-slate-800/50 p-2 pr-4 rounded-full border border-slate-700/50 backdrop-blur-sm">
-                  <div className="p-2 bg-amber-500/20 rounded-full text-amber-400">
-                    <Flame className="w-5 h-5 fill-amber-500/20" />
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+               <div className="flex items-center gap-2 bg-slate-800/50 p-1 pr-2.5 rounded-full border border-slate-700/50 backdrop-blur-sm">
+                  <div className="p-1 bg-amber-500/20 rounded-full text-amber-400">
+                    <Flame className="w-3.5 h-3.5 fill-amber-500/20" />
                   </div>
                   <div>
-                    <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Current Streak</p>
-                    <p className="text-sm font-bold text-white">5 Days</p>
+                    <p className="text-[9px] text-slate-400 uppercase tracking-wider font-semibold">Streak</p>
+                    <p className="text-[11px] font-bold text-white">5 Days</p>
                   </div>
                </div>
                
-               <div className="h-8 w-px bg-slate-700/50 hidden sm:block"></div>
+               <div className="h-5 w-px bg-slate-700/50 hidden sm:block"></div>
                
                <div className="flex items-center gap-2">
-                  <span className="text-slate-400 text-sm">Next Level:</span>
-                  <div className="w-32 h-2 bg-slate-800 rounded-full overflow-hidden">
+                  <span className="text-slate-400 text-[11px]">Next Level:</span>
+                  <div className="w-20 h-1.5 bg-slate-800 rounded-full overflow-hidden">
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: "75%" }}
@@ -113,25 +114,25 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
                       className="h-full bg-gradient-to-r from-indigo-500 to-purple-500"
                     />
                   </div>
-                  <span className="text-xs font-bold text-indigo-400">75%</span>
+                  <span className="text-[11px] font-bold text-indigo-400">75%</span>
                </div>
             </div>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 min-w-[200px]">
+          <div className="flex flex-col sm:flex-row gap-3 min-w-[180px]">
             <button 
               onClick={() => setActiveTab('skills')}
-              className="saas-button-primary flex items-center justify-center gap-2 group shadow-lg shadow-indigo-500/20"
+              className="bg-indigo-600/80 backdrop-blur-md hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20 border border-indigo-400/30 flex items-center justify-center gap-2 group text-sm"
             >
-              <BookOpen className="w-5 h-5" />
+              <BookOpen className="w-4 h-4" />
               <span>Continue Learning</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
             </button>
             <button 
               onClick={() => setShowGoals(true)}
-              className="saas-button-secondary flex items-center justify-center gap-2 backdrop-blur-sm bg-slate-800/30 hover:bg-slate-800/50"
+              className="saas-button-secondary flex items-center justify-center gap-2 backdrop-blur-sm bg-slate-800/30 hover:bg-slate-800/50 py-2 px-4 text-sm"
             >
-              <Target className="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" />
+              <Target className="w-4 h-4 text-slate-400 group-hover:text-white transition-colors" />
               <span>View Goals</span>
             </button>
           </div>
@@ -139,18 +140,89 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
       </motion.div>
 
       {/* 2. KPI Metrics Row (Advanced Cards) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <StatsCard 
-          title="Career Readiness" 
-          value="78%" 
-          icon={TrendingUp} 
-          trend="+12% this week" 
-          trendUp={true} 
-          color="primary" 
-          progress={78}
-          variant="circular"
-          tooltip="Overall readiness based on resume, skills, and mock interviews."
-        />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+        {/* Career Readiness Breakdown - Spans 2 Columns */}
+        <TiltCard 
+          className="col-span-1 md:col-span-2 lg:col-span-2 bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 relative overflow-hidden group"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+           {/* Background effects */}
+           <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl -mr-10 -mt-10 opacity-30 group-hover:opacity-60 transition-opacity duration-500" style={{ transform: 'translateZ(-20px)' }}></div>
+
+           <div className="relative z-10" style={{ transform: 'translateZ(20px)' }}>
+              <div className="flex justify-between items-start mb-3">
+                 <div className="flex items-center gap-2.5">
+                    <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 ring-1 ring-inset ring-indigo-500/20 shadow-lg shadow-indigo-500/10 group-hover:scale-110 transition-transform duration-300">
+                       <TrendingUp className="w-4 h-4" />
+                    </div>
+                    <div>
+                       <h3 className="text-base font-bold text-slate-200 group-hover:text-white transition-colors">Career Readiness</h3>
+                       <p className="text-[10px] text-slate-400">AI-Calculated Probability</p>
+                    </div>
+                 </div>
+                 <div className="flex items-center gap-1 text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-lg text-[10px] font-medium group-hover:scale-105 transition-transform duration-300">
+                    <TrendingUp className="w-3 h-3" />
+                    <span>+12% this week</span>
+                 </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4 items-center">
+                 {/* Main Circular Score */}
+                 <div className="relative w-24 h-24 flex-shrink-0 group-hover:scale-110 transition-transform duration-500" style={{ transform: 'translateZ(30px)' }}>
+                     <svg className="w-full h-full transform -rotate-90">
+                        <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-slate-800" />
+                        <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="6" fill="transparent" strokeDasharray="251" strokeDashoffset={251 - (251 * 0.78)} strokeLinecap="round" className="text-indigo-500 transition-all duration-1000 ease-out" />
+                     </svg>
+                     <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-2xl font-bold text-white">78%</span>
+                        <span className="text-[9px] text-slate-400 uppercase tracking-wider font-semibold">Ready</span>
+                     </div>
+                 </div>
+
+                 {/* Breakdown Metrics */}
+                 <div className="flex-1 w-full space-y-2">
+                    {[
+                       { label: 'Resume Quality', value: 85, color: 'bg-emerald-500', icon: FileText, tip: 'Strong action verbs used.' },
+                       { label: 'Skills Match', value: 72, color: 'bg-blue-500', icon: Code, tip: 'Missing TypeScript.' },
+                       { label: 'Interview Readiness', value: 65, color: 'bg-purple-500', icon: MessageSquare, tip: 'Practice behavioral Qs.' },
+                    ].map((metric, idx) => (
+                       <div key={idx} className="group/metric relative cursor-help">
+                          <div className="flex justify-between text-[10px] mb-1">
+                             <span className="text-slate-300 flex items-center gap-1.5 font-medium">
+                                <metric.icon className="w-3 h-3 text-slate-500" /> {metric.label}
+                             </span>
+                             <span className="text-slate-200 font-bold">{metric.value}%</span>
+                          </div>
+                          <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                             <motion.div 
+                                initial={{ width: 0 }}
+                                animate={{ width: `${metric.value}%` }}
+                                transition={{ delay: 0.5 + (idx * 0.1), duration: 1 }}
+                                className={`h-full ${metric.color}`}
+                             />
+                          </div>
+                          
+                          {/* Hover Tooltip */}
+                          <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-max max-w-[150px] p-2 bg-slate-900/95 backdrop-blur-md border border-slate-700/50 rounded-lg text-[10px] text-slate-300 opacity-0 invisible group-hover/metric:opacity-100 group-hover/metric:visible transition-all duration-200 z-50 pointer-events-none shadow-xl">
+                             {metric.tip}
+                             <div className="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-slate-900/95 transform rotate-45 border-r border-b border-slate-700/50"></div>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+              </div>
+
+              {/* AI Insight Footer */}
+              <div className="mt-3 pt-2.5 border-t border-white/5 flex items-start gap-2 bg-gradient-to-r from-amber-500/5 to-transparent -mx-5 -mb-5 p-3">
+                 <Sparkles className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-0.5 animate-pulse" />
+                 <p className="text-xs text-slate-300 leading-snug">
+                    <span className="text-amber-400 font-bold">AI Insight:</span> You are <span className="text-white font-bold underline decoration-indigo-500/50 underline-offset-2">2 skills away</span> (TypeScript, Testing) from increasing your readiness to 85%.
+                 </p>
+              </div>
+           </div>
+        </TiltCard>
+
         <StatsCard 
           title="Applications" 
           value="12" 
@@ -295,10 +367,10 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
                 ))}
               </div>
 
-              <div className="p-4 border-t border-slate-800 bg-slate-900/50 flex justify-end">
+              <div className="p-4 border-t border-white/10 bg-slate-900/50 flex justify-end">
                 <button 
                   onClick={() => setShowGoals(false)}
-                  className="saas-button-primary"
+                  className="bg-indigo-600/80 backdrop-blur-md hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-xl transition-all shadow-lg shadow-indigo-500/20 border border-indigo-400/30"
                 >
                   Close
                 </button>

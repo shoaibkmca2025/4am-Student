@@ -38,9 +38,9 @@ const ActivityHeatmap: React.FC = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
-      className="saas-card p-6 relative overflow-hidden group"
+      className="bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 relative overflow-hidden group"
     >
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-bold text-slate-200 flex items-center gap-2">
           <Flame className="w-5 h-5 text-emerald-400" />
           Learning Activity

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Save, Download, Plus, Trash2, Wand2 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { Save, Download, Plus, Trash2, Wand2, Lightbulb, Check, AlertCircle, ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface ResumeHeader {
   fullName: string;
@@ -10,6 +10,14 @@ interface ResumeHeader {
   location: string;
   website: string;
   summary: string;
+}
+
+interface Suggestion {
+  id: string;
+  message: string;
+  type: 'improvement' | 'warning' | 'success';
+  applyFix?: () => void;
+  fixed?: boolean;
 }
 
 interface Experience {
@@ -122,6 +130,72 @@ const ResumeBuilder: React.FC = () => {
   const [activeSection, setActiveSection] = useState('header');
   const [resumeData, setResumeData] = useState<ResumeData>(initialResumeState);
   const [isSaving, setIsSaving] = useState(false);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+
+  // Simulated AI Analysis
+  useEffect(() => {
+    analyzeResume();
+  }, [resumeData, activeSection]);
+
+  const analyzeResume = () => {
+    const newSuggestions: Suggestion[] = [];
+
+    if (activeSection === 'header') {
+      if (resumeData.header.summary.length > 300) {
+        newSuggestions.push({
+          id: 'summary-length',
+          message: 'Summary is too long. Keep it under 3 lines for better readability.',
+          type: 'warning',
+          applyFix: () => {
+             setResumeData(prev => ({
+               ...prev,
+               header: { ...prev.header, summary: prev.header.summary.substring(0, 250) + '.' }
+             }));
+          }
+        });
+      }
+      if (!resumeData.header.summary.includes('passionate') && !resumeData.header.summary.includes('proven')) {
+         newSuggestions.push({
+            id: 'summary-power-words',
+            message: 'Use power words like "Passionate" or "Proven track record".',
+            type: 'improvement',
+            applyFix: () => {
+               setResumeData(prev => ({
+                  ...prev,
+                  header: { ...prev.header, summary: 'Passionate ' + prev.header.summary.charAt(0).toLowerCase() + prev.header.summary.slice(1) }
+               }));
+            }
+         });
+      }
+    }
+
+    if (activeSection === 'experience') {
+       resumeData.experience.forEach((exp, idx) => {
+          if (exp.description && !exp.description.match(/\d+%/)) {
+             newSuggestions.push({
+                id: `exp-metrics-${idx}`,
+                message: `Add specific metrics to ${exp.company} role (e.g., "improved by 20%").`,
+                type: 'improvement',
+                applyFix: () => {
+                   updateExperience(exp.id, 'description', exp.description + ' Resulted in a 15% improvement in overall efficiency.');
+                }
+             });
+          }
+          if (exp.description && exp.description.startsWith('Worked on')) {
+             newSuggestions.push({
+                id: `exp-verb-${idx}`,
+                message: `Replace weak verb "Worked on" with "Architected" or "Developed".`,
+                type: 'warning',
+                applyFix: () => {
+                   updateExperience(exp.id, 'description', exp.description.replace('Worked on', 'Architected'));
+                }
+             });
+          }
+       });
+    }
+
+    setSuggestions(newSuggestions);
+  };
 
   const handleSave = () => {
     setIsSaving(true);
@@ -300,18 +374,18 @@ const ResumeBuilder: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-12 gap-8">
+      <div className="grid lg:grid-cols-12 gap-6">
         {/* Navigation Sidebar */}
-        <div className="lg:col-span-3">
+        <div className="lg:col-span-2">
           <div className="saas-card p-2 sticky top-24 space-y-1">
             {['Header', 'Experience', 'Education', 'Projects', 'Skills'].map((section) => (
               <button
                 key={section}
                 onClick={() => setActiveSection(section.toLowerCase())}
-                className={`w-full text-left px-4 py-2.5 rounded-md transition-all duration-200 text-sm font-medium flex items-center justify-between group ${
+                className={`w-full text-left px-3 py-2 rounded-md transition-all duration-200 text-xs font-medium flex items-center justify-between group ${
                   activeSection === section.toLowerCase()
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                    ? 'bg-primary/10 text-primary border border-primary/20'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent'
                 }`}
               >
                 <span>{section}</span>
@@ -327,22 +401,27 @@ const ResumeBuilder: React.FC = () => {
         </div>
 
         {/* Form Area */}
-        <div className="lg:col-span-9 space-y-6">
+        <div className="lg:col-span-7 space-y-6">
           <motion.div 
             key={activeSection}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
-            className="saas-card p-8"
+            className="saas-card p-6 min-h-[500px]"
           >
             <div className="flex justify-between items-center mb-6 pb-6 border-b border-slate-800">
-              <h3 className="text-lg font-semibold text-slate-200 capitalize">{activeSection}</h3>
+              <h3 className="text-lg font-semibold text-slate-200 capitalize flex items-center gap-2">
+                 {activeSection}
+                 <span className="text-[10px] font-normal text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">
+                    AI Optimized
+                 </span>
+              </h3>
               <button 
                 onClick={handleAIEnhance}
-                className="flex items-center space-x-2 text-primary hover:text-white hover:bg-primary text-xs font-medium bg-primary/10 px-3 py-1.5 rounded-md border border-primary/20 transition-all shadow-sm active:scale-95"
+                className="flex items-center space-x-2 text-white bg-indigo-600 hover:bg-indigo-500 text-xs font-bold px-3 py-1.5 rounded-md transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
               >
                 <Wand2 className="w-3.5 h-3.5" />
-                <span>AI Enhance</span>
+                <span>Auto-Enhance</span>
               </button>
             </div>
 
@@ -657,6 +736,96 @@ const ResumeBuilder: React.FC = () => {
               </div>
             )}
           </motion.div>
+        </div>
+        {/* AI Feedback Sidebar */}
+        <div className="lg:col-span-3 space-y-4">
+            <div className="sticky top-24">
+                <div className="saas-card p-4 border-indigo-500/20 bg-indigo-500/5">
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="p-1.5 bg-indigo-500/10 rounded-lg">
+                            <Lightbulb className="w-4 h-4 text-indigo-400" />
+                        </div>
+                        <h4 className="font-bold text-slate-200 text-sm">AI Suggestions</h4>
+                    </div>
+
+                    <div className="space-y-3">
+                        <AnimatePresence mode='popLayout'>
+                            {suggestions.length > 0 ? (
+                                suggestions.map((suggestion) => (
+                                    <motion.div
+                                        key={suggestion.id}
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        className={`p-3 rounded-lg border text-xs ${
+                                            suggestion.type === 'warning' 
+                                            ? 'bg-amber-500/10 border-amber-500/20 text-amber-200' 
+                                            : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-200'
+                                        }`}
+                                    >
+                                        <div className="flex gap-2 items-start">
+                                            {suggestion.type === 'warning' ? (
+                                                <AlertCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-amber-400" />
+                                            ) : (
+                                                <Check className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-emerald-400" />
+                                            )}
+                                            <div>
+                                                <p className="leading-snug mb-2">{suggestion.message}</p>
+                                                {suggestion.applyFix && (
+                                                    <button 
+                                                        onClick={() => {
+                                                            suggestion.applyFix?.();
+                                                            // Optimistically remove suggestion
+                                                            setSuggestions(prev => prev.filter(s => s.id !== suggestion.id));
+                                                        }}
+                                                        className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider transition-colors ${
+                                                            suggestion.type === 'warning'
+                                                            ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300'
+                                                            : 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300'
+                                                        }`}
+                                                    >
+                                                        <Wand2 className="w-3 h-3" />
+                                                        Apply Fix
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                ))
+                            ) : (
+                                <div className="text-center py-8 text-slate-500">
+                                    <Check className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                                    <p className="text-xs">Great job! No suggestions for this section.</p>
+                                </div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </div>
+
+                <div className="saas-card p-4 bg-slate-900/50">
+                    <h4 className="font-bold text-slate-300 text-xs mb-3 uppercase tracking-wider">ATS Strength</h4>
+                    <div className="space-y-3">
+                        <div>
+                            <div className="flex justify-between text-xs mb-1">
+                                <span className="text-slate-400">Keywords</span>
+                                <span className="text-emerald-400 font-bold">Good</span>
+                            </div>
+                            <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                <div className="h-full w-[85%] bg-emerald-500 rounded-full"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div className="flex justify-between text-xs mb-1">
+                                <span className="text-slate-400">Formatting</span>
+                                <span className="text-indigo-400 font-bold">Excellent</span>
+                            </div>
+                            <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                <div className="h-full w-[95%] bg-indigo-500 rounded-full"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
       </div>
     </div>

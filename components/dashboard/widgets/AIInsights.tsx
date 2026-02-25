@@ -52,7 +52,7 @@ const AIInsights: React.FC = () => {
         
         {/* View All Card */}
         <motion.div 
-            className="flex-shrink-0 w-32 flex flex-col items-center justify-center saas-card p-4 hover:bg-slate-800/80 transition-colors cursor-pointer snap-start group"
+            className="flex-shrink-0 w-32 flex flex-col items-center justify-center bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-4 hover:bg-slate-800/80 transition-colors cursor-pointer snap-start group"
             whileHover={{ scale: 1.05 }}
         >
             <div className="p-3 bg-slate-800 rounded-full mb-2 group-hover:bg-slate-700 transition-colors">
