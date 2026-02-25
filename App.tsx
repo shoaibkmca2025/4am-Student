@@ -1,28 +1,23 @@
-
 import React from 'react';
-import Navbar from './components/Navbar';
-import Hero from './components/Hero';
-import About from './components/About';
-import Services from './components/Services';
-import Internship from './components/Internship';
-import Features from './components/Features';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LandingPage from './pages/LandingPage';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+
+import AssessmentPage from './pages/AssessmentPage';
 
 function App() {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-50">
-      <Navbar />
-      <main>
-        <Hero />
-        <About />
-        <Services />
-        <Internship />
-        <Features />
-        <Contact />
-      </main>
-      <Footer />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/assessment/:id" element={<AssessmentPage />} />
+      </Routes>
+    </Router>
   );
 }
 

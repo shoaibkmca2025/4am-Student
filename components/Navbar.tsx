@@ -1,11 +1,13 @@
-
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { NAV_LINKS } from '../constants';
 import logoImage from '../4am logo.jpeg';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,8 +62,25 @@ const Navbar: React.FC = () => {
                 {link.label}
               </button>
             ))}
+            
+            {isAuthenticated ? (
+              <button 
+                onClick={() => navigate('/dashboard')}
+                className="text-slate-300 hover:text-sky-400 transition-colors font-medium text-sm focus:outline-none"
+              >
+                Dashboard
+              </button>
+            ) : (
+              <button 
+                onClick={() => navigate('/login')}
+                className="text-slate-300 hover:text-sky-400 transition-colors font-medium text-sm focus:outline-none"
+              >
+                Login
+              </button>
+            )}
+
             <button 
-              onClick={(e) => scrollToSection(e, 'contact')}
+              onClick={() => navigate('/register')}
               className="bg-white text-slate-950 px-6 py-2.5 rounded-full font-bold text-sm hover:bg-sky-400 hover:text-white transition-all shadow-lg shadow-sky-500/10 focus:outline-none"
             >
               Get Started
@@ -78,7 +97,6 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <div className={`md:hidden absolute top-full left-0 w-full glass border-t border-white/10 transition-all duration-500 ease-in-out overflow-hidden ${isMobileMenuOpen ? 'max-h-96 py-6 opacity-100' : 'max-h-0 py-0 opacity-0 pointer-events-none'}`}>
         <div className="flex flex-col space-y-4 px-4">
           {NAV_LINKS.map((link) => (
@@ -90,8 +108,25 @@ const Navbar: React.FC = () => {
               {link.label}
             </button>
           ))}
+          
+          {isAuthenticated ? (
+            <button 
+              onClick={() => navigate('/dashboard')}
+              className="text-slate-300 text-lg font-medium hover:text-sky-400 py-3 border-b border-white/5 text-left focus:outline-none"
+            >
+              Dashboard
+            </button>
+          ) : (
+            <button 
+              onClick={() => navigate('/login')}
+              className="text-slate-300 text-lg font-medium hover:text-sky-400 py-3 border-b border-white/5 text-left focus:outline-none"
+            >
+              Login
+            </button>
+          )}
+
           <button 
-            onClick={(e) => scrollToSection(e, 'contact')}
+            onClick={() => navigate('/register')}
             className="bg-sky-500 text-white px-5 py-4 rounded-xl font-bold text-center mt-4 shadow-lg shadow-sky-500/20 focus:outline-none"
           >
             Get Started
