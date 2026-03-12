@@ -1,8 +1,12 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { body } from 'express-validator';
 import User from '../models/User.js';
 import { requireAuth } from '../middleware/auth.js';
+import { authLimiter } from '../middleware/rateLimiter.js';
+import validate from '../middleware/validate.js';
+import { createNotification } from '../utils/notifications.js';
 
 const router = express.Router();
 
@@ -18,22 +22,36 @@ const signToken = (userId) => {
   return jwt.sign({ sub: userId }, secret, { expiresIn: '7d' });
 };
 
-router.post('/register', async (req, res, next) => {
-  try {
-    const name = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
-    const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
-    const password = typeof req.body?.password === 'string' ? req.body.password : '';
-    const role = req.body?.role === 'company' ? 'company' : 'student';
+const registerValidation = [
+  body('name').trim().notEmpty().withMessage('Name is required').isLength({ max: 100 }).withMessage('Name too long'),
+  body('email').trim().isEmail().withMessage('Valid email is required').normalizeEmail(),
+  body('password')
+    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+    .matches(/[A-Z]/).withMessage('Password must contain an uppercase letter')
+    .matches(/[a-z]/).withMessage('Password must contain a lowercase letter')
+    .matches(/\d/).withMessage('Password must contain a number'),
+  body('role').optional().isIn(['student', 'company']).withMessage('Invalid role'),
+  validate
+];
 
-    if (!email || !password) return res.status(400).json({ message: 'Email and password are required' });
-    if (password.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters' });
+router.post('/register', authLimiter, registerValidation, async (req, res, next) => {
+  try {
+    const { name, email, password } = req.body;
+    const role = req.body.role === 'company' ? 'company' : 'student';
 
     const existing = await User.findOne({ email });
     if (existing) return res.status(409).json({ message: 'Email already registered' });
 
-    const passwordHash = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, passwordHash, role });
+    const passwordHash = await bcrypt.hash(password, 12);
+    const user = await User.create({ name: name.trim(), email, passwordHash, role });
     const token = signToken(user._id.toString());
+
+    await createNotification({
+      userId: user._id,
+      title: 'Welcome to 4AM!',
+      message: 'Your account has been created successfully. Start exploring!',
+      type: 'success'
+    });
 
     return res.status(201).json({
       token,
@@ -44,12 +62,15 @@ router.post('/register', async (req, res, next) => {
   }
 });
 
-router.post('/login', async (req, res, next) => {
-  try {
-    const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
-    const password = typeof req.body?.password === 'string' ? req.body.password : '';
+const loginValidation = [
+  body('email').trim().isEmail().withMessage('Valid email is required').normalizeEmail(),
+  body('password').notEmpty().withMessage('Password is required'),
+  validate
+];
 
-    if (!email || !password) return res.status(400).json({ message: 'Email and password are required' });
+router.post('/login', authLimiter, loginValidation, async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
 
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });
@@ -70,6 +91,71 @@ router.post('/login', async (req, res, next) => {
 
 router.get('/me', requireAuth, async (req, res) => {
   return res.json({ user: req.user });
+});
+
+// Password reset request (generates token, in production would send email)
+router.post('/forgot-password', authLimiter, [
+  body('email').trim().isEmail().withMessage('Valid email is required').normalizeEmail(),
+  validate
+], async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    // Always return success to prevent email enumeration
+    if (!user) return res.json({ message: 'If the email exists, a reset link has been sent.' });
+
+    const secret = getJwtSecret();
+    const resetToken = jwt.sign({ sub: user._id, purpose: 'password-reset' }, secret, { expiresIn: '1h' });
+
+    // In production, send email with reset link
+    // For now, store the token on the user (demo purposes)
+    user.resetToken = resetToken;
+    user.resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000);
+    await user.save();
+
+    return res.json({ message: 'If the email exists, a reset link has been sent.' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post('/reset-password', authLimiter, [
+  body('token').notEmpty().withMessage('Reset token is required'),
+  body('password')
+    .isLength({ min: 8 }).withMessage('Password must be at least 8 characters')
+    .matches(/[A-Z]/).withMessage('Password must contain an uppercase letter')
+    .matches(/[a-z]/).withMessage('Password must contain a lowercase letter')
+    .matches(/\d/).withMessage('Password must contain a number'),
+  validate
+], async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+    const secret = getJwtSecret();
+
+    let payload;
+    try {
+      payload = jwt.verify(token, secret);
+    } catch {
+      return res.status(400).json({ message: 'Invalid or expired reset token' });
+    }
+
+    if (payload.purpose !== 'password-reset') {
+      return res.status(400).json({ message: 'Invalid token' });
+    }
+
+    const user = await User.findById(payload.sub);
+    if (!user || user.resetToken !== token) {
+      return res.status(400).json({ message: 'Invalid or expired reset token' });
+    }
+
+    user.passwordHash = await bcrypt.hash(password, 12);
+    user.resetToken = undefined;
+    user.resetTokenExpiry = undefined;
+    await user.save();
+
+    return res.json({ message: 'Password reset successfully' });
+  } catch (err) {
+    next(err);
+  }
 });
 
 export default router;

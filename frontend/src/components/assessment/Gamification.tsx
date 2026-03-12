@@ -40,14 +40,14 @@ const Gamification: React.FC<GamificationProps> = ({ streak, xpGained, show, onH
             {/* Glow Effect */}
             <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 blur-xl opacity-30 animate-pulse"></div>
             
-            <div className="relative bg-slate-900/90 backdrop-blur-xl border border-amber-500/30 p-4 pr-6 rounded-2xl shadow-2xl flex items-center gap-4 overflow-hidden">
+            <div className="relative bg-white/90 backdrop-blur-xl border border-amber-500/30 p-4 pr-6 rounded-2xl shadow-2xl flex items-center gap-4 overflow-hidden">
               {/* Shine Animation */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 translate-x-[-100%] animate-[shine_1s_infinite]" />
 
               <div className="relative flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-lg">
                 <Flame className={`w-6 h-6 ${streak > 3 ? 'animate-bounce' : ''}`} />
                 {streak > 1 && (
-                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-slate-900 shadow-sm">
+                  <div className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border border-sky-200 shadow-sm">
                     {streak}x
                   </div>
                 )}
@@ -57,7 +57,7 @@ const Gamification: React.FC<GamificationProps> = ({ streak, xpGained, show, onH
                 <div className="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-orange-400">
                   +{xpGained} XP
                 </div>
-                <div className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 mt-0.5">
+                <div className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5 mt-0.5">
                   <Sparkles className="w-3 h-3 text-yellow-400" />
                   {message}
                 </div>
@@ -71,3 +71,4 @@ const Gamification: React.FC<GamificationProps> = ({ streak, xpGained, show, onH
 };
 
 export default Gamification;
+

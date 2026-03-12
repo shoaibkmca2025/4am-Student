@@ -1,35 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
 
 // Import Dashboard Components
 import CompanySidebar from '../components/dashboard/CompanySidebar';
 import Header from '../components/dashboard/Header';
 import CompanyOverview from '../components/dashboard/CompanyOverview';
 import Settings from '../components/dashboard/Settings';
+import PostJob from '../components/dashboard/PostJob';
+import ManageApplications from '../components/dashboard/ManageApplications';
 
 const CompanyDashboard: React.FC = () => {
   const navigate = useNavigate();
-  const [userName, setUserName] = useState('Company User');
+  const { user, logout } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  useEffect(() => {
-    const isAuthenticated = localStorage.getItem('isAuthenticated');
-    if (!isAuthenticated) {
-      navigate('/login');
-    }
-    const storedName = localStorage.getItem('userName') || localStorage.getItem('userEmail') || 'Company User';
-    setUserName(storedName);
-  }, [navigate]);
+  const userName = user?.name || 'Company User';
 
   const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userName');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userRole');
+    logout();
     navigate('/');
   };
 
@@ -38,42 +30,18 @@ const CompanyDashboard: React.FC = () => {
       case 'overview':
         return <CompanyOverview userName={userName} setActiveTab={setActiveTab} />;
       case 'post-job':
-        return (
-          <div className="saas-card p-8 text-center">
-            <h2 className="text-2xl font-bold text-slate-100 mb-4">Post a Job</h2>
-            <p className="text-slate-400">Job posting form will be available here.</p>
-          </div>
-        );
+        return <PostJob />;
       case 'candidates':
-        return (
-          <div className="saas-card p-8 text-center">
-            <h2 className="text-2xl font-bold text-slate-100 mb-4">Candidates</h2>
-            <p className="text-slate-400">Candidate search and management will be here.</p>
-          </div>
-        );
-      case 'interviews':
-        return (
-          <div className="saas-card p-8 text-center">
-            <h2 className="text-2xl font-bold text-slate-100 mb-4">Interviews</h2>
-            <p className="text-slate-400">Interview scheduler and management.</p>
-          </div>
-        );
-      case 'profile':
-        return (
-          <div className="saas-card p-8 text-center">
-            <h2 className="text-2xl font-bold text-slate-100 mb-4">Company Profile</h2>
-            <p className="text-slate-400">Edit company details and branding.</p>
-          </div>
-        );
+        return <ManageApplications />;
       case 'settings':
-        return <Settings />;
+        return <Settings userName={userName} userEmail={user?.email || ''} />;
       default:
         return <CompanyOverview userName={userName} setActiveTab={setActiveTab} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-primary/30">
+    <div className="min-h-screen bg-sky-50 text-slate-900 font-sans selection:bg-primary/30">
 
       {/* Sidebar */}
       <div className="hidden lg:block">
@@ -95,7 +63,7 @@ const CompanyDashboard: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMobileSidebarOpen(false)}
-              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden"
+              className="fixed inset-0 bg-sky-900/20 backdrop-blur-sm z-40 lg:hidden"
             />
             <motion.div
               initial={{ x: -280 }}
@@ -148,3 +116,4 @@ const CompanyDashboard: React.FC = () => {
 };
 
 export default CompanyDashboard;
+

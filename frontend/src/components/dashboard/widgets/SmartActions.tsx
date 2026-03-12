@@ -68,9 +68,9 @@ const SmartActions: React.FC<SmartActionsProps> = ({ setActiveTab }) => {
       };
       default: return {
         bg: 'from-slate-700/50 to-slate-800/50',
-        border: 'border-slate-600',
-        icon: 'text-slate-400',
-        badge: 'bg-slate-700 text-slate-300',
+        border: 'border-sky-300',
+        icon: 'text-slate-600',
+        badge: 'bg-sky-200 text-slate-700',
         glow: ''
       };
     }
@@ -83,25 +83,25 @@ const SmartActions: React.FC<SmartActionsProps> = ({ setActiveTab }) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-amber-400" />
-          <h3 className="text-xl font-bold text-slate-100">Your Next Best Steps</h3>
+          <h3 className="text-xl font-bold text-slate-900">Your Next Best Steps</h3>
         </div>
-        <span className="text-xs font-medium text-slate-400 bg-slate-800/50 px-2 py-1 rounded-full border border-slate-700 animate-pulse">
+        <span className="text-xs font-medium text-slate-600 bg-sky-100/50 px-2 py-1 rounded-full border border-sky-200 animate-pulse">
           AI Generated
         </span>
       </div>
       
       {!hasActions ? (
-        <div className="flex flex-col items-center justify-center p-8 border border-slate-800 rounded-xl bg-slate-900/40 text-center">
-            <div className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center mb-3">
+        <div className="flex flex-col items-center justify-center p-8 border border-sky-200 rounded-xl bg-white/40 text-center">
+            <div className="w-12 h-12 bg-sky-100 rounded-full flex items-center justify-center mb-3">
                 <Target className="w-6 h-6 text-slate-500" />
             </div>
-            <h4 className="text-slate-200 font-bold text-sm">All caught up!</h4>
-            <p className="text-slate-400 text-xs mt-1 max-w-[200px]">
+            <h4 className="text-slate-800 font-bold text-sm">All caught up!</h4>
+            <p className="text-slate-600 text-xs mt-1 max-w-[200px]">
                 You've completed all recommended actions for now. Great work!
             </p>
             <button 
                 onClick={() => setActiveTab('jobs')}
-                className="mt-4 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg text-xs font-bold transition-colors border border-slate-700"
+                className="mt-4 px-4 py-2 bg-sky-100 hover:bg-sky-200 text-slate-800 rounded-lg text-xs font-bold transition-colors border border-sky-200"
             >
                 Browse Jobs
             </button>
@@ -138,13 +138,13 @@ const SmartActions: React.FC<SmartActionsProps> = ({ setActiveTab }) => {
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none bg-gradient-to-r from-transparent via-white/5 to-transparent -skew-x-12 translate-x-[-100%] group-hover:translate-x-[100%]" />
 
               <div className="flex items-start gap-4 relative z-10">
-                <div className={`p-3 rounded-lg bg-slate-900/50 backdrop-blur-sm border border-white/10 ${styles.icon}`}>
+                <div className={`p-3 rounded-lg bg-white/50 backdrop-blur-sm border border-white/10 ${styles.icon}`}>
                   <action.icon className="w-6 h-6" />
                 </div>
                 
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-semibold text-slate-200 group-hover:text-white transition-colors">
+                    <h4 className="font-semibold text-slate-800 group-hover:text-primary transition-colors">
                       {action.title}
                     </h4>
                     {!isTopPriority && (
@@ -154,7 +154,7 @@ const SmartActions: React.FC<SmartActionsProps> = ({ setActiveTab }) => {
                     )}
                   </div>
                   
-                  <p className="text-sm text-slate-400 leading-relaxed pr-8">
+                  <p className="text-sm text-slate-600 leading-relaxed pr-8">
                     {action.description}
                   </p>
                   
@@ -173,7 +173,7 @@ const SmartActions: React.FC<SmartActionsProps> = ({ setActiveTab }) => {
                 </div>
 
                 <div className="absolute right-0 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-4 group-hover:translate-x-0">
-                  <div className="bg-slate-800/80 p-2 rounded-full border border-slate-700 text-white shadow-lg backdrop-blur-sm">
+                  <div className="bg-sky-100/80 p-2 rounded-full border border-sky-200 text-slate-900 shadow-lg backdrop-blur-sm">
                     <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>
@@ -188,7 +188,7 @@ const SmartActions: React.FC<SmartActionsProps> = ({ setActiveTab }) => {
       <motion.button
         whileHover={{ scale: 1.02 }}
         whileTap={{ scale: 0.98 }}
-        className="w-full py-3 mt-2 text-sm font-medium text-slate-400 hover:text-white bg-slate-900/40 backdrop-blur-sm border border-white/10 hover:border-white/20 rounded-xl transition-all flex items-center justify-center gap-2 group"
+        className="w-full py-3 mt-2 text-sm font-medium text-slate-600 hover:text-primary bg-white/40 backdrop-blur-sm border border-white/10 hover:border-white/20 rounded-xl transition-all flex items-center justify-center gap-2 group"
       >
         <Target className="w-4 h-4 group-hover:text-primary transition-colors" />
         View All Recommendations
@@ -199,3 +199,5 @@ const SmartActions: React.FC<SmartActionsProps> = ({ setActiveTab }) => {
 };
 
 export default SmartActions;
+
+

@@ -33,12 +33,12 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     >
       
       <div className="flex items-start gap-4 mb-8 relative z-10">
-        <div className="p-3 bg-slate-800 rounded-lg border border-slate-700">
+        <div className="p-3 bg-sky-100 rounded-lg border border-sky-200">
           {type === 'code-challenge' ? <Code className="w-6 h-6 text-violet-400" /> :
            type === 'text-input' ? <Type className="w-6 h-6 text-sky-400" /> :
-           <span className="text-xl font-bold text-slate-400">?</span>}
+           <span className="text-xl font-bold text-slate-600">?</span>}
         </div>
-        <h2 className="text-xl md:text-2xl font-bold text-slate-200 leading-snug">
+        <h2 className="text-xl md:text-2xl font-bold text-slate-800 leading-snug">
           {question}
         </h2>
       </div>
@@ -58,13 +58,13 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
 
         {type === 'code-challenge' && (
           <div className="relative">
-            <div className="absolute top-0 right-0 p-2 text-xs text-slate-500 bg-slate-900 rounded-bl-lg border-l border-b border-slate-700">
+            <div className="absolute top-0 right-0 p-2 text-xs text-slate-500 bg-white rounded-bl-lg border-l border-b border-sky-200">
               JavaScript
             </div>
             <textarea
               value={selectedOption as string || codeSnippet || ''}
               onChange={(e) => onSelect(e.target.value)}
-              className="w-full h-64 bg-slate-950 text-slate-300 font-mono text-sm p-4 rounded-lg border border-slate-800 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none resize-none"
+              className="w-full h-64 bg-sky-50 text-slate-700 font-mono text-sm p-4 rounded-lg border border-sky-200 focus:border-violet-500 focus:ring-1 focus:ring-violet-500 outline-none resize-none"
               spellCheck={false}
               placeholder="// Write your solution here..."
             />
@@ -75,7 +75,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           <textarea
             value={selectedOption as string || ''}
             onChange={(e) => onSelect(e.target.value)}
-            className="w-full h-40 bg-slate-900/50 text-slate-200 p-4 rounded-lg border border-slate-700 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none resize-none"
+            className="w-full h-40 bg-white/50 text-slate-800 p-4 rounded-lg border border-sky-200 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 outline-none resize-none"
             placeholder="Type your answer here..."
           />
         )}
@@ -85,3 +85,4 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
 };
 
 export default QuestionCard;
+

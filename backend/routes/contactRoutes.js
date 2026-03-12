@@ -1,19 +1,22 @@
 import express from 'express';
+import { body } from 'express-validator';
 import ContactMessage from '../models/ContactMessage.js';
+import { contactLimiter } from '../middleware/rateLimiter.js';
+import validate from '../middleware/validate.js';
 
 const router = express.Router();
 
-router.post('/', async (req, res, next) => {
+router.post('/', contactLimiter, [
+  body('name').trim().isLength({ max: 100 }).withMessage('Name too long'),
+  body('email').trim().isEmail().withMessage('Valid email is required').normalizeEmail(),
+  body('interest').optional().trim().isLength({ max: 100 }),
+  body('message').trim().notEmpty().withMessage('Message is required').isLength({ max: 2000 }).withMessage('Message too long'),
+  validate
+], async (req, res, next) => {
   try {
-    const name = typeof req.body?.name === 'string' ? req.body.name.trim() : '';
-    const email = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
-    const interest = typeof req.body?.interest === 'string' ? req.body.interest.trim() : '';
-    const message = typeof req.body?.message === 'string' ? req.body.message.trim() : '';
-
-    if (!email || !message) return res.status(400).json({ message: 'Email and message are required' });
-
-    await ContactMessage.create({ name, email, interest, message });
-    return res.status(201).json({ ok: true });
+    const { name, email, interest, message } = req.body;
+    await ContactMessage.create({ name: name || '', email, interest: interest || '', message });
+    return res.status(201).json({ ok: true, message: 'Message sent successfully' });
   } catch (err) {
     next(err);
   }

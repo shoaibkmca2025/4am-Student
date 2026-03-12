@@ -83,17 +83,17 @@ const Jobs: React.FC<JobsProps> = ({ setActiveTab }) => {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-200 mb-2">
+          <h2 className="text-2xl font-bold text-slate-800 mb-2">
             {showSavedOnly ? 'Saved Jobs' : 'Job Recommendations'}
           </h2>
-          <p className="text-slate-400">
+          <p className="text-slate-600">
             {showSavedOnly ? 'Your bookmarked opportunities.' : 'Curated opportunities will appear here.'}
           </p>
         </div>
         <div className="flex space-x-2">
           <button 
             onClick={() => setShowFilters(!showFilters)}
-            className={`saas-button-secondary flex items-center gap-2 ${showFilters ? 'bg-slate-700 text-white' : ''}`}
+            className={`saas-button-secondary flex items-center gap-2 ${showFilters ? 'bg-sky-200 text-slate-900' : ''}`}
           >
             <Filter className="w-4 h-4" /> Filters
           </button>
@@ -108,11 +108,11 @@ const Jobs: React.FC<JobsProps> = ({ setActiveTab }) => {
       </div>
 
       {showFilters && (
-        <div className="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50 mb-6 flex gap-4 animate-in slide-in-from-top-2">
+        <div className="bg-sky-100/50 p-4 rounded-xl border border-sky-200/50 mb-6 flex gap-4 animate-in slide-in-from-top-2">
           <select 
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="bg-slate-900 border border-slate-700 text-slate-300 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5"
+            className="bg-white border border-sky-200 text-slate-700 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2.5"
           >
             <option value="All">All Types</option>
             <option value="Full-time">Full-time</option>
@@ -124,9 +124,9 @@ const Jobs: React.FC<JobsProps> = ({ setActiveTab }) => {
       )}
 
       {filteredJobs.length === 0 ? (
-        <div className="text-center py-16 bg-slate-800/30 rounded-2xl border border-slate-700/50">
+        <div className="text-center py-16 bg-sky-100/30 rounded-2xl border border-sky-200/50">
             <Briefcase className="w-16 h-16 mx-auto text-slate-600 mb-4" />
-            <h3 className="text-xl font-semibold text-slate-300 mb-2">No Jobs Found</h3>
+            <h3 className="text-xl font-semibold text-slate-700 mb-2">No Jobs Found</h3>
             <p className="text-slate-500 max-w-md mx-auto mb-6">
               {showSavedOnly 
                 ? "You haven't saved any jobs yet." 
@@ -162,7 +162,7 @@ const Jobs: React.FC<JobsProps> = ({ setActiveTab }) => {
                 className={`p-1.5 rounded-full transition-all ${
                   isSaved 
                     ? 'text-emerald-400 bg-emerald-400/10 hover:bg-emerald-400/20' 
-                    : 'text-slate-500 hover:text-slate-300 hover:bg-slate-700'
+                    : 'text-slate-500 hover:text-slate-700 hover:bg-sky-200'
                 }`}
               >
                 <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
@@ -170,14 +170,14 @@ const Jobs: React.FC<JobsProps> = ({ setActiveTab }) => {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-slate-800/50 rounded-lg flex items-center justify-center text-slate-200 font-bold text-xl border border-slate-700/50 group-hover:scale-110 transition-transform shadow-none">
+              <div className="w-12 h-12 bg-sky-100/50 rounded-lg flex items-center justify-center text-slate-800 font-bold text-xl border border-sky-200/50 group-hover:scale-110 transition-transform shadow-none">
                 {job.company.charAt(0)}
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-slate-200 group-hover:text-primary transition-colors">{job.title}</h3>
-                <p className="text-slate-400 text-sm mb-3">{job.company}</p>
+                <h3 className="text-lg font-bold text-slate-800 group-hover:text-primary transition-colors">{job.title}</h3>
+                <p className="text-slate-600 text-sm mb-3">{job.company}</p>
                 
-                <div className="flex flex-wrap gap-4 text-sm text-slate-400">
+                <div className="flex flex-wrap gap-4 text-sm text-slate-600">
                   <div className="flex items-center gap-1.5">
                     <MapPin className="w-4 h-4" />
                     {job.location}
@@ -213,3 +213,5 @@ const Jobs: React.FC<JobsProps> = ({ setActiveTab }) => {
 };
 
 export default Jobs;
+
+

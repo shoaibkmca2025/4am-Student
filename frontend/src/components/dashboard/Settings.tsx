@@ -141,8 +141,8 @@ const Settings: React.FC<SettingsProps> = ({ userName: initialName = '', userEma
     <div className="space-y-8 max-w-4xl mx-auto pb-12">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h2 className="text-2xl font-bold text-slate-200 mb-2">Account Settings</h2>
-          <p className="text-slate-400">Manage your profile, preferences, and security.</p>
+          <h2 className="text-2xl font-bold text-slate-800 mb-2">Account Settings</h2>
+          <p className="text-slate-600">Manage your profile, preferences, and security.</p>
         </div>
         {message && (
           <div className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 ${message.type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
@@ -157,7 +157,7 @@ const Settings: React.FC<SettingsProps> = ({ userName: initialName = '', userEma
         {/* Profile Section */}
         <div className="saas-card p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-slate-200 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
               <User className="w-5 h-5 text-primary" />
               Profile Information
             </h3>
@@ -171,7 +171,7 @@ const Settings: React.FC<SettingsProps> = ({ userName: initialName = '', userEma
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <label className="text-sm text-slate-400">Full Name</label>
+              <label className="text-sm text-slate-600">Full Name</label>
               <input
                 type="text"
                 value={profile.name}
@@ -182,7 +182,7 @@ const Settings: React.FC<SettingsProps> = ({ userName: initialName = '', userEma
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-slate-400">Email Address</label>
+              <label className="text-sm text-slate-600">Email Address</label>
               <input
                 type="email"
                 value={profile.email}
@@ -193,11 +193,11 @@ const Settings: React.FC<SettingsProps> = ({ userName: initialName = '', userEma
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-slate-400">Phone Number</label>
+              <label className="text-sm text-slate-600">Phone Number</label>
               <input type="tel" value="" disabled className="saas-input w-full opacity-60 cursor-not-allowed" placeholder="Not set" />
             </div>
             <div className="space-y-2">
-              <label className="text-sm text-slate-400">Location</label>
+              <label className="text-sm text-slate-600">Location</label>
               <input type="text" value="" disabled className="saas-input w-full opacity-60 cursor-not-allowed" placeholder="Not set" />
             </div>
           </div>
@@ -218,18 +218,18 @@ const Settings: React.FC<SettingsProps> = ({ userName: initialName = '', userEma
 
         {/* Preferences Section */}
         <div className="saas-card p-6">
-          <h3 className="text-lg font-bold text-slate-200 mb-6 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
             <Globe className="w-5 h-5 text-primary" />
             Preferences
           </h3>
 
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-lg bg-slate-800/50 border border-slate-700/50">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-sky-100/50 border border-sky-200/50">
               <div className="flex items-center gap-3">
-                <Bell className="w-5 h-5 text-slate-400" />
+                <Bell className="w-5 h-5 text-slate-600" />
                 <div>
-                  <h4 className="font-medium text-slate-200">Email Notifications</h4>
-                  <p className="text-xs text-slate-400">Receive updates about job matches and application status</p>
+                  <h4 className="font-medium text-slate-800">Email Notifications</h4>
+                  <p className="text-xs text-slate-600">Receive updates about job matches and application status</p>
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -239,16 +239,16 @@ const Settings: React.FC<SettingsProps> = ({ userName: initialName = '', userEma
                   checked={preferences.emailNotifications}
                   onChange={(e) => handleUpdatePreferences('emailNotifications', e.target.checked)}
                 />
-                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                <div className="w-11 h-6 bg-sky-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
 
-            <div className="flex items-center justify-between p-4 rounded-lg bg-slate-800/50 border border-slate-700/50">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-sky-100/50 border border-sky-200/50">
               <div className="flex items-center gap-3">
-                <Moon className="w-5 h-5 text-slate-400" />
+                <Moon className="w-5 h-5 text-slate-600" />
                 <div>
-                  <h4 className="font-medium text-slate-200">Dark Mode</h4>
-                  <p className="text-xs text-slate-400">Toggle system theme preference</p>
+                  <h4 className="font-medium text-slate-800">Dark Mode</h4>
+                  <p className="text-xs text-slate-600">Toggle system theme preference</p>
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -258,7 +258,7 @@ const Settings: React.FC<SettingsProps> = ({ userName: initialName = '', userEma
                   checked={preferences.darkMode}
                   onChange={(e) => handleUpdatePreferences('darkMode', e.target.checked)}
                 />
-                <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                <div className="w-11 h-6 bg-sky-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
               </label>
             </div>
           </div>
@@ -266,58 +266,58 @@ const Settings: React.FC<SettingsProps> = ({ userName: initialName = '', userEma
 
         {/* Billing Section (Static for now) */}
         <div className="saas-card p-6">
-          <h3 className="text-lg font-bold text-slate-200 mb-6 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
             <CreditCard className="w-5 h-5 text-indigo-400" />
             Billing & Subscription
           </h3>
 
           <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-lg bg-slate-800/50 border border-slate-700/50">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-sky-100/50 border border-sky-200/50">
               <div>
-                <h4 className="font-medium text-slate-200">Free Plan</h4>
-                <p className="text-xs text-slate-400">Basic access to student features</p>
+                <h4 className="font-medium text-slate-800">Free Plan</h4>
+                <p className="text-xs text-slate-600">Basic access to student features</p>
               </div>
               <button className="px-4 py-2 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-lg text-sm font-bold hover:bg-indigo-500/20 transition-colors">
                 Upgrade to Pro
               </button>
             </div>
 
-            <div className="flex items-center justify-between p-4 rounded-lg bg-slate-800/50 border border-slate-700/50">
+            <div className="flex items-center justify-between p-4 rounded-lg bg-sky-100/50 border border-sky-200/50">
               <div>
-                <h4 className="font-medium text-slate-200">Payment Method</h4>
-                <p className="text-xs text-slate-400">No payment method added</p>
+                <h4 className="font-medium text-slate-800">Payment Method</h4>
+                <p className="text-xs text-slate-600">No payment method added</p>
               </div>
-              <button className="text-sm text-slate-400 hover:text-white transition-colors">Add</button>
+              <button className="text-sm text-slate-600 hover:text-primary transition-colors">Add</button>
             </div>
           </div>
         </div>
 
         {/* Security Section */}
         <div className="saas-card p-6">
-          <h3 className="text-lg font-bold text-slate-200 mb-6 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
             <Lock className="w-5 h-5 text-success" />
             Security
           </h3>
 
           <div className="space-y-4">
-            <div className="bg-slate-800/50 rounded-lg border border-slate-700/50 overflow-hidden">
+            <div className="bg-sky-100/50 rounded-lg border border-sky-200/50 overflow-hidden">
               <button
                 onClick={() => setPassword(prev => ({ ...prev, isExpanded: !prev.isExpanded }))}
-                className="w-full text-left p-4 hover:bg-slate-800 transition-all flex items-center justify-between group"
+                className="w-full text-left p-4 hover:bg-sky-100 transition-all flex items-center justify-between group"
               >
                 <div>
-                  <h4 className="font-medium text-slate-200">Change Password</h4>
-                  <p className="text-xs text-slate-400">Update your account password</p>
+                  <h4 className="font-medium text-slate-800">Change Password</h4>
+                  <p className="text-xs text-slate-600">Update your account password</p>
                 </div>
-                <span className="text-slate-400 group-hover:text-slate-200 transition-colors">
+                <span className="text-slate-600 group-hover:text-slate-800 transition-colors">
                   {password.isExpanded ? 'Cancel' : 'Update'}
                 </span>
               </button>
 
               {password.isExpanded && (
-                <div className="p-4 pt-0 space-y-4 border-t border-slate-700/50 mt-2">
+                <div className="p-4 pt-0 space-y-4 border-t border-sky-200/50 mt-2">
                   <div className="space-y-2">
-                    <label className="text-sm text-slate-400">Current Password</label>
+                    <label className="text-sm text-slate-600">Current Password</label>
                     <input
                       type="password"
                       value={password.current}
@@ -326,7 +326,7 @@ const Settings: React.FC<SettingsProps> = ({ userName: initialName = '', userEma
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm text-slate-400">New Password</label>
+                    <label className="text-sm text-slate-600">New Password</label>
                     <input
                       type="password"
                       value={password.new}
@@ -335,7 +335,7 @@ const Settings: React.FC<SettingsProps> = ({ userName: initialName = '', userEma
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm text-slate-400">Confirm New Password</label>
+                    <label className="text-sm text-slate-600">Confirm New Password</label>
                     <input
                       type="password"
                       value={password.confirm}
@@ -356,10 +356,10 @@ const Settings: React.FC<SettingsProps> = ({ userName: initialName = '', userEma
               )}
             </div>
 
-            <button className="w-full text-left p-4 rounded-lg bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800 hover:border-slate-600 transition-all flex items-center justify-between group">
+            <button className="w-full text-left p-4 rounded-lg bg-sky-100/50 border border-sky-200/50 hover:bg-sky-100 hover:border-sky-300 transition-all flex items-center justify-between group">
               <div>
-                <h4 className="font-medium text-slate-200">Two-Factor Authentication</h4>
-                <p className="text-xs text-slate-400">Add an extra layer of security</p>
+                <h4 className="font-medium text-slate-800">Two-Factor Authentication</h4>
+                <p className="text-xs text-slate-600">Add an extra layer of security</p>
               </div>
               <span className="text-success font-medium">Enabled</span>
             </button>
@@ -387,7 +387,7 @@ const Settings: React.FC<SettingsProps> = ({ userName: initialName = '', userEma
                 </button>
                 <button
                   onClick={() => setDeleteConfirm(false)}
-                  className="px-3 py-1 bg-slate-800 text-slate-300 rounded text-xs font-bold hover:bg-slate-700"
+                  className="px-3 py-1 bg-sky-100 text-slate-700 rounded text-xs font-bold hover:bg-sky-200"
                 >
                   Cancel
                 </button>
@@ -401,3 +401,5 @@ const Settings: React.FC<SettingsProps> = ({ userName: initialName = '', userEma
 };
 
 export default Settings;
+
+

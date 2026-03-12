@@ -1,5 +1,5 @@
 
-import { interviewApi } from './api';
+import { interviewService as interviewApi } from './api';
 
 export interface Question {
   id: string;
@@ -27,14 +27,11 @@ class InterviewService {
 
   async startSession(): Promise<SessionState> {
     try {
-      const response = await interviewApi.startSession();
-      // Transform backend response to match frontend SessionState if needed
-      // Assuming backend returns { session: { ... } }
-      // Backend session structure might differ slightly, so we adapt it.
+      const response = await interviewApi.createSession();
       const backendSession = response.session;
       
       this.session = {
-        id: backendSession._id || backendSession.id,
+        id: backendSession._id,
         status: backendSession.status,
         currentQuestionIndex: backendSession.currentQuestionIndex || 0,
         questions: backendSession.questions || [],
@@ -52,16 +49,11 @@ class InterviewService {
   async submitAnswer(audioBlob: Blob): Promise<Feedback> {
     if (!this.session) throw new Error("No active session");
 
-    // In a real app, we would upload the audio blob.
-    // For now, we'll simulate the transcript or send a placeholder text
-    // since the backend expects text transcript.
-    // We can simulate speech-to-text here or just send a placeholder.
     const transcriptText = "User answer (audio processed)"; 
 
     try {
       const response = await interviewApi.submitAnswer(this.session.id, transcriptText);
       
-      // Update local transcript
       if (this.session.transcript) {
           this.session.transcript.push(transcriptText);
       } else {
@@ -79,7 +71,7 @@ class InterviewService {
     if (!this.session) throw new Error("No active session");
     
     try {
-      const response = await interviewApi.getNextQuestion(this.session.id);
+      const response = await interviewApi.nextQuestion(this.session.id);
       
       if (response.session) {
           this.session.status = response.session.status;
@@ -110,4 +102,4 @@ class InterviewService {
   }
 }
 
-export const interviewService = new InterviewService();
+export const interviewServiceWrapper = new InterviewService();

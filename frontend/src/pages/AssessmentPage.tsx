@@ -145,7 +145,7 @@ const AssessmentPage: React.FC = () => {
 
   if (isLoading || !testMetadata) {
     return (
-      <div className="min-h-screen bg-[#0B0F1A] flex items-center justify-center text-white">
+      <div className="min-h-screen bg-sky-50 flex items-center justify-center text-slate-900">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-500"></div>
       </div>
     );
@@ -171,12 +171,12 @@ const AssessmentPage: React.FC = () => {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <div className="min-h-screen bg-[#0B0F1A] text-white flex flex-col">
+    <div className="min-h-screen bg-sky-50 text-slate-900 flex flex-col">
       {/* Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-900/20 via-[#0B0F1A] to-[#0B0F1A]" />
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-500/10 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[100px]" />
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-200/45 via-sky-50 to-indigo-50/70" />
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-sky-400/15 rounded-full blur-[100px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-400/15 rounded-full blur-[100px]" />
       </div>
 
       <TestHeader 
@@ -191,7 +191,7 @@ const AssessmentPage: React.FC = () => {
         {/* Mobile Navigator Toggle */}
         <button 
           onClick={() => setIsNavigatorOpen(true)}
-          className="md:hidden fixed top-20 right-4 z-30 p-2 bg-slate-800 rounded-lg text-white shadow-lg border border-white/10"
+          className="md:hidden fixed top-20 right-4 z-30 p-2 bg-white rounded-lg text-slate-900 shadow-lg border border-sky-200"
         >
           <Menu className="w-5 h-5" />
         </button>
@@ -251,3 +251,5 @@ const AssessmentPage: React.FC = () => {
 };
 
 export default AssessmentPage;
+
+

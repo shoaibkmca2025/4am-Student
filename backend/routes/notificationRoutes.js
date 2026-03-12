@@ -5,61 +5,103 @@ import Notification from '../models/Notification.js';
 
 const router = express.Router();
 
-// @desc    Get user notifications
-// @route   GET /api/notifications
-// @access  Private
-router.get('/', requireAuth, async (req, res) => {
+// Get user notifications with pagination
+router.get('/', requireAuth, async (req, res, next) => {
   try {
-    const notifications = await Notification.find({ user: req.user._id })
-      .sort({ createdAt: -1 })
-      .limit(20);
-    res.json(notifications);
-  } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(50, Math.max(1, parseInt(req.query.limit) || 20));
+    const skip = (page - 1) * limit;
+
+    const [notifications, total, unreadCount] = await Promise.all([
+      Notification.find({ user: req.user._id })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Notification.countDocuments({ user: req.user._id }),
+      Notification.countDocuments({ user: req.user._id, read: false })
+    ]);
+
+    return res.json({
+      notifications,
+      unreadCount,
+      pagination: { page, limit, total, pages: Math.ceil(total / limit) }
+    });
+  } catch (err) {
+    next(err);
   }
 });
 
-// @desc    Mark all as read
-// @route   PUT /api/notifications/read-all
-// @access  Private (must be defined before /:id/read to avoid param capture)
-router.put('/read-all', requireAuth, async (req, res) => {
+// Get unread count
+router.get('/unread-count', requireAuth, async (req, res, next) => {
+  try {
+    const count = await Notification.countDocuments({ user: req.user._id, read: false });
+    return res.json({ count });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Mark all as read
+router.put('/read-all', requireAuth, async (req, res, next) => {
   try {
     await Notification.updateMany(
       { user: req.user._id, read: false },
       { $set: { read: true } }
     );
-    res.json({ message: 'All notifications marked as read' });
-  } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+    return res.json({ ok: true, message: 'All notifications marked as read' });
+  } catch (err) {
+    next(err);
   }
 });
 
-// @desc    Mark notification as read
-// @route   PUT /api/notifications/:id/read
-// @access  Private
-router.put('/:id/read', requireAuth, async (req, res) => {
+// Mark single notification as read
+router.put('/:id/read', requireAuth, async (req, res, next) => {
   try {
     if (!isValidObjectId(req.params.id)) {
       return res.status(400).json({ message: 'Invalid notification ID' });
     }
 
     const notification = await Notification.findById(req.params.id);
-
-    if (!notification) {
-      return res.status(404).json({ message: 'Notification not found' });
-    }
-
-    // Check user ownership
+    if (!notification) return res.status(404).json({ message: 'Notification not found' });
     if (notification.user.toString() !== req.user._id.toString()) {
-      return res.status(401).json({ message: 'Not authorized' });
+      return res.status(403).json({ message: 'Forbidden' });
     }
 
     notification.read = true;
     await notification.save();
+    return res.json({ notification });
+  } catch (err) {
+    next(err);
+  }
+});
 
-    res.json(notification);
-  } catch (error) {
-    res.status(500).json({ message: 'Server Error' });
+// Delete a notification
+router.delete('/:id', requireAuth, async (req, res, next) => {
+  try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid notification ID' });
+    }
+
+    const notification = await Notification.findById(req.params.id);
+    if (!notification) return res.status(404).json({ message: 'Notification not found' });
+    if (notification.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Forbidden' });
+    }
+
+    await Notification.deleteOne({ _id: notification._id });
+    return res.json({ ok: true });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Delete all notifications
+router.delete('/', requireAuth, async (req, res, next) => {
+  try {
+    await Notification.deleteMany({ user: req.user._id });
+    return res.json({ ok: true, message: 'All notifications cleared' });
+  } catch (err) {
+    next(err);
   }
 });
 

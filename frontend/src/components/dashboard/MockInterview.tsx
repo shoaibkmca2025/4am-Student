@@ -5,7 +5,7 @@ import {
   MessageSquare, Play, Square, AlertCircle, Loader2, 
   Volume2, Monitor, ChevronRight, RefreshCw, X
 } from 'lucide-react';
-import { interviewService, Question, SessionState } from '../../services/interviewService';
+import { interviewServiceWrapper as interviewService, Question, SessionState } from '../../services/interviewService';
 
 const MockInterview: React.FC = () => {
   // Session State
@@ -262,8 +262,8 @@ const MockInterview: React.FC = () => {
       {/* Header Section */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-slate-100 mb-1">AI Mock Interview</h2>
-          <p className="text-slate-400 text-sm">Practice with our AI interviewer to boost your confidence</p>
+          <h2 className="text-2xl font-bold text-slate-900 mb-1">AI Mock Interview</h2>
+          <p className="text-slate-600 text-sm">Practice with our AI interviewer to boost your confidence</p>
         </div>
         {!sessionActive ? (
           <button 
@@ -289,17 +289,17 @@ const MockInterview: React.FC = () => {
         {/* Left Column: Video & Controls */}
         <div className="lg:col-span-3 flex flex-col gap-4">
           {/* Video Container */}
-          <div className="flex-1 bg-slate-900 rounded-2xl border border-slate-800 relative overflow-hidden shadow-2xl group">
+          <div className="flex-1 bg-white rounded-2xl border border-sky-200 relative overflow-hidden shadow-2xl group">
             
             {/* Permission Error Overlay */}
             {permissionError && (
-              <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-slate-950/90 backdrop-blur-sm p-6 text-center">
+              <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-sky-50/90 backdrop-blur-sm p-6 text-center">
                 <AlertCircle className="w-16 h-16 text-rose-500 mb-4" />
-                <h3 className="text-xl font-bold text-slate-100 mb-2">Camera Access Required</h3>
-                <p className="text-slate-400 max-w-md">{permissionError}</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Camera Access Required</h3>
+                <p className="text-slate-600 max-w-md">{permissionError}</p>
                 <button 
                   onClick={() => window.location.reload()}
-                  className="mt-6 px-6 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-lg border border-slate-700 transition-colors"
+                  className="mt-6 px-6 py-2 bg-sky-100 hover:bg-sky-200 text-slate-800 rounded-lg border border-sky-200 transition-colors"
                 >
                   Retry Access
                 </button>
@@ -318,8 +318,8 @@ const MockInterview: React.FC = () => {
               
               {/* Video Off Placeholder */}
               {isVideoOff && (
-                <div className="absolute inset-0 flex items-center justify-center bg-slate-900">
-                  <div className="w-32 h-32 rounded-full bg-slate-800 flex items-center justify-center border-4 border-slate-700 shadow-xl">
+                <div className="absolute inset-0 flex items-center justify-center bg-white">
+                  <div className="w-32 h-32 rounded-full bg-sky-100 flex items-center justify-center border-4 border-sky-200 shadow-xl">
                     <VideoOff className="w-12 h-12 text-slate-500" />
                   </div>
                 </div>
@@ -327,9 +327,9 @@ const MockInterview: React.FC = () => {
 
               {/* Status Overlay */}
               <div className="absolute top-6 left-6 flex items-center gap-3">
-                <div className="px-3 py-1.5 bg-slate-950/60 backdrop-blur-md rounded-lg border border-white/10 flex items-center gap-2 shadow-lg">
+                <div className="px-3 py-1.5 bg-sky-50/60 backdrop-blur-md rounded-lg border border-white/10 flex items-center gap-2 shadow-lg">
                   <div className={`w-2.5 h-2.5 rounded-full ${sessionActive ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`}></div>
-                  <span className="text-xs font-bold text-slate-200 tracking-wide">
+                  <span className="text-xs font-bold text-slate-800 tracking-wide">
                     {sessionActive ? 'REC' : 'READY'}
                   </span>
                 </div>
@@ -337,12 +337,12 @@ const MockInterview: React.FC = () => {
 
               {/* Central Overlay for Idle State */}
               {!sessionActive && !permissionError && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-950/40 backdrop-blur-[2px]">
-                   <div className="w-24 h-24 bg-slate-800/80 backdrop-blur-xl rounded-2xl flex items-center justify-center mb-6 border border-white/10 shadow-2xl ring-1 ring-white/5">
-                    <VideoIcon className="w-10 h-10 text-slate-400" />
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-sky-50/40 backdrop-blur-[2px]">
+                   <div className="w-24 h-24 bg-sky-100/80 backdrop-blur-xl rounded-2xl flex items-center justify-center mb-6 border border-white/10 shadow-2xl ring-1 ring-white/5">
+                    <VideoIcon className="w-10 h-10 text-slate-600" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white mb-2 drop-shadow-md">Ready to Start?</h3>
-                  <p className="text-slate-300 max-w-md text-center mb-8 drop-shadow-sm font-medium">
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2 drop-shadow-md">Ready to Start?</h3>
+                  <p className="text-slate-700 max-w-md text-center mb-8 drop-shadow-sm font-medium">
                     Check your camera and microphone settings before beginning the interview session.
                   </p>
                   <div className="flex gap-4">
@@ -351,7 +351,7 @@ const MockInterview: React.FC = () => {
                         setShowSettings('audio');
                         startMedia(selectedAudioId, selectedVideoId);
                       }}
-                      className="px-5 py-2.5 bg-slate-800/80 hover:bg-slate-700/80 backdrop-blur-md text-slate-200 rounded-xl border border-white/10 font-medium flex items-center gap-2 transition-all hover:scale-105"
+                      className="px-5 py-2.5 bg-sky-100/80 hover:bg-sky-200/80 backdrop-blur-md text-slate-800 rounded-xl border border-white/10 font-medium flex items-center gap-2 transition-all hover:scale-105"
                     >
                       <Settings className="w-4 h-4" />
                       Audio Settings
@@ -361,7 +361,7 @@ const MockInterview: React.FC = () => {
                         setShowSettings('video');
                         startMedia(selectedAudioId, selectedVideoId);
                       }}
-                      className="px-5 py-2.5 bg-slate-800/80 hover:bg-slate-700/80 backdrop-blur-md text-slate-200 rounded-xl border border-white/10 font-medium flex items-center gap-2 transition-all hover:scale-105"
+                      className="px-5 py-2.5 bg-sky-100/80 hover:bg-sky-200/80 backdrop-blur-md text-slate-800 rounded-xl border border-white/10 font-medium flex items-center gap-2 transition-all hover:scale-105"
                     >
                       <Monitor className="w-4 h-4" />
                       Video Settings
@@ -373,14 +373,14 @@ const MockInterview: React.FC = () => {
           </div>
 
           {/* Control Bar */}
-          <div className="h-16 bg-slate-900 rounded-2xl border border-slate-800 flex items-center justify-between px-6 shadow-xl">
+          <div className="h-16 bg-white rounded-2xl border border-sky-200 flex items-center justify-between px-6 shadow-xl">
             <div className="flex items-center gap-4">
               <button 
                 onClick={toggleMic}
                 className={`p-2.5 rounded-xl transition-all duration-300 ${
                   isMicMuted 
                     ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20' 
-                    : 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-white hover:bg-slate-700 hover:border-slate-600'
+                    : 'bg-sky-100 text-slate-600 border border-sky-200 hover:text-primary hover:bg-sky-200 hover:border-sky-300'
                 }`}
               >
                 {isMicMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
@@ -390,7 +390,7 @@ const MockInterview: React.FC = () => {
                 className={`p-2.5 rounded-xl transition-all duration-300 ${
                   isVideoOff 
                     ? 'bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20' 
-                    : 'bg-slate-800 text-slate-400 border border-slate-700 hover:text-white hover:bg-slate-700 hover:border-slate-600'
+                    : 'bg-sky-100 text-slate-600 border border-sky-200 hover:text-primary hover:bg-sky-200 hover:border-sky-300'
                 }`}
               >
                 {isVideoOff ? <VideoOff className="w-5 h-5" /> : <VideoIcon className="w-5 h-5" />}
@@ -400,20 +400,20 @@ const MockInterview: React.FC = () => {
             <div className="flex items-center gap-6">
               <div className="flex flex-col items-end">
                 <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">Session Duration</span>
-                <span className="text-xl font-mono font-bold text-slate-200 tracking-widest tabular-nums">
+                <span className="text-xl font-mono font-bold text-slate-800 tracking-widest tabular-nums">
                   {formatTime(elapsedTime)}
                 </span>
               </div>
-              <div className={`w-2.5 h-2.5 rounded-full ${sessionActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-700'}`}></div>
+              <div className={`w-2.5 h-2.5 rounded-full ${sessionActive ? 'bg-emerald-500 animate-pulse' : 'bg-sky-200'}`}></div>
             </div>
           </div>
         </div>
 
         {/* Right Column: Progress & Chat */}
-        <div className="bg-slate-900 rounded-2xl border border-slate-800 flex flex-col overflow-hidden shadow-xl h-full">
+        <div className="bg-white rounded-2xl border border-sky-200 flex flex-col overflow-hidden shadow-xl h-full">
           {/* Header */}
-          <div className="p-5 border-b border-slate-800 bg-slate-900/50 backdrop-blur-sm">
-            <h3 className="font-bold text-slate-100 flex items-center gap-2 text-lg">
+          <div className="p-5 border-b border-sky-200 bg-white/50 backdrop-blur-sm">
+            <h3 className="font-bold text-slate-900 flex items-center gap-2 text-lg">
               <MessageSquare className="w-5 h-5 text-indigo-500" />
               Interview Progress
             </h3>
@@ -429,7 +429,7 @@ const MockInterview: React.FC = () => {
                     <div key={idx} className={`p-4 rounded-2xl text-sm leading-relaxed ${
                       msg.startsWith("AI") 
                         ? 'bg-indigo-500/10 border border-indigo-500/20 text-indigo-200 rounded-tl-none' 
-                        : 'bg-slate-800 border border-slate-700 text-slate-300 rounded-tr-none ml-8'
+                        : 'bg-sky-100 border border-sky-200 text-slate-700 rounded-tr-none ml-8'
                     }`}>
                       <span className="block text-xs font-bold opacity-50 mb-1 uppercase tracking-wider">
                         {msg.startsWith("AI") ? "AI Interviewer" : "You"}
@@ -446,12 +446,12 @@ const MockInterview: React.FC = () => {
                 </div>
 
                 {/* Current Question Card */}
-                <div className="p-5 bg-gradient-to-br from-slate-800 to-slate-900 border border-indigo-500/30 rounded-2xl shadow-lg relative overflow-hidden group">
+                <div className="p-5 bg-gradient-to-br from-slate-800 to-sky-50 border border-indigo-500/30 rounded-2xl shadow-lg relative overflow-hidden group">
                   <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
                   <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2 block">
                     Current Question
                   </span>
-                  <p className="text-slate-100 font-medium text-lg leading-relaxed mb-4">
+                  <p className="text-slate-900 font-medium text-lg leading-relaxed mb-4">
                     {currentQuestion.text}
                   </p>
                   
@@ -475,7 +475,7 @@ const MockInterview: React.FC = () => {
                          Stop & Submit
                        </button>
                      )}
-                     <button className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-xl border border-slate-700 transition-colors">
+                     <button className="p-2.5 bg-sky-100 hover:bg-sky-200 text-slate-600 hover:text-primary rounded-xl border border-sky-200 transition-colors">
                        <RefreshCw className="w-4 h-4" />
                      </button>
                   </div>
@@ -485,8 +485,8 @@ const MockInterview: React.FC = () => {
                 <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl flex items-start gap-3">
                   <AlertCircle className="w-5 h-5 text-emerald-500 mt-0.5 shrink-0" />
                   <div>
-                    <h4 className="font-bold text-slate-200 text-sm mb-1">Real-time Feedback</h4>
-                    <p className="text-xs text-slate-400 leading-relaxed">
+                    <h4 className="font-bold text-slate-800 text-sm mb-1">Real-time Feedback</h4>
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       Speak clearly and maintain eye contact with the camera. The AI is analyzing your confidence levels.
                     </p>
                   </div>
@@ -494,10 +494,10 @@ const MockInterview: React.FC = () => {
               </>
             ) : (
               <div className="h-full flex flex-col items-center justify-center text-center p-8 opacity-50">
-                <div className="w-16 h-16 bg-slate-800 rounded-2xl flex items-center justify-center mb-4 border border-slate-700 rotate-3">
+                <div className="w-16 h-16 bg-sky-100 rounded-2xl flex items-center justify-center mb-4 border border-sky-200 rotate-3">
                   <MessageSquare className="w-8 h-8 text-slate-500" />
                 </div>
-                <h4 className="text-lg font-bold text-slate-300 mb-2">Waiting to Start</h4>
+                <h4 className="text-lg font-bold text-slate-700 mb-2">Waiting to Start</h4>
                 <p className="text-slate-500 text-sm max-w-[200px]">
                   Start a session to see interview questions and receive real-time AI feedback.
                 </p>
@@ -507,10 +507,10 @@ const MockInterview: React.FC = () => {
         </div>
         {/* Settings Modal */}
         {showSettings && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-              <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-                <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-sky-900/30 backdrop-blur-sm p-4">
+            <div className="bg-white border border-sky-200 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+              <div className="p-4 border-b border-sky-200 flex justify-between items-center bg-white/50">
+                <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                   {showSettings === 'audio' ? <Settings className="w-5 h-5 text-indigo-500" /> : <Monitor className="w-5 h-5 text-indigo-500" />}
                   {showSettings === 'audio' ? 'Audio Settings' : 'Video Settings'}
                 </h3>
@@ -519,7 +519,7 @@ const MockInterview: React.FC = () => {
                     setShowSettings(null);
                     if (!sessionActive) stopMedia();
                   }}
-                  className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-colors"
+                  className="p-2 hover:bg-sky-100 rounded-lg text-slate-600 hover:text-primary transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -528,11 +528,11 @@ const MockInterview: React.FC = () => {
               <div className="p-6 space-y-6">
                 {/* Device Selection */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-400">
+                  <label className="text-sm font-medium text-slate-600">
                     {showSettings === 'audio' ? 'Microphone' : 'Camera'}
                   </label>
                   <select 
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                    className="w-full bg-sky-50 border border-sky-200 rounded-xl px-4 py-2.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
                     value={showSettings === 'audio' ? selectedAudioId : selectedVideoId}
                     onChange={(e) => {
                       const value = e.target.value;
@@ -555,7 +555,7 @@ const MockInterview: React.FC = () => {
                 </div>
 
                 {/* Preview */}
-                <div className="aspect-video bg-black rounded-xl overflow-hidden border border-slate-800 relative">
+                <div className="aspect-video bg-black rounded-xl overflow-hidden border border-sky-200 relative">
                   <video 
                     ref={settingsVideoRef} 
                     autoPlay 
@@ -597,3 +597,5 @@ const MockInterview: React.FC = () => {
 };
 
 export default MockInterview;
+
+

@@ -34,7 +34,7 @@ const ResultAnalytics: React.FC<ResultAnalyticsProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-200 p-6 md:p-12 font-sans">
+    <div className="min-h-screen bg-sky-50 text-slate-800 p-6 md:p-12 font-sans">
       <div className="max-w-6xl mx-auto space-y-8">
         
         {/* Header */}
@@ -46,10 +46,10 @@ const ResultAnalytics: React.FC<ResultAnalyticsProps> = ({
           >
             <CheckCircle className="w-10 h-10 text-success" />
           </motion.div>
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-200 tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight">
             Assessment Complete
           </h1>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">You've mastered this skill assessment. Here's a detailed breakdown of your performance.</p>
+          <p className="text-slate-600 text-lg max-w-2xl mx-auto">You've mastered this skill assessment. Here's a detailed breakdown of your performance.</p>
         </div>
 
         {/* Main Stats Grid */}
@@ -66,10 +66,10 @@ const ResultAnalytics: React.FC<ResultAnalyticsProps> = ({
               </div>
               <div>
                 <p className="text-slate-500 text-xs font-medium uppercase tracking-wider">Total Score</p>
-                <h3 className="text-2xl font-bold text-slate-200">{score}/{totalQuestions}</h3>
+                <h3 className="text-2xl font-bold text-slate-800">{score}/{totalQuestions}</h3>
               </div>
             </div>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+            <div className="w-full bg-sky-100 h-1.5 rounded-full overflow-hidden">
               <div className="bg-primary h-full" style={{ width: `${percentage}%` }} />
             </div>
           </motion.div>
@@ -86,10 +86,10 @@ const ResultAnalytics: React.FC<ResultAnalyticsProps> = ({
               </div>
               <div>
                 <p className="text-slate-500 text-xs font-medium uppercase tracking-wider">Accuracy</p>
-                <h3 className="text-2xl font-bold text-slate-200">{accuracy}%</h3>
+                <h3 className="text-2xl font-bold text-slate-800">{accuracy}%</h3>
               </div>
             </div>
-            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+            <div className="w-full bg-sky-100 h-1.5 rounded-full overflow-hidden">
               <div className="bg-success h-full" style={{ width: `${accuracy}%` }} />
             </div>
           </motion.div>
@@ -106,7 +106,7 @@ const ResultAnalytics: React.FC<ResultAnalyticsProps> = ({
               </div>
               <div>
                 <p className="text-slate-500 text-xs font-medium uppercase tracking-wider">Time Taken</p>
-                <h3 className="text-2xl font-bold text-slate-200">{timeTaken}</h3>
+                <h3 className="text-2xl font-bold text-slate-800">{timeTaken}</h3>
               </div>
             </div>
             <p className="text-xs text-slate-500">Avg. 45s per question</p>
@@ -124,7 +124,7 @@ const ResultAnalytics: React.FC<ResultAnalyticsProps> = ({
               </div>
               <div>
                 <p className="text-slate-500 text-xs font-medium uppercase tracking-wider">Percentile</p>
-                <h3 className="text-2xl font-bold text-slate-200">Top {100 - percentile}%</h3>
+                <h3 className="text-2xl font-bold text-slate-800">Top {100 - percentile}%</h3>
               </div>
             </div>
             <p className="text-xs text-slate-500">Better than {percentile}% of peers</p>
@@ -141,7 +141,7 @@ const ResultAnalytics: React.FC<ResultAnalyticsProps> = ({
             transition={{ delay: 0.5 }}
             className="lg:col-span-1 saas-card p-6 flex flex-col items-center justify-center min-h-[400px]"
           >
-            <h3 className="text-lg font-bold text-slate-200 mb-6">Skill Breakdown</h3>
+            <h3 className="text-lg font-bold text-slate-800 mb-6">Skill Breakdown</h3>
             <div className="w-full h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
@@ -172,28 +172,28 @@ const ResultAnalytics: React.FC<ResultAnalyticsProps> = ({
             transition={{ delay: 0.6 }}
             className="lg:col-span-2 saas-card p-8 space-y-6"
           >
-            <h3 className="text-lg font-bold text-slate-200 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
               AI Performance Analysis
             </h3>
             
             <div className="space-y-4">
               <div className="p-4 rounded-lg bg-success/10 border border-success/20">
                 <h4 className="font-semibold text-success mb-1 text-sm">Strengths</h4>
-                <p className="text-slate-400 text-sm leading-relaxed">
+                <p className="text-slate-600 text-sm leading-relaxed">
                   You demonstrated exceptional understanding of core concepts. Your response time was significantly faster than average in the logic section, indicating strong problem-solving intuition.
                 </p>
               </div>
 
               <div className="p-4 rounded-lg bg-warning/10 border border-warning/20">
                 <h4 className="font-semibold text-warning mb-1 text-sm">Areas for Improvement</h4>
-                <p className="text-slate-400 text-sm leading-relaxed">
+                <p className="text-slate-600 text-sm leading-relaxed">
                   Consider reviewing advanced state management patterns. While you answered correctly, the time taken for architectural questions was slightly higher, suggesting potential hesitation in complex scenarios.
                 </p>
               </div>
 
               <div className="p-4 rounded-lg bg-primary/10 border border-primary/20">
                 <h4 className="font-semibold text-primary mb-1 text-sm">Recommended Next Steps</h4>
-                <ul className="list-disc list-inside text-slate-400 text-sm space-y-1 ml-1">
+                <ul className="list-disc list-inside text-slate-600 text-sm space-y-1 ml-1">
                   <li>Take the "Advanced React Patterns" deep dive module.</li>
                   <li>Practice 3 more coding challenges in the "Algorithms" section.</li>
                   <li>Review the documentation on React Hooks performance optimization.</li>
@@ -226,3 +226,4 @@ const ResultAnalytics: React.FC<ResultAnalyticsProps> = ({
 };
 
 export default ResultAnalytics;
+

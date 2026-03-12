@@ -12,10 +12,10 @@ interface SkillRadarProps {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-slate-900 border border-slate-700 p-3 rounded-lg shadow-xl z-50">
-        <p className="text-slate-200 font-bold text-sm mb-1">{label}</p>
+      <div className="bg-white border border-sky-200 p-3 rounded-lg shadow-xl z-50">
+        <p className="text-slate-800 font-bold text-sm mb-1">{label}</p>
         <p className="text-indigo-400 text-xs font-medium">
-          Score: <span className="text-white">{payload[0].value}</span> / 100
+          Score: <span className="text-slate-900">{payload[0].value}</span> / 100
         </p>
       </div>
     );
@@ -31,10 +31,10 @@ const SkillRadar: React.FC<SkillRadarProps> = ({ data = [] }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 }}
-      className="bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 h-full flex flex-col"
+      className="bg-white/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 h-full flex flex-col"
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-slate-200 flex items-center gap-2">
+        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
           <Target className="w-5 h-5 text-indigo-400" />
           Skill Analysis
         </h3>
@@ -77,3 +77,5 @@ const SkillRadar: React.FC<SkillRadarProps> = ({ data = [] }) => {
 };
 
 export default SkillRadar;
+
+

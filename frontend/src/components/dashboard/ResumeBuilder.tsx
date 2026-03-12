@@ -516,8 +516,8 @@ const ResumeBuilder: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-slate-200">Resume Builder</h2>
-          <p className="text-slate-400 mt-1">Create an ATS-optimized resume with AI assistance</p>
+          <h2 className="text-2xl font-bold text-slate-800">Resume Builder</h2>
+          <p className="text-slate-600 mt-1">Create an ATS-optimized resume with AI assistance</p>
         </div>
         <div className="flex space-x-3 items-center">
           {lastSaved && (
@@ -551,8 +551,8 @@ const ResumeBuilder: React.FC = () => {
                 key={section}
                 onClick={() => setActiveSection(section.toLowerCase())}
                 className={`w-full text-left px-3 py-2 rounded-md transition-all duration-200 text-xs font-medium flex items-center justify-between group ${activeSection === section.toLowerCase()
-                    ? 'bg-primary/10 text-primary border border-primary/20'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent'
+                  ? 'bg-primary/10 text-primary border border-primary/20'
+                  : 'text-slate-600 hover:text-slate-800 hover:bg-sky-100/50 border border-transparent'
                   }`}
               >
                 <span>{section}</span>
@@ -576,16 +576,16 @@ const ResumeBuilder: React.FC = () => {
             transition={{ duration: 0.2 }}
             className="saas-card p-6 min-h-[500px]"
           >
-            <div className="flex justify-between items-center mb-6 pb-6 border-b border-slate-800">
-              <h3 className="text-lg font-semibold text-slate-200 capitalize flex items-center gap-2">
+            <div className="flex justify-between items-center mb-6 pb-6 border-b border-sky-200">
+              <h3 className="text-lg font-semibold text-slate-800 capitalize flex items-center gap-2">
                 {activeSection}
-                <span className="text-[10px] font-normal text-slate-500 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">
+                <span className="text-[10px] font-normal text-slate-500 bg-sky-100 px-2 py-0.5 rounded-full border border-sky-200">
                   AI Optimized
                 </span>
               </h3>
               <button
                 onClick={handleAIEnhance}
-                className="flex items-center space-x-2 text-white bg-indigo-600 hover:bg-indigo-500 text-xs font-bold px-3 py-1.5 rounded-md transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
+                className="flex items-center space-x-2 text-slate-900 bg-indigo-600 hover:bg-indigo-500 text-xs font-bold px-3 py-1.5 rounded-md transition-all shadow-lg shadow-indigo-500/20 active:scale-95"
               >
                 <Wand2 className="w-3.5 h-3.5" />
                 <span>Auto-Enhance</span>
@@ -595,7 +595,7 @@ const ResumeBuilder: React.FC = () => {
             {activeSection === 'header' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-400">Full Name</label>
+                  <label className="text-sm font-medium text-slate-600">Full Name</label>
                   <input
                     type="text"
                     name="fullName"
@@ -606,7 +606,7 @@ const ResumeBuilder: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-400">Job Title</label>
+                  <label className="text-sm font-medium text-slate-600">Job Title</label>
                   <input
                     type="text"
                     name="title"
@@ -617,7 +617,7 @@ const ResumeBuilder: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-400">Email</label>
+                  <label className="text-sm font-medium text-slate-600">Email</label>
                   <input
                     type="email"
                     name="email"
@@ -628,7 +628,7 @@ const ResumeBuilder: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-400">Phone</label>
+                  <label className="text-sm font-medium text-slate-600">Phone</label>
                   <input
                     type="tel"
                     name="phone"
@@ -639,7 +639,7 @@ const ResumeBuilder: React.FC = () => {
                   />
                 </div>
                 <div className="md:col-span-2 space-y-2">
-                  <label className="text-sm font-medium text-slate-400">Professional Summary</label>
+                  <label className="text-sm font-medium text-slate-600">Professional Summary</label>
                   <textarea
                     name="summary"
                     value={resumeData.header.summary}
@@ -654,7 +654,7 @@ const ResumeBuilder: React.FC = () => {
             {activeSection === 'experience' && (
               <div className="space-y-6">
                 {resumeData.experience.map((exp) => (
-                  <div key={exp.id} className="p-6 rounded-lg bg-slate-800/30 border border-slate-800 space-y-4 hover:border-slate-700 transition-colors group">
+                  <div key={exp.id} className="p-6 rounded-lg bg-sky-100/30 border border-sky-200 space-y-4 hover:border-sky-200 transition-colors group">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Role</label>
@@ -708,7 +708,7 @@ const ResumeBuilder: React.FC = () => {
                         placeholder="Describe your responsibilities and achievements..."
                       />
                     </div>
-                    <div className="flex justify-end pt-2 border-t border-slate-800/50 mt-4">
+                    <div className="flex justify-end pt-2 border-t border-sky-200/50 mt-4">
                       <button
                         onClick={() => removeExperience(exp.id)}
                         className="text-slate-500 hover:text-error text-xs font-medium flex items-center space-x-1.5 px-3 py-1.5 rounded hover:bg-error/10 transition-colors"
@@ -721,7 +721,7 @@ const ResumeBuilder: React.FC = () => {
                 ))}
                 <button
                   onClick={addExperience}
-                  className="w-full py-3 rounded-lg border border-dashed border-slate-700 text-slate-400 hover:text-primary hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 flex items-center justify-center space-x-2 group"
+                  className="w-full py-3 rounded-lg border border-dashed border-sky-200 text-slate-600 hover:text-primary hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 flex items-center justify-center space-x-2 group"
                 >
                   <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
                   <span className="text-sm font-medium">Add Experience</span>
@@ -732,7 +732,7 @@ const ResumeBuilder: React.FC = () => {
             {activeSection === 'education' && (
               <div className="space-y-6">
                 {resumeData.education.map((edu) => (
-                  <div key={edu.id} className="p-6 rounded-lg bg-slate-800/30 border border-slate-800 space-y-4 hover:border-slate-700 transition-colors group">
+                  <div key={edu.id} className="p-6 rounded-lg bg-sky-100/30 border border-sky-200 space-y-4 hover:border-sky-200 transition-colors group">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">School</label>
@@ -789,7 +789,7 @@ const ResumeBuilder: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex justify-end pt-2 border-t border-slate-800/50 mt-4">
+                    <div className="flex justify-end pt-2 border-t border-sky-200/50 mt-4">
                       <button
                         onClick={() => removeEducation(edu.id)}
                         className="text-slate-500 hover:text-error text-xs font-medium flex items-center space-x-1.5 px-3 py-1.5 rounded hover:bg-error/10 transition-colors"
@@ -802,7 +802,7 @@ const ResumeBuilder: React.FC = () => {
                 ))}
                 <button
                   onClick={addEducation}
-                  className="w-full py-3 rounded-lg border border-dashed border-slate-700 text-slate-400 hover:text-primary hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 flex items-center justify-center space-x-2 group"
+                  className="w-full py-3 rounded-lg border border-dashed border-sky-200 text-slate-600 hover:text-primary hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 flex items-center justify-center space-x-2 group"
                 >
                   <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
                   <span className="text-sm font-medium">Add Education</span>
@@ -813,7 +813,7 @@ const ResumeBuilder: React.FC = () => {
             {activeSection === 'projects' && (
               <div className="space-y-6">
                 {resumeData.projects.map((proj) => (
-                  <div key={proj.id} className="p-6 rounded-lg bg-slate-800/30 border border-slate-800 space-y-4 hover:border-slate-700 transition-colors group">
+                  <div key={proj.id} className="p-6 rounded-lg bg-sky-100/30 border border-sky-200 space-y-4 hover:border-sky-200 transition-colors group">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-1.5">
                         <label className="text-xs font-medium text-slate-500 uppercase tracking-wider">Project Name</label>
@@ -855,7 +855,7 @@ const ResumeBuilder: React.FC = () => {
                         placeholder="Describe the project..."
                       />
                     </div>
-                    <div className="flex justify-end pt-2 border-t border-slate-800/50 mt-4">
+                    <div className="flex justify-end pt-2 border-t border-sky-200/50 mt-4">
                       <button
                         onClick={() => removeProject(proj.id)}
                         className="text-slate-500 hover:text-error text-xs font-medium flex items-center space-x-1.5 px-3 py-1.5 rounded hover:bg-error/10 transition-colors"
@@ -868,7 +868,7 @@ const ResumeBuilder: React.FC = () => {
                 ))}
                 <button
                   onClick={addProject}
-                  className="w-full py-3 rounded-lg border border-dashed border-slate-700 text-slate-400 hover:text-primary hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 flex items-center justify-center space-x-2 group"
+                  className="w-full py-3 rounded-lg border border-dashed border-sky-200 text-slate-600 hover:text-primary hover:border-primary/50 hover:bg-primary/5 transition-all duration-200 flex items-center justify-center space-x-2 group"
                 >
                   <Plus className="w-4 h-4 group-hover:scale-110 transition-transform" />
                   <span className="text-sm font-medium">Add Project</span>
@@ -878,9 +878,9 @@ const ResumeBuilder: React.FC = () => {
 
             {activeSection === 'skills' && (
               <div className="space-y-6">
-                <div className="p-6 rounded-lg bg-slate-800/30 border border-slate-800 space-y-6">
+                <div className="p-6 rounded-lg bg-sky-100/30 border border-sky-200 space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-400">Technical Skills</label>
+                    <label className="text-sm font-medium text-slate-600">Technical Skills</label>
                     <textarea
                       value={resumeData.skills.technical}
                       onChange={(e) => handleSkillsChange('technical', e.target.value)}
@@ -890,7 +890,7 @@ const ResumeBuilder: React.FC = () => {
                     <p className="text-xs text-slate-500">Separate skills with commas</p>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium text-slate-400">Soft Skills</label>
+                    <label className="text-sm font-medium text-slate-600">Soft Skills</label>
                     <textarea
                       value={resumeData.skills.soft}
                       onChange={(e) => handleSkillsChange('soft', e.target.value)}
@@ -912,7 +912,7 @@ const ResumeBuilder: React.FC = () => {
                 <div className="p-1.5 bg-indigo-500/10 rounded-lg">
                   <Lightbulb className="w-4 h-4 text-indigo-400" />
                 </div>
-                <h4 className="font-bold text-slate-200 text-sm">AI Suggestions</h4>
+                <h4 className="font-bold text-slate-800 text-sm">AI Suggestions</h4>
               </div>
 
               <div className="space-y-3">
@@ -925,8 +925,8 @@ const ResumeBuilder: React.FC = () => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, scale: 0.9 }}
                         className={`p-3 rounded-lg border text-xs ${suggestion.type === 'warning'
-                            ? 'bg-amber-500/10 border-amber-500/20 text-amber-200'
-                            : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-200'
+                          ? 'bg-amber-500/10 border-amber-500/20 text-amber-700 dark:text-amber-200'
+                          : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-700 dark:text-emerald-200'
                           }`}
                       >
                         <div className="flex gap-2 items-start">
@@ -945,8 +945,8 @@ const ResumeBuilder: React.FC = () => {
                                   setSuggestions(prev => prev.filter(s => s.id !== suggestion.id));
                                 }}
                                 className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider transition-colors ${suggestion.type === 'warning'
-                                    ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300'
-                                    : 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300'
+                                  ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-700 dark:text-amber-300'
+                                  : 'bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-700 dark:text-emerald-300'
                                   }`}
                               >
                                 <Wand2 className="w-3 h-3" />
@@ -967,24 +967,24 @@ const ResumeBuilder: React.FC = () => {
               </div>
             </div>
 
-            <div className="saas-card p-4 bg-slate-900/50">
-              <h4 className="font-bold text-slate-300 text-xs mb-3 uppercase tracking-wider">ATS Strength</h4>
+            <div className="saas-card p-4 bg-white/50">
+              <h4 className="font-bold text-slate-700 text-xs mb-3 uppercase tracking-wider">ATS Strength</h4>
               <div className="space-y-3">
                 <div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-400">Keywords</span>
+                    <span className="text-slate-600">Keywords</span>
                     <span className="text-emerald-400 font-bold">Good</span>
                   </div>
-                  <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-sky-100 rounded-full overflow-hidden">
                     <div className="h-full w-[85%] bg-emerald-500 rounded-full"></div>
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-slate-400">Formatting</span>
+                    <span className="text-slate-600">Formatting</span>
                     <span className="text-indigo-400 font-bold">Excellent</span>
                   </div>
-                  <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-sky-100 rounded-full overflow-hidden">
                     <div className="h-full w-[95%] bg-indigo-500 rounded-full"></div>
                   </div>
                 </div>
@@ -998,3 +998,5 @@ const ResumeBuilder: React.FC = () => {
 };
 
 export default ResumeBuilder;
+
+

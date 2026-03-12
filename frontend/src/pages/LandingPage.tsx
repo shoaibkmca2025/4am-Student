@@ -7,22 +7,33 @@ import Internship from '../components/Internship';
 import Features from '../components/Features';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
+import ParticleCanvas from '../components/ParticleCanvas';
 
-function LandingPage() {
+const LandingPage: React.FC = () => {
   return (
-    <div className="min-h-screen text-slate-900">
-      <Navbar />
-      <main>
-        <Hero />
-        <About />
-        <Services />
-        <Internship />
-        <Features />
-        <Contact />
-      </main>
-      <Footer />
+    <div className="min-h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-white relative">
+      <ParticleCanvas />
+
+      {/* Background gradients */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute -top-1/3 -right-1/3 w-[70vw] h-[70vw] rounded-full bg-cyan-900/20 blur-[120px]" />
+        <div className="absolute -bottom-1/3 -left-1/3 w-[70vw] h-[70vw] rounded-full bg-blue-900/20 blur-[120px]" />
+      </div>
+
+      <div className="relative z-10">
+        <Navbar />
+        <main>
+          <Hero />
+          <Services />
+          <Features />
+          <Internship />
+          <About />
+          <Contact />
+        </main>
+        <Footer />
+      </div>
     </div>
   );
-}
+};
 
 export default LandingPage;

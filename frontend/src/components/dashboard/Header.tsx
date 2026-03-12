@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { 
+import {
   Search, Bell, User, ChevronDown, Menu, X, Sun, Moon, HelpCircle,
-  ExternalLink, Mail, FileText, MessageCircle, LayoutDashboard, 
+  ExternalLink, Mail, FileText, MessageCircle, LayoutDashboard,
   Code, TrendingUp, Briefcase, Award, MessageSquare, CreditCard, Settings, Users, Building
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { achievementService, notificationService } from '../../services/api';
+import { useTheme } from '../../context/ThemeContext';
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -26,7 +27,7 @@ interface SearchResult {
 }
 
 const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName, userRole = 'student', setActiveTab, handleLogout }) => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const { theme, toggleTheme } = useTheme();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -39,17 +40,15 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
   const [showNotifications, setShowNotifications] = useState(false);
 
   useEffect(() => {
-    // Fetch Level & XP from Backend
     const fetchStats = async () => {
       try {
-        const data = await achievementService.getStats();
+        const data = await achievementService.get();
         if (data) {
           setLevel(data.level);
           setXp(data.xp);
         }
       } catch (error) {
         console.error("Failed to fetch user stats for header", error);
-        // Set default values if backend fails
         setLevel(1);
         setXp(0);
       }
@@ -58,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
     const fetchNotifications = async () => {
       try {
         const data = await notificationService.getAll();
-        setNotifications(data);
+        setNotifications(data.notifications ?? []);
       } catch (error) {
         console.error("Failed to fetch notifications", error);
       }
@@ -77,10 +76,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
     }
   };
 
-
-  // Mock Data for Search
   const studentSearchData: SearchResult[] = [
-    // Pages
     { id: 'overview', title: 'Overview', type: 'page', subtitle: 'Dashboard Home', icon: LayoutDashboard, action: () => setActiveTab('overview') },
     { id: 'resume', title: 'Resume Builder', type: 'page', subtitle: 'Create your resume', icon: FileText, action: () => setActiveTab('resume') },
     { id: 'interview', title: 'Mock Interview', type: 'page', subtitle: 'Practice interviews', icon: MessageSquare, action: () => setActiveTab('interview') },
@@ -90,24 +86,14 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
     { id: 'achievements', title: 'Achievements', type: 'page', subtitle: 'View badges', icon: Award, action: () => setActiveTab('achievements') },
     { id: 'settings', title: 'Settings', type: 'page', subtitle: 'Account preferences', icon: Settings, action: () => setActiveTab('settings') },
     { id: 'billing', title: 'Billing', type: 'page', subtitle: 'Manage subscription', icon: CreditCard, action: () => setActiveTab('settings') },
-    
-    // Mock Jobs (Simulated) - Commented out for real implementation
-    // { id: 'job-1', title: 'Frontend Developer', type: 'job', subtitle: 'Google - Remote', icon: Briefcase, action: () => setActiveTab('jobs') },
-    // { id: 'job-2', title: 'React Engineer', type: 'job', subtitle: 'Meta - London', icon: Briefcase, action: () => setActiveTab('jobs') },
-    // { id: 'job-3', title: 'UX Designer', type: 'job', subtitle: 'Airbnb - NYC', icon: Briefcase, action: () => setActiveTab('jobs') },
-
-    // Mock Skills - Commented out for real implementation
-    // { id: 'skill-1', title: 'React.js', type: 'skill', subtitle: 'Advanced Assessment', icon: Code, action: () => setActiveTab('skills') },
-    // { id: 'skill-2', title: 'TypeScript', type: 'skill', subtitle: 'Intermediate Assessment', icon: Code, action: () => setActiveTab('skills') },
   ];
 
   const companySearchData: SearchResult[] = [
-    // Pages
     { id: 'overview', title: 'Overview', type: 'page', subtitle: 'Dashboard Home', icon: LayoutDashboard, action: () => setActiveTab('overview') },
     { id: 'post-job', title: 'Post a Job', type: 'page', subtitle: 'Create new listing', icon: Briefcase, action: () => setActiveTab('post-job') },
     { id: 'candidates', title: 'Candidates', type: 'page', subtitle: 'Search talent', icon: Users, action: () => setActiveTab('candidates') },
     { id: 'interviews', title: 'Interviews', type: 'page', subtitle: 'Schedule & manage', icon: MessageSquare, action: () => setActiveTab('interviews') },
-    { id: 'profile', title: 'Company Profile', type: 'page', subtitle: 'Branding & info', icon: Building, action: () => setActiveTab('profile') }, // Building needs import but let's check if it is imported
+    { id: 'profile', title: 'Company Profile', type: 'page', subtitle: 'Branding & info', icon: Building, action: () => setActiveTab('profile') },
     { id: 'settings', title: 'Settings', type: 'page', subtitle: 'Account preferences', icon: Settings, action: () => setActiveTab('settings') },
   ];
 
@@ -118,272 +104,263 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
       setSearchResults([]);
       return;
     }
-
     const lowerQuery = searchQuery.toLowerCase();
-    const filtered = searchData.filter(item => 
-      item.title.toLowerCase().includes(lowerQuery) || 
+    const filtered = searchData.filter(item =>
+      item.title.toLowerCase().includes(lowerQuery) ||
       item.subtitle?.toLowerCase().includes(lowerQuery)
     );
     setSearchResults(filtered);
   }, [searchQuery]);
 
-  useEffect(() => {
-    // Check for saved theme preference or system preference
-    const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme === 'light' || (!savedTheme && !prefersDark)) {
-      setIsDarkMode(false);
-      document.documentElement.classList.remove('dark');
-      // Note: Since the app is built with slate-900 as default, we might need to handle this more globally
-      // For now, we'll toggle the state to reflect user choice
-    } else {
-      setIsDarkMode(true);
-      document.documentElement.classList.add('dark');
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    const newMode = !isDarkMode;
-    setIsDarkMode(newMode);
-    localStorage.setItem('theme', newMode ? 'dark' : 'light');
-    
-    if (newMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  };
-
   return (
     <>
-      <header className="sticky top-0 z-40 bg-slate-950/60 backdrop-blur-xl border-b border-white/5 h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 transition-all duration-300">
-      
-      {/* Mobile Toggle & Logo */}
-      <div className="flex items-center lg:hidden">
-        <button 
-          onClick={toggleSidebar}
-          className="p-2 text-slate-400 hover:text-slate-200 hover:bg-white/10 rounded-lg transition-colors"
-        >
-          {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
-      </div>
+      <header className="sticky top-0 z-40 backdrop-blur-xl h-16 flex items-center justify-between px-4 sm:px-6 lg:px-8 transition-all duration-300 bg-white/70 dark:bg-black/70 border-b border-black/5 dark:border-white/5">
 
-      {/* Smart Search Bar */}
-      <div className={`relative flex items-center transition-all duration-300 ${isSearchActive ? 'w-full lg:w-96' : 'w-auto lg:w-96'}`}>
-        <div className="absolute left-3 text-slate-500 pointer-events-none z-10">
-          <Search className="w-4 h-4" />
+        {/* Mobile Toggle */}
+        <div className="flex items-center lg:hidden">
+          <button
+            onClick={toggleSidebar}
+            className="p-2 text-gray-400 hover:text-cyan-400 rounded-lg transition-colors"
+            style={{ background: 'transparent' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,245,255,0.08)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+          >
+            {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
-        <input 
-          type="text" 
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search jobs, skills, mentors..." 
-          className={`w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all ${
-            isSearchActive ? 'opacity-100 w-full' : 'hidden lg:block opacity-100 w-full'
-          }`}
-          onFocus={() => setIsSearchActive(true)}
-          onBlur={() => setTimeout(() => setIsSearchActive(false), 200)}
-        />
-        <button 
-          className={`lg:hidden p-2 text-slate-400 hover:text-slate-100 ${isSearchActive ? 'hidden' : 'block'}`}
-          onClick={() => setIsSearchActive(!isSearchActive)}
-        >
-          <Search className="w-5 h-5" />
-        </button>
-        
-        {/* Search Suggestions Dropdown */}
-        <div className={`absolute top-full left-0 right-0 mt-2 bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-lg shadow-2xl p-2 z-50 transform origin-top transition-all duration-200 ${isSearchActive ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}>
+
+        {/* Smart Search Bar */}
+        <div className={`relative flex items-center transition-all duration-300 ${isSearchActive ? 'w-full lg:w-96' : 'w-auto lg:w-96'}`}>
+          <div className="absolute left-3 text-gray-500 pointer-events-none z-10">
+            <Search className="w-4 h-4" />
+          </div>
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search jobs, skills, mentors..."
+            className={`w-full pl-10 pr-4 py-2 rounded-lg text-slate-900 dark:text-white placeholder-gray-500 focus:outline-none transition-all ${isSearchActive ? 'opacity-100 w-full' : 'hidden lg:block opacity-100 w-full'
+              }`}
+            style={{ background: theme === 'dark' ? 'rgba(0,245,255,0.05)' : 'rgba(0,0,0,0.05)', border: '1px solid rgba(0,245,255,0.1)' }}
+            onFocus={(e) => { setIsSearchActive(true); e.currentTarget.style.borderColor = 'rgba(0,245,255,0.3)'; e.currentTarget.style.boxShadow = '0 0 0 3px rgba(0,245,255,0.08)'; }}
+            onBlur={(e) => { setTimeout(() => setIsSearchActive(false), 200); e.currentTarget.style.borderColor = 'rgba(0,245,255,0.1)'; e.currentTarget.style.boxShadow = 'none'; }}
+          />
+          <button
+            className={`lg:hidden p-2 text-gray-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white ${isSearchActive ? 'hidden' : 'block'}`}
+            onClick={() => setIsSearchActive(!isSearchActive)}
+          >
+            <Search className="w-5 h-5" />
+          </button>
+
+          {/* Search Suggestions Dropdown */}
+          <div className={`absolute top-full left-0 right-0 mt-2 backdrop-blur-xl rounded-lg shadow-2xl p-2 z-50 transform origin-top transition-all duration-200 ${isSearchActive ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}
+            style={{ background: theme === 'dark' ? 'rgba(10,10,10,0.95)' : 'rgba(255,255,255,0.95)', border: '1px solid rgba(0,245,255,0.12)' }}>
             {searchQuery === '' ? (
-              <div className="px-3 py-4 text-center text-slate-500">
+              <div className="px-3 py-4 text-center text-gray-500">
                 <p className="text-xs font-medium">Start typing to search pages...</p>
               </div>
             ) : searchResults.length > 0 ? (
               <>
-                <p className="px-3 py-2 text-xs font-bold text-slate-500 uppercase tracking-wider">Results</p>
+                <p className="px-3 py-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Results</p>
                 {searchResults.map((result) => (
-                  <button 
+                  <button
                     key={result.id}
                     onClick={() => {
                       result.action();
                       setIsSearchActive(false);
                       setSearchQuery('');
                     }}
-                    className="w-full text-left px-3 py-2 text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-md transition-colors flex items-center gap-3 group"
+                    className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 rounded-md transition-colors flex items-center gap-3 group"
+                    style={{ background: 'transparent' }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,245,255,0.08)'; e.currentTarget.style.color = theme === 'dark' ? '#fff' : '#0f172a'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = theme === 'dark' ? '#9ca3af' : '#4b5563'; }}
                   >
-                    <div className="p-1.5 rounded-md bg-slate-800 group-hover:bg-slate-700 transition-colors">
-                      <result.icon className="w-4 h-4 text-indigo-400" />
+                    <div className="p-1.5 rounded-md" style={{ background: 'rgba(0,245,255,0.1)' }}>
+                      <result.icon className="w-4 h-4" style={{ color: 'var(--primary)' }} />
                     </div>
                     <div>
-                      <p className="font-medium text-slate-200">{result.title}</p>
-                      {result.subtitle && <p className="text-xs text-slate-500">{result.subtitle}</p>}
+                      <p className="font-medium text-slate-900 dark:text-white">{result.title}</p>
+                      {result.subtitle && <p className="text-xs text-gray-500">{result.subtitle}</p>}
                     </div>
                   </button>
                 ))}
               </>
             ) : (
-              <div className="px-3 py-4 text-center text-slate-500">
+              <div className="px-3 py-4 text-center text-gray-500">
                 <p className="text-sm">No results found for "{searchQuery}"</p>
               </div>
             )}
+          </div>
         </div>
-      </div>
 
-      {/* Right Actions */}
-      <div className="flex items-center space-x-2 sm:space-x-3">
-        
-        {/* Help Center */}
-        <button 
-          onClick={() => setShowHelp(true)}
-          className="hidden sm:flex items-center justify-center w-9 h-9 rounded-md text-slate-400 hover:text-primary hover:bg-slate-800 transition-colors"
-        >
-          <HelpCircle className="w-5 h-5" />
-        </button>
+        {/* Right Actions */}
+        <div className="flex items-center space-x-2 sm:space-x-3">
 
-        {/* Theme Toggle */}
-        <button 
-          onClick={toggleTheme}
-          className="hidden sm:flex items-center justify-center w-9 h-9 rounded-md text-slate-400 hover:text-warning hover:bg-slate-800 transition-colors"
-        >
-          {isDarkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
-        </button>
-
-        {/* Notifications */}
-        <div className="relative">
-          <button 
-            className="relative flex items-center justify-center w-9 h-9 rounded-md text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
-            onClick={() => setShowNotifications(!showNotifications)}
+          {/* Help Center */}
+          <button
+            onClick={() => setShowHelp(true)}
+            className="hidden sm:flex items-center justify-center w-9 h-9 rounded-md text-gray-500 hover:text-cyan-400 transition-colors"
+            style={{ background: 'transparent' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,245,255,0.08)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
           >
-            <Bell className="w-5 h-5" />
-            {notifications.filter(n => !n.read).length > 0 && (
-              <span className="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border-2 border-slate-900"></span>
-            )}
+            <HelpCircle className="w-5 h-5" />
           </button>
-          
-          {/* Notification Dropdown */}
-          <div className={`absolute right-0 top-full mt-2 w-80 bg-slate-900 border border-slate-700 rounded-lg shadow-xl transition-all duration-200 z-50 overflow-hidden ${showNotifications ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2'}`}>
-            <div className="flex items-center justify-between p-3 border-b border-slate-700 bg-slate-800/50">
-              <h4 className="text-sm font-semibold text-slate-200">Notifications</h4>
-              {notifications.length > 0 && (
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    notificationService.markAllRead().then(() => setNotifications(prev => prev.map(n => ({ ...n, read: true }))));
-                  }}
-                  className="text-xs text-indigo-400 hover:text-indigo-300"
-                >
-                  Mark all read
-                </button>
+
+          {/* Theme Toggle */}
+          <button
+            onClick={toggleTheme}
+            className="hidden sm:flex items-center justify-center w-9 h-9 rounded-md text-gray-500 hover:text-amber-400 transition-colors"
+            style={{ background: 'transparent' }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,245,255,0.08)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+          >
+            {theme === 'dark' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+          </button>
+
+          {/* Notifications */}
+          <div className="relative">
+            <button
+              className="relative flex items-center justify-center w-9 h-9 rounded-md text-gray-500 hover:text-cyan-400 transition-colors"
+              onClick={() => setShowNotifications(!showNotifications)}
+              style={{ background: 'transparent' }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(0,245,255,0.08)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+            >
+              <Bell className="w-5 h-5" />
+              {notifications.filter(n => !n.read).length > 0 && (
+                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-[#0a0a0a]" />
               )}
-            </div>
-            <div className="max-h-64 overflow-y-auto">
-              {notifications.length > 0 ? (
-                notifications.map(notification => (
-                  <button 
-                    key={notification._id} 
-                    onClick={() => handleNotificationClick(notification._id)}
-                    className={`w-full text-left p-3 border-b border-slate-800 hover:bg-slate-800/50 cursor-pointer transition-colors ${notification.read ? 'opacity-50' : 'opacity-100'}`}
+            </button>
+
+            {/* Notification Dropdown */}
+            <div className={`absolute right-0 top-full mt-2 w-80 rounded-lg shadow-xl transition-all duration-200 z-50 overflow-hidden bg-white dark:bg-[#0a0a0a] border border-black/10 dark:border-white/10 ${showNotifications ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2'}`}>
+              <div className="flex items-center justify-between p-3 border-b border-black/5 dark:border-white/5 bg-slate-50 dark:bg-white/5">
+                <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Notifications</h4>
+                {notifications.length > 0 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      notificationService.markAllRead().then(() => setNotifications(prev => prev.map(n => ({ ...n, read: true }))));
+                    }}
+                    className="text-xs hover:underline text-primary"
                   >
-                    <div className="flex items-start gap-3">
-                      <div className={`w-2 h-2 mt-1.5 rounded-full flex-shrink-0 ${notification.type === 'success' ? 'bg-emerald-500' : notification.type === 'error' ? 'bg-red-500' : notification.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'}`}></div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-200">{notification.title}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">{notification.message}</p>
-                        <p className="text-[10px] text-slate-500 mt-1.5">{new Date(notification.createdAt).toLocaleDateString()}</p>
-                      </div>
-                    </div>
+                    Mark all read
                   </button>
-                ))
-              ) : (
-                <div className="p-8 text-center text-slate-500">
-                  <Bell className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                  <p className="text-xs">No new notifications</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* User Profile */}
-        <div className="relative group ml-2 pl-4 border-l border-slate-800">
-          <button className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-            <div className="relative">
-              <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center overflow-hidden border border-slate-700">
-                <User className="w-4 h-4 text-slate-400" />
+                )}
               </div>
-              <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-success border-2 border-slate-900 rounded-full"></div>
-            </div>
-            <div className="hidden md:block text-left">
-              <p className="text-sm font-medium text-slate-200 leading-none">{userName}</p>
-              <div className="flex items-center gap-1 mt-1">
-                <div className="w-12 h-1 bg-slate-800 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-primary" 
-                    style={{ width: `${(xp / 1000) * 100}%` }}
-                  ></div>
-                </div>
-                <p className="text-[10px] text-slate-500">Lvl {level}</p>
+              <div className="max-h-64 overflow-y-auto">
+                {notifications.length > 0 ? (
+                  notifications.map(notification => (
+                    <button
+                      key={notification._id}
+                      onClick={() => handleNotificationClick(notification._id)}
+                      className={`w-full text-left p-3 cursor-pointer transition-colors border-b border-black/5 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 ${notification.read ? 'opacity-50' : 'opacity-100'}`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`w-2 h-2 mt-1.5 rounded-full flex-shrink-0 ${notification.type === 'success' ? 'bg-emerald-500' : notification.type === 'error' ? 'bg-red-500' : notification.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'}`} />
+                        <div>
+                          <p className="text-sm font-medium text-slate-900 dark:text-white">{notification.title}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{notification.message}</p>
+                          <p className="text-[10px] text-gray-500 mt-1.5">{new Date(notification.createdAt).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                    </button>
+                  ))
+                ) : (
+                  <div className="p-8 text-center text-gray-600">
+                    <Bell className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                    <p className="text-xs">No new notifications</p>
+                  </div>
+                )}
               </div>
             </div>
-            <ChevronDown className="w-4 h-4 text-slate-500 hidden md:block group-hover:rotate-180 transition-transform duration-200" />
-          </button>
-          
-          {/* Dropdown Menu */}
-          <div className="absolute right-0 top-full mt-2 w-56 bg-slate-900 border border-slate-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transform translate-y-2 group-hover:translate-y-0 transition-all duration-200 z-50 overflow-hidden">
-            <div className="p-1.5 space-y-0.5">
-              <button 
-                onClick={() => setActiveTab('settings')}
-                className="w-full text-left px-3 py-2 text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-md transition-colors"
-              >
-                Profile
-              </button>
-              <button 
-                onClick={() => setActiveTab('settings')}
-                className="w-full text-left px-3 py-2 text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-md transition-colors"
-              >
-                Billing
-              </button>
-              <button 
-                onClick={() => setActiveTab('settings')}
-                className="w-full text-left px-3 py-2 text-sm text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-md transition-colors"
-              >
-                Settings
-              </button>
-              <div className="h-px bg-slate-800 my-1"></div>
-              <button 
-                onClick={handleLogout}
-                className="w-full text-left px-3 py-2 text-sm text-error hover:bg-error/10 rounded-md transition-colors"
-              >
-                Sign Out
-              </button>
+          </div>
+
+          {/* User Profile */}
+          <div className="relative group ml-2 pl-4" style={{ borderLeft: '1px solid rgba(0,245,255,0.1)' }}>
+            <button className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+              <div className="relative">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center overflow-hidden" style={{ background: 'rgba(0,245,255,0.1)', border: '1px solid rgba(0,245,255,0.2)' }}>
+                  <User className="w-4 h-4 text-slate-700 dark:text-gray-400" />
+                </div>
+                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white dark:border-[#0a0a0a]" />
+              </div>
+              <div className="hidden md:block text-left">
+                <p className="text-sm font-medium text-slate-900 dark:text-white leading-none">{userName}</p>
+                <div className="flex items-center gap-1 mt-1">
+                  <div className="w-12 h-1 rounded-full overflow-hidden" style={{ background: 'rgba(0,245,255,0.1)' }}>
+                    <div
+                      className="h-full rounded-full"
+                      style={{ width: `${(xp / 1000) * 100}%`, background: 'var(--primary)' }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-slate-700 dark:text-gray-500 font-medium">Lvl {level}</p>
+                </div>
+              </div>
+              <ChevronDown className="w-4 h-4 text-gray-500 hidden md:block group-hover:rotate-180 transition-transform duration-200" />
+            </button>
+
+            {/* Dropdown Menu */}
+            <div className="absolute right-0 top-full mt-2 w-56 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transform translate-y-2 group-hover:translate-y-0 transition-all duration-200 z-50 overflow-hidden bg-white dark:bg-[#0a0a0a] border border-black/10 dark:border-white/10">
+              <div className="p-1.5 space-y-0.5">
+                <button
+                  onClick={() => setActiveTab('settings')}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 rounded-md transition-colors hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
+                >
+                  Profile
+                </button>
+                <button
+                  onClick={() => setActiveTab('settings')}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 rounded-md transition-colors hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
+                >
+                  Billing
+                </button>
+                <button
+                  onClick={() => setActiveTab('settings')}
+                  className="w-full text-left px-3 py-2 text-sm text-gray-600 dark:text-gray-400 rounded-md transition-colors hover:bg-slate-50 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white"
+                >
+                  Settings
+                </button>
+                <div className="h-px my-1" style={{ background: 'rgba(0,245,255,0.08)' }} />
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-md transition-colors"
+                >
+                  Sign Out
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-      </div>
-    </header>
+        </div>
+      </header>
 
       {/* Help Modal */}
       <AnimatePresence>
         {showHelp && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-            <motion.div 
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden flex flex-col shadow-2xl"
+              className="w-full max-w-lg overflow-hidden flex flex-col shadow-2xl rounded-2xl"
+              style={{ background: '#0a0a0a', border: '1px solid rgba(0,245,255,0.12)' }}
             >
-              <div className="p-6 border-b border-slate-800 flex items-center justify-between">
+              <div className="p-6 flex items-center justify-between border-b border-black/5 dark:border-white/5">
                 <div>
-                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    <HelpCircle className="w-5 h-5 text-indigo-400" />
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                    <HelpCircle className="w-5 h-5 text-primary" />
                     Help Center
                   </h2>
-                  <p className="text-sm text-slate-400 mt-1">How can we assist you today?</p>
+                  <p className="text-sm text-gray-500 mt-1">How can we assist you today?</p>
                 </div>
-                <button 
+                <button
                   onClick={() => setShowHelp(false)}
-                  className="p-2 hover:bg-slate-800 rounded-full text-slate-400 hover:text-white transition-colors"
+                  className="p-2 rounded-full text-gray-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+                  style={{ background: 'transparent' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = 'var(--primary-dim)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -391,59 +368,45 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
 
               <div className="p-6 space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <button className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800 hover:border-indigo-500/50 transition-all text-left group">
-                    <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                      <FileText className="w-5 h-5 text-indigo-400" />
-                    </div>
-                    <h3 className="font-semibold text-slate-200 mb-1">Documentation</h3>
-                    <p className="text-xs text-slate-400">Browse guides and tutorials</p>
-                  </button>
-
-                  <button className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800 hover:border-emerald-500/50 transition-all text-left group">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                      <MessageCircle className="w-5 h-5 text-emerald-400" />
-                    </div>
-                    <h3 className="font-semibold text-slate-200 mb-1">Live Chat</h3>
-                    <p className="text-xs text-slate-400">Talk to our support team</p>
-                  </button>
-
-                  <button className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800 hover:border-purple-500/50 transition-all text-left group">
-                    <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                      <Mail className="w-5 h-5 text-purple-400" />
-                    </div>
-                    <h3 className="font-semibold text-slate-200 mb-1">Email Support</h3>
-                    <p className="text-xs text-slate-400">Get help via email</p>
-                  </button>
-
-                  <button className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:bg-slate-800 hover:border-amber-500/50 transition-all text-left group">
-                    <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                      <ExternalLink className="w-5 h-5 text-amber-400" />
-                    </div>
-                    <h3 className="font-semibold text-slate-200 mb-1">Community</h3>
-                    <p className="text-xs text-slate-400">Join our student forum</p>
-                  </button>
+                  {[
+                    { icon: FileText, title: 'Documentation', desc: 'Browse guides and tutorials', color: '#00f5ff' },
+                    { icon: MessageCircle, title: 'Live Chat', desc: 'Talk to our support team', color: '#34d399' },
+                    { icon: Mail, title: 'Email Support', desc: 'Get help via email', color: '#a78bfa' },
+                    { icon: ExternalLink, title: 'Community', desc: 'Join our student forum', color: '#fbbf24' },
+                  ].map((item) => (
+                    <button key={item.title} className="p-4 rounded-xl text-left group transition-all bg-slate-50 dark:bg-black border border-black/5 dark:border-white/5 hover:border-black/20 dark:hover:border-white/20"
+                    >
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform" style={{ background: `${item.color}15` }}>
+                        <item.icon className="w-5 h-5" style={{ color: item.color }} />
+                      </div>
+                      <h3 className="font-semibold text-slate-900 dark:text-white mb-1">{item.title}</h3>
+                      <p className="text-xs text-gray-500">{item.desc}</p>
+                    </button>
+                  ))}
                 </div>
-                
-                <div className="pt-4 border-t border-slate-800">
-                  <h4 className="text-sm font-medium text-slate-300 mb-2">Frequently Asked Questions</h4>
+
+                <div className="pt-4" style={{ borderTop: '1px solid rgba(0,245,255,0.08)' }}>
+                  <h4 className="text-sm font-medium text-gray-300 mb-2">Frequently Asked Questions</h4>
                   <div className="space-y-2">
-                    <button className="w-full text-left text-sm text-slate-400 hover:text-indigo-400 transition-colors py-1">
-                      • How do I reset my password?
-                    </button>
-                    <button className="w-full text-left text-sm text-slate-400 hover:text-indigo-400 transition-colors py-1">
-                      • Can I download my resume as Word doc?
-                    </button>
-                    <button className="w-full text-left text-sm text-slate-400 hover:text-indigo-400 transition-colors py-1">
-                      • How is the skill score calculated?
-                    </button>
+                    {[
+                      '• How do I reset my password?',
+                      '• Can I download my resume as Word doc?',
+                      '• How is the skill score calculated?',
+                    ].map((q) => (
+                      <button key={q} className="w-full text-left text-sm text-gray-500 transition-colors py-1"
+                        onMouseEnter={(e) => { e.currentTarget.style.color = '#00f5ff'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.color = '#6b7280'; }}>
+                        {q}
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
 
-              <div className="p-4 border-t border-slate-800 bg-slate-900/50 flex justify-end">
-                <button 
+              <div className="p-4 flex justify-end" style={{ borderTop: '1px solid rgba(0,245,255,0.08)', background: 'rgba(0,0,0,0.3)' }}>
+                <button
                   onClick={() => setShowHelp(false)}
-                  className="saas-button-primary"
+                  className="btn-primary px-6 py-2 text-sm"
                 >
                   Close
                 </button>

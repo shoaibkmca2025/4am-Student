@@ -28,9 +28,9 @@ const colorMap = {
   },
   secondary: {
     bg: 'bg-slate-500/10',
-    text: 'text-slate-400',
-    border: 'border-slate-500/20',
-    icon: 'text-slate-400',
+    text: 'text-slate-600',
+    border: 'border-sky-400/20',
+    icon: 'text-slate-600',
     gradient: 'from-slate-500/20 to-slate-500/5',
     stroke: '#94A3B8'
   },
@@ -177,7 +177,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
     <TiltCard 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 relative overflow-hidden group h-full flex flex-col justify-between hover:shadow-2xl hover:bg-slate-800/60 transition-all duration-300`}
+      className={`bg-white/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 relative overflow-hidden group h-full flex flex-col justify-between hover:shadow-2xl hover:bg-sky-100/60 transition-all duration-300`}
     >
       {/* Background Gradient Splash */}
       <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${theme.gradient} rounded-full blur-2xl -mr-10 -mt-10 opacity-30 group-hover:opacity-60 transition-opacity duration-500`} style={{ transform: 'translateZ(-20px)' }}></div>
@@ -199,30 +199,30 @@ const StatsCard: React.FC<StatsCardProps> = ({
             {variant === 'circular' ? (
                 <div className="flex flex-col items-center justify-center py-2 group-hover:scale-105 transition-transform duration-300">
                      <CircleProgress value={currentProgress} theme={theme} />
-                     <p className="text-sm font-medium text-slate-400 mt-2">{title}</p>
+                     <p className="text-sm font-medium text-slate-600 mt-2">{title}</p>
                 </div>
             ) : variant === 'gauge' ? (
                 <div className="flex flex-col items-center justify-center py-2">
                     <Gauge percentage={currentProgress} theme={theme} />
-                    <h3 className="text-2xl font-bold text-slate-200 mt-2">
+                    <h3 className="text-2xl font-bold text-slate-800 mt-2">
                       <AnimatedNumber value={value} />
                     </h3>
-                    <p className="text-sm font-medium text-slate-400">{title}</p>
+                    <p className="text-sm font-medium text-slate-600">{title}</p>
                 </div>
             ) : (
                 <>
-                  <h3 className="text-3xl font-bold text-slate-200 tracking-tight">
+                  <h3 className="text-3xl font-bold text-slate-800 tracking-tight">
                     <AnimatedNumber value={value} />
                   </h3>
                   <div className="flex items-center space-x-2 group/tooltip cursor-help">
-                    <p className="text-sm font-medium text-slate-400">{title}</p>
-                    {tooltip && <Info className="w-3.5 h-3.5 text-slate-500 hover:text-slate-300 transition-colors" />}
+                    <p className="text-sm font-medium text-slate-600">{title}</p>
+                    {tooltip && <Info className="w-3.5 h-3.5 text-slate-500 hover:text-slate-700 transition-colors" />}
                     
                     {/* Tooltip */}
                     {tooltip && (
-                      <div className="absolute left-0 bottom-full mb-2 w-56 p-3 bg-slate-900/95 backdrop-blur-md text-xs text-slate-200 rounded-xl shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 pointer-events-none border border-slate-700/50">
+                      <div className="absolute left-0 bottom-full mb-2 w-56 p-3 bg-white/95 backdrop-blur-md text-xs text-slate-800 rounded-xl shadow-xl opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible transition-all duration-200 z-50 pointer-events-none border border-sky-200/50">
                         {tooltip}
-                        <div className="absolute left-4 top-full w-2 h-2 bg-slate-900/95 transform rotate-45 border-r border-b border-slate-700/50"></div>
+                        <div className="absolute left-4 top-full w-2 h-2 bg-white/95 transform rotate-45 border-r border-b border-sky-200/50"></div>
                       </div>
                     )}
                   </div>
@@ -252,7 +252,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
 
                   {/* Progress Bar Variant */}
                   {variant === 'bar' && (
-                    <div className="mt-4 relative h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                    <div className="mt-4 relative h-2 w-full bg-sky-100 rounded-full overflow-hidden">
                       <motion.div 
                         initial={{ width: 0 }}
                         animate={{ width: `${currentProgress}%` }}

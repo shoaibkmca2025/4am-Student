@@ -21,7 +21,7 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ activityData = [] }) 
       case 3: return 'bg-emerald-500/70';
       case 2: return 'bg-emerald-500/30';
       case 1: return 'bg-emerald-900/50';
-      default: return 'bg-slate-800/50';
+      default: return 'bg-sky-100/50';
     }
   };
 
@@ -41,16 +41,16 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ activityData = [] }) 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
-      className="bg-slate-900/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 relative overflow-hidden group"
+      className="bg-white/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 relative overflow-hidden group"
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-slate-200 flex items-center gap-2">
+        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
           <Flame className="w-5 h-5 text-emerald-400" />
           Learning Activity
         </h3>
-        <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-800/50 px-3 py-1.5 rounded-full border border-slate-700/50">
+        <div className="flex items-center gap-2 text-xs text-slate-600 bg-sky-100/50 px-3 py-1.5 rounded-full border border-sky-200/50">
           <span>Less</span>
-          <div className="w-2.5 h-2.5 bg-slate-800/50 rounded-sm"></div>
+          <div className="w-2.5 h-2.5 bg-sky-100/50 rounded-sm"></div>
           <div className="w-2.5 h-2.5 bg-emerald-500/30 rounded-sm"></div>
           <div className="w-2.5 h-2.5 bg-emerald-500/70 rounded-sm"></div>
           <div className="w-2.5 h-2.5 bg-emerald-500 rounded-sm shadow-[0_0_4px_rgba(16,185,129,0.4)]"></div>
@@ -84,13 +84,13 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ activityData = [] }) 
         </div>
       </div>
       
-      <div className="mt-5 flex items-center justify-between text-sm border-t border-slate-800 pt-4">
+      <div className="mt-5 flex items-center justify-between text-sm border-t border-sky-200 pt-4">
         <div className="flex flex-col">
             <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Total Contributions</span>
-            <span className="text-slate-200 font-bold text-lg">{totalContributions}</span>
+            <span className="text-slate-800 font-bold text-lg">{totalContributions}</span>
         </div>
         
-        <div className="h-8 w-px bg-slate-800"></div>
+        <div className="h-8 w-px bg-sky-100"></div>
 
         <div className="flex flex-col items-end">
             <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Current Streak</span>
@@ -104,3 +104,4 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ activityData = [] }) 
 };
 
 export default ActivityHeatmap;
+

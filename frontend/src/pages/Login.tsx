@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Lock, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-import { authService } from '../services/api';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -11,6 +11,12 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { login, isAuthenticated } = useAuth();
+
+  // Redirect if already authenticated
+  React.useEffect(() => {
+    if (isAuthenticated) navigate('/dashboard');
+  }, [isAuthenticated, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,33 +29,30 @@ const Login: React.FC = () => {
         return;
       }
 
-      const data = await authService.login({ email, password });
-
-      localStorage.setItem('authToken', data.token);
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userEmail', data.user.email);
-      localStorage.setItem('userRole', data.user.role);
-      localStorage.setItem('userName', data.user.name);
-
+      await login(email, password);
       navigate('/dashboard');
-    } catch (err: any) {
-      console.error('Login failed', err);
-      setError(err.response?.data?.message || 'Login failed. Check credentials and backend status.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || 'Login failed. Check credentials and backend status.');
+      } else {
+        setError('An unexpected error occurred.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden px-4 py-10">
+    <div className="relative min-h-screen overflow-hidden px-4 py-10 bg-slate-50 dark:bg-[#030303]">
+      {/* Background glows */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-20 top-0 h-96 w-96 rounded-full bg-primary-200/40 blur-3xl" />
-        <div className="absolute -right-24 bottom-8 h-96 w-96 rounded-full bg-secondary-300/35 blur-3xl" />
+        <div className="absolute -left-20 top-0 h-96 w-96 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, rgba(0,245,255,0.4), transparent 70%)' }} />
+        <div className="absolute -right-24 bottom-8 h-96 w-96 rounded-full opacity-15" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.4), transparent 70%)' }} />
       </div>
 
       <button
         onClick={() => navigate('/')}
-        className="relative z-10 inline-flex items-center gap-2 rounded-lg border border-slate-300/60 bg-white/75 px-4 py-2 text-sm font-semibold text-slate-700 backdrop-blur-sm transition-colors hover:border-primary/40 hover:text-primary"
+        className="relative z-10 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-colors text-slate-600 dark:text-gray-400 border border-black/10 dark:border-primary/20 bg-white/50 dark:bg-black/50 hover:border-primary/50 hover:text-primary"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Home
@@ -60,50 +63,50 @@ const Login: React.FC = () => {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: 'easeOut' }}
-          className="w-full rounded-3xl border border-slate-200/70 bg-white/88 p-8 shadow-[0_34px_75px_-45px_rgba(15,23,42,0.55)] backdrop-blur-xl md:p-10"
+          className="w-full rounded-2xl p-8 backdrop-blur-xl md:p-10 bg-white/60 dark:bg-black/60 border border-black/10 dark:border-primary/10 shadow-2xl"
         >
           <div className="mb-8 text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 text-lg font-black text-white shadow-lg shadow-primary/30">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl text-lg font-black text-white dark:text-black bg-primary">
               4
             </div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary-700">Welcome Back</p>
-            <h1 className="mt-2 text-3xl font-extrabold text-slate-900">Sign In</h1>
-            <p className="mt-2 text-sm text-slate-500">Access your student or company dashboard.</p>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Welcome Back</p>
+            <h1 className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">Sign In</h1>
+            <p className="mt-2 text-sm text-slate-600 dark:text-gray-400">Access your student or company dashboard.</p>
           </div>
 
           {error && (
-            <div className="mb-5 rounded-xl border border-error-200 bg-error-50 px-4 py-3 text-sm font-medium text-error-700">
+            <div className="mb-5 rounded-xl px-4 py-3 text-sm font-medium" style={{ border: '1px solid rgba(239,68,68,0.3)', background: 'rgba(239,68,68,0.1)', color: '#f87171' }}>
               {error}
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
             <label className="block">
-              <span className="mb-2 block text-sm font-semibold text-slate-700">Email</span>
+              <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-gray-300">Email</span>
               <div className="relative">
-                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full rounded-xl border border-slate-300 bg-white pl-10 pr-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                  className="dark-input pl-10"
                 />
               </div>
             </label>
 
             <label className="block">
-              <span className="mb-2 block text-sm font-semibold text-slate-700">Password</span>
+              <span className="mb-2 block text-sm font-semibold text-slate-700 dark:text-gray-300">Password</span>
               <div className="relative">
-                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                 <input
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full rounded-xl border border-slate-300 bg-white pl-10 pr-4 py-3 text-sm text-slate-900 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-100"
+                  className="dark-input pl-10"
                 />
               </div>
             </label>
@@ -111,17 +114,15 @@ const Login: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`mt-2 w-full rounded-xl bg-gradient-to-r from-primary-500 to-secondary-500 px-4 py-3 text-sm font-bold text-white shadow-lg shadow-primary/25 transition hover:from-primary-600 hover:to-secondary-600 ${
-                loading ? 'cursor-not-allowed opacity-70' : ''
-              }`}
+              className={`btn-primary mt-2 w-full justify-center py-3 text-sm ${loading ? 'cursor-not-allowed opacity-70' : ''}`}
             >
               {loading ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-600">
+          <p className="mt-6 text-center text-sm text-gray-500">
             New here?{' '}
-            <button onClick={() => navigate('/register')} className="font-bold text-primary-700 hover:text-primary-800">
+            <button onClick={() => navigate('/register')} className="font-bold hover:underline" style={{ color: '#00f5ff' }}>
               Create account
             </button>
           </p>

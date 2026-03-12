@@ -2,7 +2,11 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import helmet from 'helmet';
+import compression from 'compression';
+import morgan from 'morgan';
 import connectDB from './config/db.js';
+import { apiLimiter } from './middleware/rateLimiter.js';
 import assessmentRoutes from './routes/assessmentRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
@@ -15,20 +19,44 @@ import interviewRoutes from './routes/interviewRoutes.js';
 import careerRoutes from './routes/careerRoutes.js';
 import achievementRoutes from './routes/achievementRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import statsRoutes from './routes/statsRoutes.js';
 
 dotenv.config();
 
 const app = express();
 
-// Middleware
-app.use(express.json());
-app.use(cors());
+// Security Middleware
+app.use(helmet());
+app.use(compression());
+
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+}
+
+// Body parsing
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// CORS
+const allowedOrigins = (process.env.CORS_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173').split(',').map(s => s.trim());
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Global rate limiter
+app.use('/api', apiLimiter);
 
 // Database Connection
 connectDB();
 
 // Routes
-app.get('/api/health', (req, res) => res.json({ ok: true }));
+app.get('/api/health', (req, res) => res.json({ ok: true, timestamp: new Date().toISOString() }));
 app.use('/api/assessments', assessmentRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
@@ -41,6 +69,7 @@ app.use('/api/interviews', interviewRoutes);
 app.use('/api/career', careerRoutes);
 app.use('/api/achievements', achievementRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/stats', statsRoutes);
 
 // API 404 handler
 app.all(/^\/api(?:\/.*)?$/, (req, res) => {
@@ -77,7 +106,7 @@ app.use((err, req, res, next) => {
   return res.status(status).json({
     message,
     details,
-    stack: process.env.NODE_ENV === 'production' || status < 500 ? null : err.stack
+    ...(process.env.NODE_ENV !== 'production' && status >= 500 ? { stack: err.stack } : {})
   });
 });
 

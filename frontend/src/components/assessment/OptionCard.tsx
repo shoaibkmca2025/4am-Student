@@ -23,27 +23,27 @@ const OptionCard: React.FC<OptionCardProps> = ({
   const getStyles = () => {
     if (correct === true) return {
         container: 'bg-emerald-500/10 border-emerald-500/50 shadow-[0_0_15px_rgba(16,185,129,0.15)]',
-        text: 'text-white',
+        text: 'text-slate-900',
         icon: 'text-emerald-400',
         badge: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
     };
     if (correct === false && selected) return {
         container: 'bg-red-500/10 border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]',
-        text: 'text-white',
+        text: 'text-slate-900',
         icon: 'text-red-400',
         badge: 'bg-red-500/20 text-red-400 border-red-500/30'
     };
     if (selected) return {
         container: 'bg-indigo-500/20 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.2)]',
-        text: 'text-white',
+        text: 'text-slate-900',
         icon: 'text-indigo-400',
         badge: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30'
     };
     return {
-        container: 'bg-slate-800/40 border-slate-700/50 hover:bg-slate-800/80 hover:border-slate-600 hover:shadow-lg',
-        text: 'text-slate-300 group-hover:text-white',
+        container: 'bg-sky-100/40 border-sky-200/50 hover:bg-sky-100/80 hover:border-sky-300 hover:shadow-lg',
+        text: 'text-slate-700 group-hover:text-primary',
         icon: 'text-slate-500 group-hover:text-indigo-400',
-        badge: 'bg-slate-800 text-slate-500 border-slate-700 group-hover:border-slate-600 group-hover:text-slate-300'
+        badge: 'bg-sky-100 text-slate-500 border-sky-200 group-hover:border-sky-300 group-hover:text-slate-700'
     };
   };
 
@@ -66,13 +66,13 @@ const OptionCard: React.FC<OptionCardProps> = ({
       {/* Selection Indicator (Radio) */}
       <div className={`
         flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-300
-        ${selected ? 'border-indigo-500 bg-indigo-500' : 'border-slate-600 group-hover:border-indigo-400'}
+        ${selected ? 'border-indigo-500 bg-indigo-500' : 'border-sky-300 group-hover:border-indigo-400'}
         ${correct === true ? '!border-emerald-500 !bg-emerald-500' : ''}
         ${correct === false && selected ? '!border-red-500 !bg-red-500' : ''}
       `}>
         {selected || correct !== null ? (
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
-                {correct === false ? <XCircle className="w-4 h-4 text-white" /> : <Check className="w-4 h-4 text-white" />}
+                {correct === false ? <XCircle className="w-4 h-4 text-slate-900" /> : <Check className="w-4 h-4 text-slate-900" />}
             </motion.div>
         ) : null}
       </div>
@@ -101,3 +101,5 @@ const OptionCard: React.FC<OptionCardProps> = ({
 };
 
 export default OptionCard;
+
+

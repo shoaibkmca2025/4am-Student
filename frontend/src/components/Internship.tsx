@@ -1,116 +1,99 @@
-
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { INTERNSHIP_PERKS } from '../constants';
 
+const TRAINING_PROGRAMS = [
+  { title: 'Web Mastery', tech: 'React, Node, TypeScript', gradient: 'from-cyan-500 to-blue-600', icon: '<>' },
+  { title: 'App Design', tech: 'Figma, UX Psychology', gradient: 'from-pink-500 to-rose-600', icon: '##' },
+  { title: 'Backend Pro', tech: 'SQL, Redis, Docker', gradient: 'from-emerald-500 to-green-600', icon: '≡' },
+  { title: 'AI Integrations', tech: 'LLMs, Python, APIs', gradient: 'from-amber-500 to-orange-600', icon: '⊕' },
+];
+
+const PERK_ICONS = [
+  <svg key="0" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>,
+  <svg key="1" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" /></svg>,
+  <svg key="2" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>,
+  <svg key="3" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="7" /><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" /></svg>,
+];
+
 const Internship: React.FC = () => {
-  const scrollToContact = () => {
-    const el = document.getElementById('contact');
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-  };
+  const sectionRef = useRef<HTMLElement>(null);
 
-  const CheckIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-  );
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add('visible');
+        });
+      },
+      { threshold: 0.1 }
+    );
 
-  const GraduationCap = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-  );
+    const elements = sectionRef.current?.querySelectorAll('.animate-on-scroll');
+    elements?.forEach((el) => observer.observe(el));
 
-  const AwardIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
-  );
-
-  const TrendingUp = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-  );
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section id="training" className="section bg-white scroll-mt-24">
+    <section id="training" ref={sectionRef} className="section">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gray-50 rounded-[3rem] p-8 md:p-16 border border-gray-200 relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none">
-            <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-primary-600"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+          {/* Left side */}
+          <div>
+            <div className="animate-on-scroll">
+              <span className="badge-pill">
+                <span className="pulse-dot"></span>
+                2024 Enrollment Open
+              </span>
+            </div>
+
+            <h2 className="section-title mt-6 animate-on-scroll" style={{ transitionDelay: '0.1s' }}>
+              Not Just a Course.
+              <br />
+              <span className="text-gradient">A Career Launchpad.</span>
+            </h2>
+
+            <p className="section-subtitle mt-4 animate-on-scroll" style={{ transitionDelay: '0.2s' }}>
+              Most students are taught what to think. We teach you how to build. Our Internship &
+              Training Division focuses on project-based learning that mimics the high-pressure
+              environment of top tech firms.
+            </p>
+
+            {/* Perk cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-10">
+              {INTERNSHIP_PERKS.map((perk, idx) => (
+                <div
+                  key={perk.title}
+                  className="glass-card p-4 flex items-start gap-3 animate-on-scroll"
+                  style={{ transitionDelay: `${0.3 + idx * 0.1}s` }}
+                >
+                  <div className="icon-box shrink-0 w-10 h-10">
+                    {PERK_ICONS[idx]}
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">{perk.title}</h4>
+                    <p className="text-xs text-gray-400 mt-1 leading-relaxed">{perk.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-16 items-center relative z-10">
-            <div>
-              <div className="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-secondary-50 border border-secondary-200 text-secondary-600 text-sm font-bold mb-6">
-                <AwardIcon />
-                <span>2024 Enrollment Open</span>
-              </div>
-              
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-gray-900">
-                Not Just a Course.<br />
-                <span className="text-gradient">A Career Launchpad.</span>
-              </h2>
-              
-              <p className="text-gray-600 text-lg mb-8 leading-relaxed">
-                Most students are taught what to think. We teach you how to build. Our Internship & Training Division 
-                focuses on project-based learning that mimics the high-pressure environment of top tech firms.
-              </p>
-
-              <div className="space-y-6">
-                {INTERNSHIP_PERKS.map((perk, index) => (
-                  <div key={index} className="flex items-start space-x-4">
-                    <div className="mt-1 bg-primary-100 p-1 rounded-full text-primary-600">
-                      <CheckIcon />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-gray-900 mb-1">{perk.title}</h4>
-                      <p className="text-sm text-gray-600">{perk.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-12 flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6">
-                <button 
-                  onClick={scrollToContact}
-                  className="btn-secondary flex items-center justify-center"
-                >
-                  Apply for Internship
-                </button>
-                <div className="flex items-center space-x-2 text-gray-600">
-                  <span className="text-secondary-600"><TrendingUp /></span>
-                  <span className="text-sm font-medium">92% Job Placement Rate</span>
+          {/* Right side — Training program cards */}
+          <div className="grid grid-cols-2 gap-4">
+            {TRAINING_PROGRAMS.map((prog, idx) => (
+              <div
+                key={prog.title}
+                className="glass-card p-5 animate-on-scroll"
+                style={{ transitionDelay: `${0.2 + idx * 0.1}s` }}
+              >
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${prog.gradient} flex items-center justify-center text-white font-bold text-lg mb-4`}>
+                  {prog.icon}
                 </div>
+                <h3 className="text-base font-bold text-slate-900 dark:text-white">{prog.title}</h3>
+                <p className="text-xs text-gray-500 mt-1">{prog.tech}</p>
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <div className="card p-6 rounded-2xl">
-                  <h5 className="text-primary-600 font-bold text-lg mb-2">Web Mastery</h5>
-                  <p className="text-xs text-gray-500 mb-4">React, Node, TypeScript</p>
-                  <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-primary-500 w-3/4 h-full"></div>
-                  </div>
-                </div>
-                <div className="card p-6 rounded-2xl translate-x-4">
-                  <h5 className="text-secondary-600 font-bold text-lg mb-2">App Design</h5>
-                  <p className="text-xs text-gray-500 mb-4">Figma, UX Psychology</p>
-                  <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-secondary-500 w-1/2 h-full"></div>
-                  </div>
-                </div>
-              </div>
-              <div className="space-y-4 mt-8">
-                <div className="card p-6 rounded-2xl">
-                  <h5 className="text-primary-600 font-bold text-lg mb-2">Backend Pro</h5>
-                  <p className="text-xs text-gray-500 mb-4">SQL, Redis, Docker</p>
-                  <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-primary-500 w-2/3 h-full"></div>
-                  </div>
-                </div>
-                <div className="card p-6 rounded-2xl translate-x-4">
-                  <h5 className="text-secondary-600 font-bold text-lg mb-2">AI Integrations</h5>
-                  <p className="text-xs text-gray-500 mb-4">LLMs, Python, APIs</p>
-                  <div className="w-full bg-gray-200 h-1.5 rounded-full overflow-hidden">
-                    <div className="bg-secondary-500 w-4/5 h-full"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>

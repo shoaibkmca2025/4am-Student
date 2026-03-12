@@ -31,10 +31,10 @@ const CompanySidebar: React.FC<SidebarProps> = ({
       initial={{ width: 280 }}
       animate={{ width: isCollapsed ? 80 : 280 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="h-screen bg-[#0F172A] border-r border-slate-800 flex flex-col fixed left-0 top-0 z-50 shadow-xl"
+      className="h-screen bg-[#0F172A] border-r border-sky-200 flex flex-col fixed left-0 top-0 z-50 shadow-xl"
     >
       {/* Logo Section */}
-      <div className={`flex items-center h-20 px-6 border-b border-slate-800/50 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+      <div className={`flex items-center h-20 px-6 border-b border-sky-200/50 ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
         <div className="flex items-center space-x-3 overflow-hidden">
           <div className="relative group">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg blur opacity-30 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
@@ -47,10 +47,10 @@ const CompanySidebar: React.FC<SidebarProps> = ({
               animate={{ opacity: 1, x: 0 }}
               className="flex flex-col"
             >
-              <span className="font-bold text-lg text-white tracking-tight">
+              <span className="font-bold text-lg text-slate-900 tracking-tight">
                 4AM <span className="text-purple-400">Business</span>
               </span>
-              <span className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">Company Edition</span>
+              <span className="text-[10px] text-slate-600 uppercase tracking-wider font-medium">Company Edition</span>
             </motion.div>
           )}
         </div>
@@ -58,7 +58,7 @@ const CompanySidebar: React.FC<SidebarProps> = ({
         {!isCollapsed && (
           <button 
             onClick={() => setIsCollapsed(true)}
-            className="p-1.5 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-all"
+            className="p-1.5 rounded-lg text-slate-600 hover:bg-sky-100 hover:text-primary transition-all"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -79,7 +79,7 @@ const CompanySidebar: React.FC<SidebarProps> = ({
                 relative w-full flex items-center p-3 rounded-xl transition-all duration-200 group overflow-hidden
                 ${isActive 
                   ? 'bg-gradient-to-r from-purple-500/10 to-pink-500/5 text-white shadow-[0_0_20px_rgba(168,85,247,0.15)] border border-purple-500/20' 
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/50 border border-transparent'
+                  : 'text-slate-600 hover:text-primary hover:bg-sky-100/50 border border-transparent'
                 } 
                 ${isCollapsed ? 'justify-center' : 'space-x-3'}
               `}
@@ -88,10 +88,10 @@ const CompanySidebar: React.FC<SidebarProps> = ({
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-purple-500 rounded-r-full shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
               )}
               
-              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-purple-400' : 'group-hover:text-slate-200'} transition-colors`} />
+              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-purple-400' : 'group-hover:text-slate-800'} transition-colors`} />
               
               {!isCollapsed && (
-                <span className={`text-sm font-medium ${isActive ? 'text-white' : ''}`}>
+                <span className={`text-sm font-medium ${isActive ? 'text-slate-900' : ''}`}>
                   {item.label}
                 </span>
               )}
@@ -103,9 +103,9 @@ const CompanySidebar: React.FC<SidebarProps> = ({
 
               {/* Tooltip for collapsed state */}
               {isCollapsed && (
-                <div className="absolute left-full ml-4 px-3 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl border border-slate-700 z-50">
+                <div className="absolute left-full ml-4 px-3 py-1.5 bg-sky-100 text-slate-900 text-xs font-medium rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl border border-sky-200 z-50">
                   {item.label}
-                  <div className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 w-2 h-2 bg-slate-800 rotate-45 border-l border-b border-slate-700"></div>
+                  <div className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 w-2 h-2 bg-sky-100 rotate-45 border-l border-b border-sky-200"></div>
                 </div>
               )}
             </button>
@@ -114,11 +114,11 @@ const CompanySidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Bottom Section (Logout) */}
-      <div className="p-4 border-t border-slate-800/50 bg-[#0B1120]/50">
+      <div className="p-4 border-t border-sky-200/50 bg-[#0B1120]/50">
         {!isCollapsed ? (
           <button 
             onClick={handleLogout}
-            className="w-full flex items-center space-x-3 p-2.5 rounded-xl text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-colors group"
+            className="w-full flex items-center space-x-3 p-2.5 rounded-xl text-slate-600 hover:bg-red-500/10 hover:text-red-400 transition-colors group"
           >
             <LogOut className="w-5 h-5 group-hover:rotate-180 transition-transform duration-300" />
             <span className="text-sm font-medium">Sign Out</span>
@@ -126,7 +126,7 @@ const CompanySidebar: React.FC<SidebarProps> = ({
         ) : (
           <button 
             onClick={handleLogout}
-            className="w-full flex justify-center p-2 rounded-lg text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+            className="w-full flex justify-center p-2 rounded-lg text-slate-600 hover:bg-red-500/10 hover:text-red-400 transition-colors"
           >
             <LogOut className="w-5 h-5" />
           </button>
@@ -137,7 +137,7 @@ const CompanySidebar: React.FC<SidebarProps> = ({
       {isCollapsed && (
         <button 
           onClick={() => setIsCollapsed(false)}
-          className="mx-auto mb-4 p-2 rounded-lg text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+          className="mx-auto mb-4 p-2 rounded-lg text-slate-600 hover:bg-sky-100 hover:text-primary transition-colors"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
@@ -147,3 +147,5 @@ const CompanySidebar: React.FC<SidebarProps> = ({
 };
 
 export default CompanySidebar;
+
+

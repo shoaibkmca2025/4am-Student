@@ -14,7 +14,7 @@ const Achievements: React.FC = () => {
     const fetchAchievements = async () => {
       try {
         setLoading(true);
-        const data = await achievementService.getStats();
+        const data = await achievementService.get();
         if (data) {
           setLevel(data.level);
           setXp(data.xp);
@@ -48,24 +48,24 @@ const Achievements: React.FC = () => {
         className="flex flex-col md:flex-row md:items-center justify-between gap-4"
       >
         <div>
-          <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+          <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
             <Trophy className="w-8 h-8 text-amber-400" />
             Achievements & Badges
           </h1>
-          <p className="text-slate-400 mt-2">
+          <p className="text-slate-600 mt-2">
             Track your progress and earn rewards as you learn. You've unlocked <span className="text-emerald-400 font-bold">{badges.filter(b => b.unlocked).length}</span> out of {badges.length} badges.
           </p>
         </div>
         
-        <div className="flex items-center gap-4 bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
-          <div className="text-center px-4 border-r border-slate-700">
-            <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Level</p>
+        <div className="flex items-center gap-4 bg-sky-100/50 p-4 rounded-xl border border-sky-200/50">
+          <div className="text-center px-4 border-r border-sky-200">
+            <p className="text-xs text-slate-600 uppercase tracking-wider font-semibold">Level</p>
             <p className="text-2xl font-bold text-amber-400 flex items-center justify-center gap-1">
               <Crown className="w-5 h-5" /> {level}
             </p>
           </div>
           <div className="text-center px-4">
-            <p className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Total XP</p>
+            <p className="text-xs text-slate-600 uppercase tracking-wider font-semibold">Total XP</p>
             <p className="text-2xl font-bold text-indigo-400 flex items-center justify-center gap-1">
               <Zap className="w-5 h-5" /> {xp}
             </p>
@@ -81,10 +81,10 @@ const Achievements: React.FC = () => {
         className="saas-card p-6"
       >
         <div className="flex justify-between items-end mb-2">
-          <span className="text-sm font-semibold text-slate-300">Level Progress</span>
-          <span className="text-sm font-bold text-slate-200">{xp} / {maxXp} XP</span>
+          <span className="text-sm font-semibold text-slate-700">Level Progress</span>
+          <span className="text-sm font-bold text-slate-800">{xp} / {maxXp} XP</span>
         </div>
-        <div className="h-4 w-full bg-slate-800 rounded-full overflow-hidden relative">
+        <div className="h-4 w-full bg-sky-100 rounded-full overflow-hidden relative">
           <motion.div 
             initial={{ width: 0 }}
             animate={{ width: `${(xp / maxXp) * 100}%` }}
@@ -113,7 +113,7 @@ const Achievements: React.FC = () => {
             className={`aspect-square rounded-xl flex flex-col items-center justify-center p-4 text-center gap-3 border transition-all relative group ${
               badge.unlocked 
                 ? `${badge.color} hover:scale-105 shadow-lg`
-                : 'bg-slate-800/30 border-slate-800 text-slate-600 grayscale'
+                : 'bg-sky-100/30 border-sky-200 text-slate-600 grayscale'
             }`}
           >
             <div className="relative">
@@ -123,12 +123,12 @@ const Achievements: React.FC = () => {
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.5 + idx * 0.1 }}
-                  className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900 shadow-[0_0_8px_rgba(16,185,129,0.6)]"
+                  className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-500 rounded-full border-2 border-sky-200 shadow-[0_0_8px_rgba(16,185,129,0.6)]"
                 />
               )}
             </div>
             
-            <h4 className={`text-sm font-bold ${badge.unlocked ? 'text-white' : 'text-slate-500'}`}>
+            <h4 className={`text-sm font-bold ${badge.unlocked ? 'text-slate-900' : 'text-slate-500'}`}>
               {badge.title}
             </h4>
             
@@ -139,12 +139,12 @@ const Achievements: React.FC = () => {
             )}
 
             {/* Hover Info */}
-            <div className="absolute inset-0 bg-slate-900/95 backdrop-blur-sm flex items-center justify-center p-4 text-center opacity-0 group-hover:opacity-100 transition-opacity rounded-xl z-10 border border-slate-700">
+            <div className="absolute inset-0 bg-white/95 backdrop-blur-sm flex items-center justify-center p-4 text-center opacity-0 group-hover:opacity-100 transition-opacity rounded-xl z-10 border border-sky-200">
               <div>
-                <p className="text-xs font-bold text-white mb-2">{badge.title}</p>
-                <p className="text-[11px] text-slate-400 leading-tight mb-3">{badge.desc}</p>
+                <p className="text-xs font-bold text-slate-900 mb-2">{badge.title}</p>
+                <p className="text-[11px] text-slate-600 leading-tight mb-3">{badge.desc}</p>
                 <div className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full inline-block ${
-                  badge.unlocked ? 'bg-emerald-500/20 text-emerald-400' : 'bg-slate-700 text-slate-400'
+                  badge.unlocked ? 'bg-emerald-500/20 text-emerald-400' : 'bg-sky-200 text-slate-600'
                 }`}>
                   {badge.unlocked ? 'Unlocked' : 'Locked'}
                 </div>
@@ -158,3 +158,5 @@ const Achievements: React.FC = () => {
 };
 
 export default Achievements;
+
+
