@@ -33,7 +33,13 @@ const Login: React.FC = () => {
       navigate('/dashboard');
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || 'Login failed. Check credentials and backend status.');
+        if (err.code === 'ECONNABORTED') {
+          setError('Request timed out. Please try again.');
+        } else if (!err.response) {
+          setError('Cannot reach the server. Please try again later.');
+        } else {
+          setError(err.response?.data?.message || 'Login failed. Check your credentials.');
+        }
       } else {
         setError('An unexpected error occurred.');
       }

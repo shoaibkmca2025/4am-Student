@@ -44,7 +44,7 @@ const Register: React.FC = () => {
         if (err.code === 'ECONNABORTED') {
           setError('Registration timed out. Please try again.');
         } else if (!err.response) {
-          setError('Cannot reach backend on port 5000. Start backend and try again.');
+          setError('Cannot reach the server. Please try again later.');
         } else {
           const details = err.response?.data?.details;
           if (Array.isArray(details) && details.length > 0) {
