@@ -42,21 +42,22 @@ router.post('/register', authLimiter, registerValidation, async (req, res, next)
     const existing = await User.findOne({ email });
     if (existing) return res.status(409).json({ message: 'Email already registered' });
 
-    const passwordHash = await bcrypt.hash(password, 12);
+    const passwordHash = await bcrypt.hash(password, 10);
     const user = await User.create({ name: name.trim(), email, passwordHash, role });
     const token = signToken(user._id.toString());
 
-    await createNotification({
+    // Send response first, create notification in background
+    res.status(201).json({
+      token,
+      user: { id: user._id, name: user.name, email: user.email, role: user.role, preferences: user.preferences }
+    });
+
+    createNotification({
       userId: user._id,
       title: 'Welcome to 4AM!',
       message: 'Your account has been created successfully. Start exploring!',
       type: 'success'
-    });
-
-    return res.status(201).json({
-      token,
-      user: { id: user._id, name: user.name, email: user.email, role: user.role, preferences: user.preferences }
-    });
+    }).catch(() => {});
   } catch (err) {
     next(err);
   }
