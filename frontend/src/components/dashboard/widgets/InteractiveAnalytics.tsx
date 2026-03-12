@@ -1,41 +1,87 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer 
 } from 'recharts';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp, ArrowUpRight } from 'lucide-react';
 
-const weeklyData: any[] = [
-  // { name: 'Mon', score: 65 },
-  // { name: 'Tue', score: 68 },
-  // { name: 'Wed', score: 75 },
-  // { name: 'Thu', score: 72 },
-  // { name: 'Fri', score: 80 },
-  // { name: 'Sat', score: 85 },
-  // { name: 'Sun', score: 88 },
-];
+interface InteractiveAnalyticsProps {
+  completedTests?: any[];
+}
 
-const monthlyData: any[] = [
-  // { name: 'Week 1', score: 60 },
-  // { name: 'Week 2', score: 72 },
-  // { name: 'Week 3', score: 68 },
-  // { name: 'Week 4', score: 85 },
-];
+const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-const yearlyData: any[] = [
-  // { name: 'Jan', score: 45 },
-  // { name: 'Feb', score: 52 },
-  // { name: 'Mar', score: 58 },
-  // { name: 'Apr', score: 65 },
-  // { name: 'May', score: 70 },
-  // { name: 'Jun', score: 85 },
-  // { name: 'Jul', score: 82 },
-  // { name: 'Aug', score: 88 },
-  // { name: 'Sep', score: 92 },
-  // { name: 'Oct', score: 95 },
-  // { name: 'Nov', score: 98 },
-  // { name: 'Dec', score: 100 },
-];
+function buildChartData(completedTests: any[], range: string) {
+  if (!completedTests.length) return [];
+
+  const now = new Date();
+  const entries = completedTests
+    .map(t => ({
+      date: new Date(t.completedAt || t.updatedAt || t.createdAt),
+      score: parseInt(String(t.score)) || 0,
+    }))
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  if (range === 'Week') {
+    // Last 7 days
+    const buckets: Record<string, number[]> = {};
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now);
+      d.setDate(now.getDate() - i);
+      const key = dayNames[d.getDay()];
+      buckets[key] = [];
+    }
+    entries.forEach(e => {
+      const diff = Math.floor((now.getTime() - e.date.getTime()) / (1000 * 60 * 60 * 24));
+      if (diff >= 0 && diff < 7) {
+        const key = dayNames[e.date.getDay()];
+        if (buckets[key]) buckets[key].push(e.score);
+      }
+    });
+    return Object.entries(buckets).map(([name, scores]) => ({
+      name,
+      score: scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0,
+    }));
+  }
+
+  if (range === 'Month') {
+    // Last 4 weeks
+    const buckets: { name: string; scores: number[] }[] = [];
+    for (let w = 3; w >= 0; w--) {
+      const start = new Date(now);
+      start.setDate(now.getDate() - (w + 1) * 7);
+      const end = new Date(now);
+      end.setDate(now.getDate() - w * 7);
+      buckets.push({ name: `Week ${4 - w}`, scores: [] });
+      entries.forEach(e => {
+        if (e.date >= start && e.date < end) {
+          buckets[buckets.length - 1].scores.push(e.score);
+        }
+      });
+    }
+    return buckets.map(b => ({
+      name: b.name,
+      score: b.scores.length ? Math.round(b.scores.reduce((a, c) => a + c, 0) / b.scores.length) : 0,
+    }));
+  }
+
+  // Year — last 12 months
+  const buckets: { name: string; scores: number[] }[] = [];
+  for (let m = 11; m >= 0; m--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - m, 1);
+    buckets.push({ name: monthNames[d.getMonth()], scores: [] });
+    entries.forEach(e => {
+      if (e.date.getFullYear() === d.getFullYear() && e.date.getMonth() === d.getMonth()) {
+        buckets[buckets.length - 1].scores.push(e.score);
+      }
+    });
+  }
+  return buckets.map(b => ({
+    name: b.name,
+    score: b.scores.length ? Math.round(b.scores.reduce((a, c) => a + c, 0) / b.scores.length) : 0,
+  }));
+}
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
@@ -44,9 +90,6 @@ const CustomTooltip = ({ active, payload, label }: any) => {
         <p className="text-slate-600 text-xs mb-1">{label}</p>
         <p className="text-slate-900 font-bold text-sm flex items-center gap-2">
           Score: {payload[0].value}
-          <span className="text-emerald-400 text-[10px] flex items-center bg-emerald-500/10 px-1.5 py-0.5 rounded">
-            <TrendingUp className="w-3 h-3 mr-0.5" /> +2.5%
-          </span>
         </p>
       </div>
     );
@@ -54,17 +97,10 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-const InteractiveAnalytics: React.FC = () => {
+const InteractiveAnalytics: React.FC<InteractiveAnalyticsProps> = ({ completedTests = [] }) => {
   const [timeRange, setTimeRange] = useState('Week');
 
-  const getData = () => {
-    switch (timeRange) {
-      case 'Week': return weeklyData;
-      case 'Month': return monthlyData;
-      case 'Year': return yearlyData;
-      default: return weeklyData;
-    }
-  };
+  const data = useMemo(() => buildChartData(completedTests, timeRange), [completedTests, timeRange]);
 
   return (
     <motion.div 
@@ -79,12 +115,7 @@ const InteractiveAnalytics: React.FC = () => {
             <TrendingUp className="w-5 h-5 text-emerald-400" />
             Career Growth
           </h3>
-          <p className="text-xs text-slate-600 font-medium mt-1 flex items-center gap-1">
-            Readiness score over time 
-            <span className="text-emerald-400 flex items-center bg-emerald-500/10 px-1.5 py-0.5 rounded text-[10px]">
-              <ArrowUpRight className="w-3 h-3 mr-0.5" /> Top 10%
-            </span>
-          </p>
+          <p className="text-xs text-slate-600 font-medium mt-1">Readiness score over time</p>
         </div>
         
         <div className="flex bg-white/50 rounded-lg p-1 border border-sky-200">
@@ -105,7 +136,7 @@ const InteractiveAnalytics: React.FC = () => {
       </div>
       
       <div className="flex-1 min-h-[250px] w-full relative">
-        {getData().length === 0 ? (
+        {data.every(d => d.score === 0) ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
              <div className="w-12 h-12 bg-sky-100/50 rounded-full flex items-center justify-center mb-3 border border-sky-200">
                 <TrendingUp className="w-6 h-6 text-slate-500" />
@@ -117,7 +148,7 @@ const InteractiveAnalytics: React.FC = () => {
           </div>
         ) : (
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={getData()} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+          <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>

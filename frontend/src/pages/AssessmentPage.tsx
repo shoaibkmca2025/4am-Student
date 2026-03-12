@@ -26,10 +26,29 @@ const AssessmentPage: React.FC = () => {
   const [showResult, setShowResult] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
+  // Timer State
+  const [startTime] = useState<number>(Date.now());
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+
   // Gamification State
   const [streak, setStreak] = useState(0);
   const [showXP, setShowXP] = useState(false);
   const [xpGained, setXpGained] = useState(0);
+
+  // Elapsed timer — ticks every second while assessment is active
+  useEffect(() => {
+    if (showResult) return;
+    const timer = setInterval(() => {
+      setElapsedSeconds(Math.floor((Date.now() - startTime) / 1000));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [startTime, showResult]);
+
+  const formatElapsed = (totalSec: number): string => {
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${m}m ${s.toString().padStart(2, '0')}s`;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,11 +70,35 @@ const AssessmentPage: React.FC = () => {
 
         setTestMetadata(assessment);
         
-        // Shuffle questions only for MCQ-heavy tests to preserve flow for coding/scenarios
+        // Shuffle questions with a seed based on current session so retakes get different order
         if (assessment.questions) {
-          // Keep original order for coding challenges as they might be progressive
-          const isTechnical = assessment.category === 'Coding' || assessment.category === 'Architecture';
-          const finalQuestions = isTechnical ? assessment.questions : [...assessment.questions].sort(() => Math.random() - 0.5);
+          const seed = Date.now();
+          const seededRandom = (i: number) => {
+            const x = Math.sin(seed + i) * 10000;
+            return x - Math.floor(x);
+          };
+          const shuffled = [...assessment.questions]
+            .map((q: Question, i: number) => ({ q, sort: seededRandom(i) }))
+            .sort((a: { sort: number }, b: { sort: number }) => a.sort - b.sort)
+            .map((item: { q: Question }) => item.q);
+          
+          // Also shuffle MCQ options (and adjust correct index) for variety
+          const finalQuestions = shuffled.map((q: Question, qi: number) => {
+            if (q.type !== 'code-challenge' && q.type !== 'text-input' && q.options && q.correct !== undefined) {
+              const optionPairs = q.options.map((opt: string, idx: number) => ({ opt, wasCorrect: idx === q.correct }));
+              // Shuffle options
+              for (let i = optionPairs.length - 1; i > 0; i--) {
+                const j = Math.floor(seededRandom(qi * 100 + i) * (i + 1));
+                [optionPairs[i], optionPairs[j]] = [optionPairs[j], optionPairs[i]];
+              }
+              return {
+                ...q,
+                options: optionPairs.map((p: { opt: string }) => p.opt),
+                correct: optionPairs.findIndex((p: { wasCorrect: boolean }) => p.wasCorrect)
+              };
+            }
+            return q;
+          });
           setQuestions(finalQuestions);
         }
       } catch (error) {
@@ -134,7 +177,8 @@ const AssessmentPage: React.FC = () => {
       await userAssessmentService.upsertMe(testId, {
         status: 'Completed',
         score: `${percentage}%`,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        timeTaken: formatElapsed(elapsedSeconds)
       });
       setShowResult(true);
     } catch (err) {
@@ -159,7 +203,7 @@ const AssessmentPage: React.FC = () => {
       <ResultAnalytics 
         score={score}
         totalQuestions={questions.length}
-        timeTaken="15m 20s" // Mock time for now
+        timeTaken={formatElapsed(elapsedSeconds)}
         accuracy={percentage}
         percentile={85} // Mock percentile
         onRetry={() => window.location.reload()}

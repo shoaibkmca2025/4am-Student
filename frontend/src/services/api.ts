@@ -301,7 +301,7 @@ export const userAssessmentService = {
     const response = await api.get('/user-assessments/me');
     return response.data;
   },
-  upsertMe: async (assessmentId: number, payload: { status?: string; score?: string | number; timestamp?: string }): Promise<{ assessment: UserAssessment }> => {
+  upsertMe: async (assessmentId: number, payload: { status?: string; score?: string | number; timestamp?: string; timeTaken?: string }): Promise<{ assessment: UserAssessment }> => {
     const response = await api.put(`/user-assessments/me/${assessmentId}`, payload);
     return response.data;
   }

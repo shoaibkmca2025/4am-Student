@@ -38,37 +38,39 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
   const [jobMatchScore, setJobMatchScore] = useState(0);
   const [activityData, setActivityData] = useState<number[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
+  const [completedTests, setCompletedTests] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // 1. Load User Assessments from Backend
-        let completedTests: any[] = [];
+        let fetchedTests: any[] = [];
         try {
           const assessmentData = await userAssessmentService.getMe();
           if (assessmentData && assessmentData.assessments) {
-            completedTests = assessmentData.assessments.filter((a: any) => a.status === 'Completed');
+            fetchedTests = assessmentData.assessments.filter((a: any) => a.status === 'Completed');
           }
         } catch (e) {
           console.error("Failed to fetch assessments", e);
-          completedTests = [];
+          fetchedTests = [];
         }
+        setCompletedTests(fetchedTests);
 
         // 2. Calculate Skill Points
-        const points = completedTests.length * 100;
+        const points = fetchedTests.length * 100;
         setSkillPoints(points);
 
         // 3. Calculate Streak
-        setStreak(completedTests.length > 0 ? 1 : 0);
+        setStreak(fetchedTests.length > 0 ? 1 : 0);
 
         // 4. Calculate Career Readiness
-        const readiness = completedTests.length > 0 ? Math.min(10 + (completedTests.length * 5), 100) : 0;
+        const readiness = fetchedTests.length > 0 ? Math.min(10 + (fetchedTests.length * 5), 100) : 0;
         setCareerReadiness(readiness);
 
         // 5. Generate Skill Radar Data
-        if (completedTests.length > 0) {
+        if (fetchedTests.length > 0) {
            const skillMap: Record<string, number> = {};
-           completedTests.forEach(test => {
+           fetchedTests.forEach(test => {
              const title = test.title || test.assessmentId?.toString() || 'Skill';
              const subject = title.split(/\s+/)[0];
              skillMap[subject] = (skillMap[subject] || 0) + (parseInt(String(test.score)) || 0);
@@ -129,7 +131,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
         const startDate = new Date(today);
         startDate.setDate(today.getDate() - (52 * 7));
 
-        completedTests.forEach((test: any) => {
+        fetchedTests.forEach((test: any) => {
             const dateStr = test.completedAt || test.updatedAt || test.createdAt;
             if (dateStr) {
                 const testDate = new Date(dateStr);
@@ -143,7 +145,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
         setActivityData(activityMap);
 
         // Random Motivation
-        if (completedTests.length > 0) {
+        if (fetchedTests.length > 0) {
             const quotes = [
             "You're improving fast! Keep pushing.",
             "Small steps every day lead to big results.",
@@ -336,9 +338,9 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
                  {/* Breakdown Metrics */}
                  <div className="flex-1 w-full space-y-2">
                     {[
-                       { label: 'Resume Quality', value: careerReadiness > 0 ? 85 : 0, color: 'bg-emerald-500', icon: FileText, tip: 'Strong action verbs used.' },
-                       { label: 'Skills Match', value: careerReadiness > 0 ? 72 : 0, color: 'bg-blue-500', icon: Code, tip: 'Missing TypeScript.' },
-                       { label: 'Interview Readiness', value: careerReadiness > 0 ? 65 : 0, color: 'bg-purple-500', icon: MessageSquare, tip: 'Practice behavioral Qs.' },
+                       { label: 'Resume Quality', value: 0, color: 'bg-emerald-500', icon: FileText, tip: 'Upload a resume to get your quality score.' },
+                       { label: 'Skills Match', value: skillsData.length > 0 ? Math.min(Math.round(skillsData.reduce((acc: number, s: any) => acc + (s.A || 0), 0) / skillsData.length), 100) : 0, color: 'bg-blue-500', icon: Code, tip: 'Based on your completed assessments.' },
+                       { label: 'Interview Readiness', value: interviewConfidence > 0 ? interviewConfidence * 20 : 0, color: 'bg-purple-500', icon: MessageSquare, tip: 'Complete mock interviews to improve.' },
                     ].map((metric, idx) => (
                        <div key={idx} className="group/metric relative cursor-help">
                           <div className="flex justify-between text-[10px] mb-1">
@@ -427,7 +429,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left: Career Growth Chart */}
         <div className="lg:col-span-8 h-full">
-          <InteractiveAnalytics />
+          <InteractiveAnalytics completedTests={completedTests} />
         </div>
         {/* Right: Skill Radar */}
         <div className="lg:col-span-4 h-full">
@@ -443,7 +445,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
         </div>
         {/* Right: Gamification (XP, Level, Badges) */}
         <div className="lg:col-span-4 h-full">
-          <Achievements />
+          <Achievements streak={streak} />
         </div>
       </div>
 

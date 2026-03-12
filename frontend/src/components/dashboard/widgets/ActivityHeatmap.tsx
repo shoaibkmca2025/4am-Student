@@ -67,20 +67,23 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ activityData = [] }) 
         </div>
 
         <div className="flex gap-1 overflow-x-auto pb-2 scrollbar-hide ml-2 mask-linear-fade">
-          {Array.from({ length: weeks }).map((_, weekIndex) => (
+          {Array.from({ length: weeks }).map((_, wi) => {
+            const weekIndex = weeks - 1 - wi; // Reverse: most recent week first (leftmost)
+            return (
             <div key={weekIndex} className="flex flex-col gap-1">
               {Array.from({ length: days }).map((_, dayIndex) => (
                 <motion.div
                   key={`${weekIndex}-${dayIndex}`}
                   initial={{ opacity: 0, scale: 0 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: (weekIndex * 0.01) + (dayIndex * 0.005) }}
+                  transition={{ delay: (wi * 0.01) + (dayIndex * 0.005) }}
                   className={`w-2.5 h-2.5 rounded-[2px] ${getIntensityClass(heatmapData[weekIndex * 7 + dayIndex])} transition-all hover:scale-125 hover:z-10 cursor-pointer`}
                   title={`Activity on Week ${weekIndex + 1}, Day ${dayIndex + 1}`}
                 />
               ))}
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
       
