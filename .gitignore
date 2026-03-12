@@ -2,6 +2,9 @@
 node_modules/
 */node_modules/
 
+# Root package-lock (not needed for deployment)
+/package-lock.json
+
 # Environment variables
 .env
 .env.local
