@@ -62,16 +62,16 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden px-4 py-10 bg-slate-50 dark:bg-[#030303]">
+    <div className="relative min-h-screen overflow-hidden px-4 py-10 bg-slate-50 dark:bg-slate-900">
       {/* Background glows */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-20 top-10 h-96 w-96 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, rgba(0,245,255,0.4), transparent 70%)' }} />
+        <div className="absolute -left-20 top-10 h-96 w-96 rounded-full opacity-20" style={{ background: 'radial-gradient(circle, rgba(34,211,238,0.4), transparent 70%)' }} />
         <div className="absolute -right-28 bottom-0 h-96 w-96 rounded-full opacity-15" style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.4), transparent 70%)' }} />
       </div>
 
       <button
         onClick={() => navigate('/')}
-        className="relative z-10 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-colors text-slate-600 dark:text-gray-400 border border-black/10 dark:border-primary/20 bg-white/50 dark:bg-black/50 hover:border-primary/50 hover:text-primary"
+        className="relative z-10 inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold backdrop-blur-sm transition-colors text-slate-600 dark:text-gray-400 border border-black/10 dark:border-primary/20 bg-white/50 dark:bg-slate-800/50 hover:border-primary/50 hover:text-primary"
       >
         <ArrowLeft className="h-4 w-4" />
         Back to Home
@@ -79,7 +79,7 @@ const Register: React.FC = () => {
 
       <div className="relative z-10 mx-auto mt-8 w-full max-w-xl">
         <div
-          className="rounded-2xl p-8 backdrop-blur-xl md:p-10 bg-white/60 dark:bg-black/60 border border-black/10 dark:border-primary/10 shadow-2xl"
+          className="rounded-2xl p-8 backdrop-blur-xl md:p-10 bg-white/60 dark:bg-slate-800/60 border border-black/10 dark:border-primary/10 shadow-2xl"
         >
           <div className="mb-8 text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl text-lg font-black text-white dark:text-black bg-primary">
@@ -150,7 +150,7 @@ const Register: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setRole('student')}
-                  className={`rounded-xl px-4 py-3 text-left transition ${role === 'student' ? 'border-primary bg-primary/10 text-primary' : 'border-black/10 dark:border-white/10 bg-white/50 dark:bg-black/50 text-slate-600 dark:text-gray-400 border'}`}
+                  className={`rounded-xl px-4 py-3 text-left transition ${role === 'student' ? 'border-primary bg-primary/10 text-primary' : 'border-black/10 dark:border-white/10 bg-white/50 dark:bg-slate-800/50 text-slate-600 dark:text-gray-400 border'}`}
                 >
                   <User className="mb-2 h-4 w-4" />
                   <p className="text-sm font-bold">Student</p>
@@ -159,7 +159,7 @@ const Register: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setRole('company')}
-                  className={`rounded-xl px-4 py-3 text-left transition ${role === 'company' ? 'border-primary bg-primary/10 text-primary' : 'border-black/10 dark:border-white/10 bg-white/50 dark:bg-black/50 text-slate-600 dark:text-gray-400 border'}`}
+                  className={`rounded-xl px-4 py-3 text-left transition ${role === 'company' ? 'border-primary bg-primary/10 text-primary' : 'border-black/10 dark:border-white/10 bg-white/50 dark:bg-slate-800/50 text-slate-600 dark:text-gray-400 border'}`}
                 >
                   <Briefcase className="mb-2 h-4 w-4" />
                   <p className="text-sm font-bold">Company</p>
@@ -178,7 +178,7 @@ const Register: React.FC = () => {
 
           <p className="mt-6 text-center text-sm text-gray-500">
             Already have an account?{' '}
-            <button onClick={() => navigate('/login')} className="font-bold hover:underline" style={{ color: '#00f5ff' }}>
+            <button onClick={() => navigate('/login')} className="font-bold hover:underline" style={{ color: '#22d3ee' }}>
               Sign in
             </button>
           </p>

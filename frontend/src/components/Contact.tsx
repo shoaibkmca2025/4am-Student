@@ -94,7 +94,7 @@ const Contact: React.FC = () => {
                 className="glass-card p-5 flex items-center gap-4 animate-on-scroll"
                 style={{ transitionDelay: `${0.1 * idx}s` }}
               >
-                <div className="icon-box shrink-0" style={{ color: '#00f5ff' }}>
+                <div className="icon-box shrink-0" style={{ color: '#22d3ee' }}>
                   {info.icon}
                 </div>
                 <div>

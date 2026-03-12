@@ -9,7 +9,7 @@ const FOOTER_LINKS = {
 
 const Footer: React.FC = () => {
   return (
-    <footer className="border-t border-black/5 dark:border-white/5 bg-slate-50 dark:bg-black">
+    <footer className="border-t border-black/5 dark:border-white/5 bg-slate-50 dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
           {/* Brand column */}
@@ -17,7 +17,7 @@ const Footer: React.FC = () => {
             <div className="flex items-center space-x-2.5 mb-4">
               <div
                 className="h-9 w-9 rounded-lg flex items-center justify-center text-black font-black text-sm"
-                style={{ background: '#00f5ff' }}
+                style={{ background: '#22d3ee' }}
               >
                 4
               </div>
@@ -59,7 +59,7 @@ const Footer: React.FC = () => {
           </p>
           <p
             className="text-xs"
-            style={{ color: '#00f5ff', fontFamily: 'JetBrains Mono, monospace' }}
+            style={{ color: '#22d3ee', fontFamily: 'JetBrains Mono, monospace' }}
           >
             {'< Built with passion at 4AM />'}
           </p>

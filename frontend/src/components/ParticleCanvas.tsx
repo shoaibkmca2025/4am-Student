@@ -56,7 +56,7 @@ const ParticleCanvas: React.FC = () => {
                     if (dist < CONNECTION_DISTANCE) {
                         const alpha = (1 - dist / CONNECTION_DISTANCE) * 0.15;
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(0, 245, 255, ${alpha})`;
+                        ctx.strokeStyle = `rgba(34, 211, 238, ${alpha})`;
                         ctx.lineWidth = 0.5;
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
@@ -69,7 +69,7 @@ const ParticleCanvas: React.FC = () => {
             for (const p of particles) {
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0, 245, 255, ${p.opacity})`;
+                ctx.fillStyle = `rgba(34, 211, 238, ${p.opacity})`;
                 ctx.fill();
 
                 // Move

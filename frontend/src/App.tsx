@@ -31,8 +31,8 @@ class AppErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#030303] p-4">
-          <div className="max-w-md w-full rounded-2xl p-8 bg-white/60 dark:bg-black/60 border border-red-500/20 shadow-2xl text-center">
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4">
+          <div className="max-w-md w-full rounded-2xl p-8 bg-white/60 dark:bg-slate-800/60 border border-red-500/20 shadow-2xl text-center">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 text-2xl">
               ⚠️
             </div>

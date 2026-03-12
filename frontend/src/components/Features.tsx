@@ -49,9 +49,9 @@ const Features: React.FC = () => {
                 className="absolute -top-3 -right-1 text-xs font-bold px-2 py-0.5 rounded-full"
                 style={{
                   fontFamily: 'JetBrains Mono, monospace',
-                  background: 'rgba(0, 245, 255, 0.15)',
+                  background: 'rgba(34, 211, 238, 0.15)',
                   color: 'var(--primary)',
-                  border: '1px solid rgba(0, 245, 255, 0.3)',
+                  border: '1px solid rgba(34, 211, 238, 0.3)',
                 }}
               >
                 {FEATURE_NUMBERS[idx]}

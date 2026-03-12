@@ -67,7 +67,7 @@ const About: React.FC = () => {
                 className="glass-card p-6 text-center animate-on-scroll"
                 style={{ transitionDelay: `${0.2 + idx * 0.1}s` }}
               >
-                <div className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#00f5ff' }}>
+                <div className="text-3xl sm:text-4xl font-bold mb-2" style={{ color: '#22d3ee' }}>
                   {stat.value}
                 </div>
                 <div className="text-sm text-gray-400">{stat.label}</div>

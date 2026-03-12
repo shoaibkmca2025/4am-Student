@@ -68,7 +68,7 @@ const Hero: React.FC = () => {
       {/* Gradient orbs */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full opacity-20"
-          style={{ background: 'radial-gradient(circle, rgba(0,245,255,0.3), transparent 70%)' }} />
+          style={{ background: 'radial-gradient(circle, rgba(34,211,238,0.3), transparent 70%)' }} />
         <div className="absolute top-1/4 -right-32 w-[500px] h-[500px] rounded-full opacity-15"
           style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.3), transparent 70%)' }} />
       </div>
@@ -153,7 +153,7 @@ const Hero: React.FC = () => {
         <div className="flex flex-col items-center mt-12 animate-fade-in-up" style={{ animationDelay: '0.7s' }}>
           <span className="text-xs text-gray-500 mb-2">Scroll</span>
           <div className="w-6 h-10 border-2 border-gray-600 rounded-full flex items-start justify-center p-1">
-            <div className="w-1.5 h-2.5 rounded-full animate-float" style={{ background: '#00f5ff' }} />
+            <div className="w-1.5 h-2.5 rounded-full animate-float" style={{ background: '#22d3ee' }} />
           </div>
         </div>
       </div>
