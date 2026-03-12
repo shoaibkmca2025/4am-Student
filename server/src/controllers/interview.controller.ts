@@ -1,5 +1,6 @@
 import { Response, NextFunction } from 'express';
 import { AuthRequest } from '../middleware/auth';
+import { prisma } from '../config/database';
 import * as interviewService from '../services/interview.service';
 import { ApiResponse } from '../utils/ApiResponse';
 import { ApiError } from '../utils/ApiError';
@@ -40,9 +41,7 @@ export async function endInterview(req: AuthRequest, res: Response, next: NextFu
 export async function getSession(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const sessionId = req.params['sessionId'] as string;
-    const session = await import('../config/database').then(({ prisma }) =>
-      prisma.interviewSession.findUnique({ where: { id: sessionId } })
-    );
+    const session = await prisma.interviewSession.findUnique({ where: { id: sessionId } });
     if (!session) throw ApiError.notFound('Session not found');
     if (session.userId !== req.userId) throw ApiError.forbidden('Access denied');
     res.json(ApiResponse.ok(session));

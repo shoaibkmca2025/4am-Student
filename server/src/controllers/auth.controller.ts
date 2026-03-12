@@ -16,9 +16,6 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
-export const registerSchema_ = registerSchema;
-export const loginSchema_ = loginSchema;
-
 export async function register(req: Request, res: Response, next: NextFunction) {
   try {
     const input = req.body as z.infer<typeof registerSchema>;

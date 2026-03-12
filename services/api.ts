@@ -1,6 +1,4 @@
-const API_BASE_URL =
-  (typeof import.meta !== 'undefined' && (import.meta as { env?: { VITE_API_URL?: string } }).env?.VITE_API_URL) ||
-  'http://localhost:3001/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3001/api';
 
 interface ApiResponse<T = unknown> {
   success: boolean;

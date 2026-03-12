@@ -47,8 +47,8 @@ Edit `.env` with your values:
 
 ```env
 DATABASE_URL=postgresql://4am_user:yourpassword@localhost:5432/4am_student
-JWT_SECRET=<generate with: openssl rand -base64 64>
-JWT_REFRESH_SECRET=<generate with: openssl rand -base64 64>
+JWT_SECRET=6s8hT7kP2xL9mQ4nR1wV5jF0aE3uI8yG6s8hT7kP2xL9mQ4nR1wV5jF0aE3uI8y
+JWT_REFRESH_SECRET=3dJ5fH8kN1pS4vX7zB0wE2aQ6uY9cR3dJ5fH8kN1pS4vX7zB0wE2aQ6uY9cR0mP
 GEMINI_API_KEY=your-gemini-api-key
 FRONTEND_URL=http://localhost:5173
 PORT=3001

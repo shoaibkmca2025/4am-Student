@@ -13,6 +13,8 @@ interface TranscriptEntry {
   timestamp: string;
 }
 
+const TOTAL_INTERVIEW_QUESTIONS = 5;
+
 function getGeminiClient() {
   if (!env.GEMINI_API_KEY) {
     throw ApiError.internal('Gemini API key not configured');
@@ -54,7 +56,7 @@ async function evaluateAnswer(
   const genAI = getGeminiClient();
   const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-  const isLast = questionIndex >= 4; // 5 questions total
+  const isLast = questionIndex >= TOTAL_INTERVIEW_QUESTIONS - 1;
 
   const prompt = `${SYSTEM_PROMPT}
 
