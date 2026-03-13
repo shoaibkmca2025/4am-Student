@@ -13,10 +13,16 @@ router.get('/student', requireAuth, requireRole(['student']), async (req, res, n
   try {
     const userId = req.user._id;
 
-    const [assessments, applications, interviews] = await Promise.all([
-      UserAssessment.find({ userId }),
-      Application.find({ studentId: userId }),
-      InterviewSession.find({ userId })
+    const [assessments, applicationCounts, interviewCounts] = await Promise.all([
+      UserAssessment.find({ userId }).select('status score').lean(),
+      Application.aggregate([
+        { $match: { studentId: userId } },
+        { $group: { _id: '$status', count: { $sum: 1 } } }
+      ]),
+      InterviewSession.aggregate([
+        { $match: { userId } },
+        { $group: { _id: '$status', count: { $sum: 1 } } }
+      ])
     ]);
 
     const completedAssessments = assessments.filter(a => a.status === 'Completed').length;
@@ -24,21 +30,28 @@ router.get('/student', requireAuth, requireRole(['student']), async (req, res, n
       ? Math.round(assessments.reduce((sum, a) => sum + (parseInt(a.score) || 0), 0) / assessments.length)
       : 0;
 
-    const applicationsByStatus = applications.reduce((acc, app) => {
-      acc[app.status] = (acc[app.status] || 0) + 1;
-      return acc;
-    }, {});
+    const applicationsByStatus = {};
+    let totalApplications = 0;
+    for (const { _id, count } of applicationCounts) {
+      applicationsByStatus[_id] = count;
+      totalApplications += count;
+    }
 
-    const completedInterviews = interviews.filter(i => i.status === 'completed').length;
+    let totalInterviews = 0;
+    let completedInterviews = 0;
+    for (const { _id, count } of interviewCounts) {
+      totalInterviews += count;
+      if (_id === 'completed') completedInterviews = count;
+    }
 
     return res.json({
       stats: {
         totalAssessments: assessments.length,
         completedAssessments,
         averageScore: avgScore,
-        totalApplications: applications.length,
+        totalApplications,
         applicationsByStatus,
-        totalInterviews: interviews.length,
+        totalInterviews,
         completedInterviews,
         profileCompletion: calculateProfileCompletion(req.user)
       }
@@ -53,30 +66,37 @@ router.get('/company', requireAuth, requireRole(['company']), async (req, res, n
   try {
     const companyId = req.user._id;
 
-    const jobs = await Job.find({ companyId });
+    const jobs = await Job.find({ companyId }).select('_id isActive').lean();
     const jobIds = jobs.map(j => j._id);
 
-    const [applications, totalStudents] = await Promise.all([
-      Application.find({ jobId: { $in: jobIds } }),
+    const [applicationCounts, recentApplications, totalStudents] = await Promise.all([
+      Application.aggregate([
+        { $match: { jobId: { $in: jobIds } } },
+        { $group: { _id: '$status', count: { $sum: 1 } } }
+      ]),
+      Application.find({ jobId: { $in: jobIds } })
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .lean(),
       User.countDocuments({ role: 'student' })
     ]);
 
     const activeJobs = jobs.filter(j => j.isActive).length;
-    const applicationsByStatus = applications.reduce((acc, app) => {
-      acc[app.status] = (acc[app.status] || 0) + 1;
-      return acc;
-    }, {});
+    const applicationsByStatus = {};
+    let totalApplications = 0;
+    for (const { _id, count } of applicationCounts) {
+      applicationsByStatus[_id] = count;
+      totalApplications += count;
+    }
 
     return res.json({
       stats: {
         totalJobs: jobs.length,
         activeJobs,
-        totalApplications: applications.length,
+        totalApplications,
         applicationsByStatus,
         totalStudents,
-        recentApplications: applications
-          .sort((a, b) => b.createdAt - a.createdAt)
-          .slice(0, 5)
+        recentApplications
       }
     });
   } catch (err) {

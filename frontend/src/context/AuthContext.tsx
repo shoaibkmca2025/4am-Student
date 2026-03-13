@@ -13,9 +13,29 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const getCachedUser = (): UserProfile | null => {
+  try {
+    const token = localStorage.getItem('authToken');
+    const name = localStorage.getItem('userName');
+    const email = localStorage.getItem('userEmail');
+    const role = localStorage.getItem('userRole') as 'student' | 'company' | null;
+    if (token && name && email && role) {
+      return {
+        id: '',
+        name,
+        email,
+        role,
+        preferences: { emailNotifications: true, darkMode: true },
+      };
+    }
+  } catch {}
+  return null;
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const cached = getCachedUser();
+  const [user, setUser] = useState<UserProfile | null>(cached);
+  const [isLoading, setIsLoading] = useState(!cached);
 
   const isAuthenticated = !!user;
 
@@ -45,7 +65,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem('userRole', data.user.role);
       }
     } catch {
-      // Token may be expired
       clearAuthData();
       setUser(null);
     }

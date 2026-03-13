@@ -39,7 +39,7 @@ router.post('/register', authLimiter, registerValidation, async (req, res, next)
     const { name, email, password } = req.body;
     const role = req.body.role === 'company' ? 'company' : 'student';
 
-    const existing = await User.findOne({ email });
+    const existing = await User.findOne({ email }).select('_id').lean();
     if (existing) return res.status(409).json({ message: 'Email already registered' });
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -73,7 +73,7 @@ router.post('/login', authLimiter, loginValidation, async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select('_id name email role passwordHash preferences').lean();
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });
 
     const ok = await bcrypt.compare(password, user.passwordHash);

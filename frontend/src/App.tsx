@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Dashboard from './pages/Dashboard';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
-import AssessmentPage from './pages/AssessmentPage';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider as AuthContextProvider } from './context/AuthContext';
+
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
+const AssessmentPage = React.lazy(() => import('./pages/AssessmentPage'));
+
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
+    <div className="flex flex-col items-center gap-3">
+      <div className="w-10 h-10 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin" />
+      <span className="text-sm text-slate-500 dark:text-slate-400">Loading...</span>
+    </div>
+  </div>
+);
 
 // Simple error boundary
 class AppErrorBoundary extends React.Component<
@@ -59,25 +69,27 @@ function App() {
       <AuthContextProvider>
         <AppErrorBoundary>
           <Router>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Register />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/dashboard" element={
-                <ProtectedRoute>
-                  <ErrorBoundary>
-                    <Dashboard />
-                  </ErrorBoundary>
-                </ProtectedRoute>
-              } />
-              <Route path="/assessment/:id" element={
-                <ProtectedRoute>
-                  <AssessmentPage />
-                </ProtectedRoute>
-              } />
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Register />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/dashboard" element={
+                  <ProtectedRoute>
+                    <ErrorBoundary>
+                      <Dashboard />
+                    </ErrorBoundary>
+                  </ProtectedRoute>
+                } />
+                <Route path="/assessment/:id" element={
+                  <ProtectedRoute>
+                    <AssessmentPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
           </Router>
         </AppErrorBoundary>
       </AuthContextProvider>

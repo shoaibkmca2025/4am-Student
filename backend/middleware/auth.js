@@ -7,6 +7,8 @@ const getJwtSecret = () => {
   return '';
 };
 
+const USER_FIELDS = 'name email role bio phone location website skills savedJobs preferences isActive avatar';
+
 export const requireAuth = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization || '';
@@ -17,9 +19,10 @@ export const requireAuth = async (req, res, next) => {
     if (!secret) return res.status(500).json({ message: 'JWT secret not configured' });
 
     const payload = jwt.verify(token, secret);
-    const user = await User.findById(payload.sub).select('-passwordHash');
+    const user = await User.findById(payload.sub).select(USER_FIELDS).lean();
     if (!user) return res.status(401).json({ message: 'Unauthorized' });
 
+    user.id = user._id.toString();
     req.user = user;
     next();
   } catch (err) {
@@ -32,4 +35,3 @@ export const requireRole = (roles) => (req, res, next) => {
   if (!role || !roles.includes(role)) return res.status(403).json({ message: 'Forbidden' });
   next();
 };
-

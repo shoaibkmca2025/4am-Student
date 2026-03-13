@@ -192,9 +192,10 @@ const resolvedBaseURL =
 
 const api = axios.create({
   baseURL: resolvedBaseURL,
-  timeout: 60000,
+  timeout: 15000,
 });
 
+// Retry with exponential backoff for network errors & 5xx
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken');
   if (token) {
@@ -205,15 +206,35 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+const MAX_RETRIES = 3;
+const RETRY_DELAY_BASE = 1000;
+
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const config = error.config;
+    if (!config) return Promise.reject(error);
+
+    config.__retryCount = config.__retryCount || 0;
+
+    const isRetryable =
+      !error.response ||
+      error.code === 'ECONNABORTED' ||
+      error.code === 'ERR_NETWORK' ||
+      (error.response?.status >= 500 && error.response?.status < 600);
+
+    if (isRetryable && config.__retryCount < MAX_RETRIES) {
+      config.__retryCount += 1;
+      const delay = RETRY_DELAY_BASE * Math.pow(2, config.__retryCount - 1);
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return api(config);
+    }
+
     if (error.response?.status === 401) {
-      // Token expired or invalid - clear auth state
       localStorage.removeItem('authToken');
       localStorage.removeItem('isAuthenticated');
-      // Don't redirect here — let the auth context handle it
     }
+
     return Promise.reject(error);
   }
 );

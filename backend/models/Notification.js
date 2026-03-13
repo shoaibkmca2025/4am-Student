@@ -4,7 +4,8 @@ const notificationSchema = mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
+    index: true
   },
   title: {
     type: String,
@@ -29,6 +30,8 @@ const notificationSchema = mongoose.Schema({
 }, {
   timestamps: true
 });
+
+notificationSchema.index({ user: 1, read: 1, createdAt: -1 });
 
 const Notification = mongoose.models.Notification || mongoose.model('Notification', notificationSchema);
 
