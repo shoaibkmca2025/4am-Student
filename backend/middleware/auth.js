@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { isValidObjectId } from 'mongoose';
 import User from '../models/User.js';
 
 const getJwtSecret = () => {
@@ -12,15 +13,25 @@ const USER_FIELDS = 'name email role bio phone location website skills savedJobs
 export const requireAuth = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization || '';
-    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+    const [scheme, rawToken] = authHeader.split(' ');
+    const token = scheme === 'Bearer' && rawToken ? rawToken.trim() : '';
     if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
     const secret = getJwtSecret();
     if (!secret) return res.status(500).json({ message: 'JWT secret not configured' });
 
-    const payload = jwt.verify(token, secret);
+    const payload = jwt.verify(token, secret, {
+      algorithms: ['HS256'],
+      ignoreExpiration: false
+    });
+
+    const userId = typeof payload?.sub === 'string' ? payload.sub : '';
+    if (!userId || !isValidObjectId(userId)) {
+      return res.status(401).json({ message: 'Unauthorized' });
+    }
+
     const user = await User.findById(payload.sub).select(USER_FIELDS).lean();
-    if (!user) return res.status(401).json({ message: 'Unauthorized' });
+    if (!user || user.isActive === false) return res.status(401).json({ message: 'Unauthorized' });
 
     user.id = user._id.toString();
     req.user = user;

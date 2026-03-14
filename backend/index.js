@@ -27,6 +27,9 @@ dotenv.config();
 
 const app = express();
 
+// Required when running behind Render/Cloudflare so req.ip and rate limiting are accurate.
+app.set('trust proxy', 1);
+
 // Security Middleware
 app.use(helmet());
 app.use(compression());

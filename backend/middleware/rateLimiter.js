@@ -1,25 +1,31 @@
 import rateLimit from 'express-rate-limit';
 
-export const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 20, // 20 attempts per window
+const defaultLimiterOptions = {
   standardHeaders: true,
   legacyHeaders: false,
+  keyGenerator: (req) => req.ip,
+  handler: (req, res, _next, options) => {
+    res.status(options.statusCode || 429).json({ message: options.message?.message || 'Too many requests' });
+  }
+};
+
+export const authLimiter = rateLimit({
+  ...defaultLimiterOptions,
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // 10 attempts per window
   message: { message: 'Too many attempts. Please try again later.' }
 });
 
 export const apiLimiter = rateLimit({
+  ...defaultLimiterOptions,
   windowMs: 15 * 60 * 1000,
   max: 100,
-  standardHeaders: true,
-  legacyHeaders: false,
   message: { message: 'Too many requests' }
 });
 
 export const contactLimiter = rateLimit({
+  ...defaultLimiterOptions,
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 5,
-  standardHeaders: true,
-  legacyHeaders: false,
   message: { message: 'Too many messages sent. Please try again later.' }
 });
