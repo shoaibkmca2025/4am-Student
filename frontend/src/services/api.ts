@@ -216,12 +216,24 @@ const normalizeApiBase = (value?: string) => {
   return withoutTrailingSlash.endsWith('/api') ? withoutTrailingSlash : `${withoutTrailingSlash}/api`;
 };
 
+const inferFallbackBaseUrl = () => {
+  if (typeof window === 'undefined') return 'http://localhost:5000/api';
+
+  const { protocol, hostname } = window.location;
+  const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
+
+  if (isLocal) {
+    return `${protocol}//${hostname}:5000/api`;
+  }
+
+  // Production fallback for deployments where VITE_API_BASE_URL is not set.
+  return 'https://fouram-student-backend.onrender.com/api';
+};
+
 const resolvedBaseURL =
   normalizeApiBase((import.meta as any).env?.VITE_API_BASE_URL) ||
   normalizeApiBase((import.meta as any).env?.VITE_API_URL) ||
-  (typeof window !== 'undefined'
-    ? `${window.location.protocol}//${window.location.hostname}:5000/api`
-    : 'http://localhost:5000/api');
+  inferFallbackBaseUrl();
 
 const api = axios.create({
   baseURL: resolvedBaseURL,

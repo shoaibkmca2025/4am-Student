@@ -55,6 +55,9 @@ This project is organized into two main directories:
    - Frontend: Create `.env.local` file in `frontend/` directory (if needed)
      ```
      VITE_API_URL=http://localhost:5000
+
+      # Production frontend (Vercel) should point to Render backend API
+      VITE_API_BASE_URL=https://fouram-student-backend.onrender.com
      ```
 
 3. **Database Setup:**
