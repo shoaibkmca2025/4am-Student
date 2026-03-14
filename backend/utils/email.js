@@ -138,7 +138,15 @@ export const sendPasswordResetEmail = async ({ to, name, token, expiresInMinutes
   let lastError = null;
   for (const candidate of candidates) {
     try {
-      await candidate.transporter.sendMail({ from, to, subject, text, html });
+      const info = await candidate.transporter.sendMail({ from, to, subject, text, html });
+      const accepted = Array.isArray(info?.accepted) ? info.accepted.map((item) => String(item).toLowerCase()) : [];
+      const rejected = Array.isArray(info?.rejected) ? info.rejected.map((item) => String(item).toLowerCase()) : [];
+      const target = String(to || '').toLowerCase();
+
+      if (!accepted.length || rejected.includes(target)) {
+        throw new Error(`SMTP did not accept recipient (${target}). response=${info?.response || 'n/a'}`);
+      }
+
       return;
     } catch (err) {
       lastError = err;
