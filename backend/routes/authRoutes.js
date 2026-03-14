@@ -118,23 +118,19 @@ router.post('/forgot-password', authLimiter, [
     user.resetTokenExpiry = resetTokenExpiry;
     await user.save();
 
-    try {
-      await sendPasswordResetEmail({
-        to: user.email,
-        name: user.name,
-        token,
-        expiresInMinutes: 15
-      });
-      return res.json({ message: 'If the email exists, a reset link has been sent.' });
-    } catch (emailErr) {
-      // Reset token should not remain active if email dispatch failed.
-      user.resetTokenHash = undefined;
-      user.resetTokenExpiry = undefined;
-      await user.save();
+    // Return quickly to avoid frontend timeout; send email in background.
+    res.json({ message: 'If the email exists, a reset link has been sent.' });
 
+    sendPasswordResetEmail({
+      to: user.email,
+      name: user.name,
+      token,
+      expiresInMinutes: 15
+    }).catch((emailErr) => {
       console.error('Failed to send password reset email:', emailErr?.message || emailErr);
-      return res.status(503).json({ message: 'Unable to send reset email right now. Please try again later.' });
-    }
+    });
+
+    return;
   } catch (err) {
     next(err);
   }
