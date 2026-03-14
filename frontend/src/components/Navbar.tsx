@@ -9,6 +9,8 @@ const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  const userRole = localStorage.getItem('userRole');
+  const isAdmin = userRole === 'admin';
   const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
@@ -108,6 +110,25 @@ const Navbar: React.FC = () => {
                 >
                   Dashboard
                 </button>
+                {isAdmin ? (
+                  <button
+                    onClick={() => navigate('/admin')}
+                    className="px-3 py-1.5 rounded-md text-xs font-semibold transition-all duration-200"
+                    style={{
+                      border: '1px solid var(--primary)',
+                      color: theme === 'dark' ? '#0f172a' : '#ffffff',
+                      background: 'var(--primary)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'var(--primary-bright)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'var(--primary)';
+                    }}
+                  >
+                    Add Assessment
+                  </button>
+                ) : null}
                 <button
                   onClick={() => {
                     localStorage.clear();
@@ -209,6 +230,17 @@ const Navbar: React.FC = () => {
               >
                 Dashboard
               </button>
+              {isAdmin ? (
+                <button
+                  onClick={() => {
+                    navigate('/admin');
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-slate-600 dark:text-gray-300 text-base font-medium hover:text-primary py-3 border-b border-black/5 dark:border-white/5 text-left focus:outline-none transition-colors"
+                >
+                  Add Assessment
+                </button>
+              ) : null}
               <button
                 onClick={() => {
                   localStorage.clear();
