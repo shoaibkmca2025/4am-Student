@@ -14,10 +14,16 @@ const getClientUrl = () => {
   return 'http://localhost:5173';
 };
 
+const isValidFromValue = (value) => {
+  if (!value) return false;
+  // Accept either plain email or display name format: Name <email@domain>
+  return /@/.test(value);
+};
+
 const createTransportCandidates = () => {
   const host = getEnv('SMTP_HOST', 'EMAIL_HOST', 'MAIL_HOST');
-  const user = getEnv('SMTP_USER', 'EMAIL_USER', 'MAIL_USER', 'GMAIL_USER');
-  const pass = getEnv('SMTP_PASS', 'EMAIL_PASS', 'MAIL_PASS', 'GMAIL_APP_PASSWORD', 'GOOGLE_APP_PASSWORD', 'APP_PASSWORD');
+  const user = getEnv('SMTP_USER', 'SMTP_USERNAME', 'EMAIL_USER', 'MAIL_USER', 'GMAIL_USER', 'MAIL_USERNAME');
+  const pass = getEnv('SMTP_PASS', 'SMTP_PASSWORD', 'EMAIL_PASS', 'MAIL_PASS', 'GMAIL_APP_PASSWORD', 'GOOGLE_APP_PASSWORD', 'APP_PASSWORD', 'MAIL_PASSWORD');
   const port = Number(getEnv('SMTP_PORT', 'EMAIL_PORT', 'MAIL_PORT') || 587);
   const secureEnv = getEnv('SMTP_SECURE', 'EMAIL_SECURE', 'MAIL_SECURE').toLowerCase();
   const secure = secureEnv ? secureEnv === 'true' : Number.isFinite(port) && port === 465;
@@ -92,10 +98,11 @@ const createTransportCandidates = () => {
 
 export const sendPasswordResetEmail = async ({ to, name, token, expiresInMinutes = 15 }) => {
   const resetLink = `${getClientUrl()}/reset-password?token=${encodeURIComponent(token)}`;
-  const from =
-    getEnv('SMTP_FROM', 'EMAIL_FROM', 'MAIL_FROM') ||
-    getEnv('SMTP_USER', 'EMAIL_USER', 'MAIL_USER') ||
-    'no-reply@4amglobalmedia.com';
+  const configuredFrom = getEnv('SMTP_FROM', 'EMAIL_FROM', 'MAIL_FROM', 'MAILER_FROM');
+  const authUser = getEnv('SMTP_USER', 'SMTP_USERNAME', 'EMAIL_USER', 'MAIL_USER', 'GMAIL_USER', 'MAIL_USERNAME');
+  const from = isValidFromValue(configuredFrom)
+    ? configuredFrom
+    : (authUser || 'no-reply@4amglobalmedia.com');
 
   const subject = 'Reset your password';
   const text = [
