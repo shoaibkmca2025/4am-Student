@@ -118,26 +118,27 @@ router.post('/forgot-password', authLimiter, [
     user.resetTokenExpiry = resetTokenExpiry;
     await user.save();
 
-    try {
-      await Promise.race([
-        sendPasswordResetEmail({
-          to: user.email,
-          name: user.name,
-          token,
-          expiresInMinutes: 15
-        }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Email send timed out')), 12000))
-      ]);
-      return res.json({ message: 'If the email exists, a reset link has been sent.' });
-    } catch (emailErr) {
-      // If email dispatch fails, clear token so stale reset links are never left active.
-      user.resetTokenHash = undefined;
-      user.resetTokenExpiry = undefined;
-      await user.save();
+    // Respond immediately so users don't wait on SMTP provider/network latency.
+    res.json({ message: 'If the email exists, a reset link has been sent.' });
 
+    sendPasswordResetEmail({
+      to: user.email,
+      name: user.name,
+      token,
+      expiresInMinutes: 15
+    }).catch(async (emailErr) => {
       console.error('Failed to send password reset email:', emailErr?.message || emailErr);
-      return res.status(503).json({ message: 'Unable to send reset email right now. Please try again later.' });
-    }
+      // Clean up token when delivery fails.
+      try {
+        user.resetTokenHash = undefined;
+        user.resetTokenExpiry = undefined;
+        await user.save();
+      } catch (cleanupErr) {
+        console.error('Failed to cleanup reset token after email failure:', cleanupErr?.message || cleanupErr);
+      }
+    });
+
+    return;
   } catch (err) {
     next(err);
   }
