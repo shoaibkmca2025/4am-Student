@@ -17,23 +17,6 @@ router.get('/', requireAuth, async (req, res, next) => {
   }
 });
 
-// @desc    Get assessment by ID
-// @route   GET /api/assessments/:id
-// @access  Private
-router.get('/:id(\\d+)', requireAuth, async (req, res, next) => {
-  try {
-    const id = Number(req.params.id);
-    if (!Number.isFinite(id)) return res.status(400).json({ message: 'Invalid ID' });
-
-    const assessment = await Assessment.findOne({ id });
-    if (!assessment) return res.status(404).json({ message: 'Assessment not found' });
-
-    return res.json(assessment);
-  } catch (err) {
-    next(err);
-  }
-});
-
 // @desc    Create a new assessment
 // @route   POST /api/assessments
 // @access  Private (Admin)
@@ -92,7 +75,7 @@ router.post('/', requireAuth, requireAdmin, async (req, res, next) => {
 // @desc    Delete assessment by ID
 // @route   DELETE /api/assessments/:id
 // @access  Private (Admin)
-router.delete('/:id(\\d+)', requireAuth, requireAdmin, async (req, res, next) => {
+router.delete('/:id', requireAuth, requireAdmin, async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) return res.status(400).json({ message: 'Invalid ID' });
@@ -172,6 +155,23 @@ router.get('/top-students', requireAuth, requireAdmin, async (req, res, next) =>
     ]);
 
     return res.json({ students: topStudents });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// @desc    Get assessment by ID
+// @route   GET /api/assessments/:id
+// @access  Private
+router.get('/:id', requireAuth, async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return res.status(400).json({ message: 'Invalid ID' });
+
+    const assessment = await Assessment.findOne({ id });
+    if (!assessment) return res.status(404).json({ message: 'Assessment not found' });
+
+    return res.json(assessment);
   } catch (err) {
     next(err);
   }
