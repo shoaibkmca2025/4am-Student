@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Eye, EyeOff, Lock, LogIn, Mail, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import axios from 'axios';
+import { authService } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 const fadeUp = {
@@ -19,7 +20,9 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
 
@@ -30,6 +33,7 @@ const Login: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setInfo('');
     setLoading(true);
 
     try {
@@ -54,6 +58,35 @@ const Login: React.FC = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setError('');
+    setInfo('');
+
+    const normalizedEmail = email.trim();
+    if (!normalizedEmail) {
+      setError('Enter your email first, then click Forgot password.');
+      return;
+    }
+
+    setForgotLoading(true);
+    try {
+      const res = await authService.forgotPassword(normalizedEmail);
+      setInfo(res?.message || 'If the email exists, a reset link has been sent.');
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        if (!err.response) {
+          setError('Cannot reach the server. Please try again later.');
+        } else {
+          setError(err.response?.data?.message || 'Failed to send reset email. Please try again.');
+        }
+      } else {
+        setError('Failed to send reset email. Please try again.');
+      }
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -106,6 +139,16 @@ const Login: React.FC = () => {
             </motion.div>
           )}
 
+          {info && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-700"
+            >
+              {info}
+            </motion.div>
+          )}
+
           <form onSubmit={handleLogin} className="space-y-5">
             {/* Email */}
             <motion.div custom={1} initial="hidden" animate="visible" variants={fadeUp}>
@@ -129,8 +172,13 @@ const Login: React.FC = () => {
             <motion.div custom={2} initial="hidden" animate="visible" variants={fadeUp}>
               <div className="flex items-center justify-between">
                 <label className="auth-label" htmlFor="login-password">Password</label>
-                <button type="button" className="text-xs font-medium text-primary hover:underline hover:underline-offset-2 mb-1">
-                  Forgot password?
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  disabled={forgotLoading}
+                  className="text-xs font-medium text-primary hover:underline hover:underline-offset-2 mb-1 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {forgotLoading ? 'Sending...' : 'Forgot password?'}
                 </button>
               </div>
               <div className="relative">
