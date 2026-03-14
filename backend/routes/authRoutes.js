@@ -119,12 +119,15 @@ router.post('/forgot-password', authLimiter, [
     await user.save();
 
     try {
-      await sendPasswordResetEmail({
-        to: user.email,
-        name: user.name,
-        token,
-        expiresInMinutes: 15
-      });
+      await Promise.race([
+        sendPasswordResetEmail({
+          to: user.email,
+          name: user.name,
+          token,
+          expiresInMinutes: 15
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Email send timed out')), 12000))
+      ]);
       return res.json({ message: 'If the email exists, a reset link has been sent.' });
     } catch (emailErr) {
       // If email dispatch fails, clear token so stale reset links are never left active.
