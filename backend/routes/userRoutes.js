@@ -47,7 +47,7 @@ router.put('/me', requireAuth, [
       req.user._id,
       { $set: update },
       { returnDocument: 'after' }
-    ).select('-passwordHash -resetToken -resetTokenExpiry');
+    ).select('-passwordHash -resetTokenHash -resetTokenExpiry');
     return res.json({ user: updated });
   } catch (err) {
     next(err);
@@ -70,7 +70,7 @@ router.put('/me/preferences', requireAuth, async (req, res, next) => {
       req.user._id,
       { $set: update },
       { returnDocument: 'after' }
-    ).select('-passwordHash -resetToken -resetTokenExpiry');
+    ).select('-passwordHash -resetTokenHash -resetTokenExpiry');
     return res.json({ user: updated });
   } catch (err) {
     next(err);
@@ -130,7 +130,7 @@ router.post('/me/saved-jobs', requireAuth, async (req, res, next) => {
       req.user._id,
       { $addToSet: { savedJobs: jobId } },
       { returnDocument: 'after' }
-    ).select('-passwordHash -resetToken -resetTokenExpiry');
+    ).select('-passwordHash -resetTokenHash -resetTokenExpiry');
 
     return res.json({ user: updated });
   } catch (err) {
@@ -148,7 +148,7 @@ router.delete('/me/saved-jobs/:jobId', requireAuth, async (req, res, next) => {
       req.user._id,
       { $pull: { savedJobs: jobId } },
       { returnDocument: 'after' }
-    ).select('-passwordHash -resetToken -resetTokenExpiry');
+    ).select('-passwordHash -resetTokenHash -resetTokenExpiry');
 
     return res.json({ user: updated });
   } catch (err) {

@@ -15,6 +15,15 @@ const jobSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+jobSchema.virtual('applications', {
+  ref: 'Application',
+  localField: '_id',
+  foreignField: 'jobId'
+});
+
+jobSchema.set('toObject', { virtuals: true });
+jobSchema.set('toJSON', { virtuals: true });
+
 const Job = mongoose.models.Job || mongoose.model('Job', jobSchema);
 
 export default Job;

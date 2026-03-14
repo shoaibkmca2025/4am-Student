@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema(
     name: { type: String, trim: true, default: '' },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     passwordHash: { type: String, required: true },
-    role: { type: String, enum: ['student', 'company'], default: 'student', index: true },
+    role: { type: String, enum: ['student', 'company', 'admin'], default: 'student', index: true },
     avatar: { type: String, default: '' },
     bio: { type: String, default: '', maxlength: 500 },
     phone: { type: String, default: '', trim: true },
@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema(
       language: { type: String, default: 'en' }
     },
     // Password reset
-    resetToken: { type: String },
+    resetTokenHash: { type: String },
     resetTokenExpiry: { type: Date },
     // Account status
     isActive: { type: Boolean, default: true },
@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema(
 userSchema.methods.toJSON = function () {
   const obj = this.toObject();
   delete obj.passwordHash;
-  delete obj.resetToken;
+  delete obj.resetTokenHash;
   delete obj.resetTokenExpiry;
   return obj;
 };

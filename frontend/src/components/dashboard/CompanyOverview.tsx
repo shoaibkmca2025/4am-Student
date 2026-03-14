@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import StatsCard from './StatsCard';
+import { statsService } from '../../services/api';
 
 interface OverviewProps {
   userName: string;
@@ -13,6 +14,7 @@ interface OverviewProps {
 
 const CompanyOverview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
   const [greeting, setGreeting] = useState('');
+  const [loadingStats, setLoadingStats] = useState(true);
   
   // Real Data States (Initialized to 0/empty for new users)
   const [stats, setStats] = useState({
@@ -30,8 +32,49 @@ const CompanyOverview: React.FC<OverviewProps> = ({ userName, setActiveTab }) =>
     if (hour < 12) setGreeting('Good Morning');
     else if (hour < 18) setGreeting('Good Afternoon');
     else setGreeting('Good Evening');
-    
-    // TODO: Fetch real company stats here
+
+    const loadStats = async () => {
+      try {
+        const data = await statsService.company();
+        const responseStats = data?.stats;
+
+        if (!responseStats) return;
+
+        const offered = responseStats.applicationsByStatus?.Offered || 0;
+        const interview = responseStats.applicationsByStatus?.Interview || 0;
+        const offerRate = responseStats.totalApplications > 0
+          ? Math.round((offered / responseStats.totalApplications) * 100)
+          : 0;
+
+        setStats({
+          activeJobs: responseStats.activeJobs || 0,
+          totalApplicants: responseStats.totalApplicants || 0,
+          interviews: interview,
+          offerRate
+        });
+
+        setRecentApplicants((responseStats.recentApplications || []).map((application: any) => {
+          const job = application?.jobId || {};
+          const title = typeof job === 'object' ? job.title : 'Job';
+          return {
+            name: title,
+            role: application.status,
+            initials: String(title || 'J').slice(0, 2).toUpperCase()
+          };
+        }));
+      } catch {
+        setStats({
+          activeJobs: 0,
+          totalApplicants: 0,
+          interviews: 0,
+          offerRate: 0
+        });
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+
+    loadStats();
   }, []);
 
   return (
@@ -55,7 +98,7 @@ const CompanyOverview: React.FC<OverviewProps> = ({ userName, setActiveTab }) =>
             </h1>
             
             <p className="text-slate-700 text-lg leading-relaxed max-w-xl font-medium">
-              Ready to find your next top talent? You have {stats.activeJobs} active job listings and {stats.totalApplicants} new applicants today.
+              Ready to find your next top talent? You have {stats.activeJobs} active job listings and {stats.totalApplicants} total applicants.
             </p>
 
             <div className="flex flex-wrap items-center gap-4 pt-2">
@@ -100,7 +143,7 @@ const CompanyOverview: React.FC<OverviewProps> = ({ userName, setActiveTab }) =>
           title="Active Jobs" 
           value={stats.activeJobs.toString()} 
           icon={Briefcase} 
-          trend="No activity" 
+          trend={loadingStats ? 'Loading...' : 'Live data'} 
           trendUp={true} 
           color="primary" 
           progress={0}
@@ -111,7 +154,7 @@ const CompanyOverview: React.FC<OverviewProps> = ({ userName, setActiveTab }) =>
           title="Total Applicants" 
           value={stats.totalApplicants.toString()} 
           icon={Users} 
-          trend="No activity" 
+          trend={loadingStats ? 'Loading...' : 'Live data'} 
           trendUp={true} 
           color="secondary" 
           variant="chart"
@@ -121,7 +164,7 @@ const CompanyOverview: React.FC<OverviewProps> = ({ userName, setActiveTab }) =>
           title="Interviews" 
           value={stats.interviews.toString()} 
           icon={MessageSquare} 
-          trend="0 Pending" 
+          trend={loadingStats ? 'Loading...' : `${stats.interviews} Pending`} 
           trendUp={true} 
           color="accent" 
           progress={0}
@@ -132,7 +175,7 @@ const CompanyOverview: React.FC<OverviewProps> = ({ userName, setActiveTab }) =>
           title="Offer Rate" 
           value={`${stats.offerRate}%`} 
           icon={Target} 
-          trend="0%" 
+          trend={loadingStats ? 'Loading...' : `${stats.offerRate}%`} 
           trendUp={true} 
           color="purple" 
           variant="gauge"

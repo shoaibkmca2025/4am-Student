@@ -6,7 +6,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, role: 'student' | 'company') => Promise<void>;
+  register: (name: string, email: string, password: string, role: 'student' | 'company' | 'admin') => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
@@ -18,7 +18,7 @@ const getCachedUser = (): UserProfile | null => {
     const token = localStorage.getItem('authToken');
     const name = localStorage.getItem('userName');
     const email = localStorage.getItem('userEmail');
-    const role = localStorage.getItem('userRole') as 'student' | 'company' | null;
+    const role = localStorage.getItem('userRole') as 'student' | 'company' | 'admin' | null;
     if (token && name && email && role) {
       return {
         id: '',
@@ -85,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(data.user);
   };
 
-  const register = async (name: string, email: string, password: string, role: 'student' | 'company') => {
+  const register = async (name: string, email: string, password: string, role: 'student' | 'company' | 'admin') => {
     const data = await authService.register({ name, email, password, role });
     storeAuthData(data.token, data.user);
     setUser(data.user);

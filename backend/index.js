@@ -8,6 +8,7 @@ import morgan from 'morgan';
 import mongoose from 'mongoose';
 import connectDB from './config/db.js';
 import { apiLimiter } from './middleware/rateLimiter.js';
+import errorHandler from './middleware/errorHandler.js';
 import assessmentRoutes from './routes/assessmentRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
@@ -83,44 +84,13 @@ app.use('/api/achievements', achievementRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/stats', statsRoutes);
 
-// API 404 handler
-app.all(/^\/api(?:\/.*)?$/, (req, res) => {
-  return res.status(404).json({ message: 'API route not found' });
+// 404 handler
+app.use((req, res) => {
+  return res.status(404).json({ message: 'Page not found' });
 });
 
 // Error handling middleware
-app.use((err, req, res, next) => {
-  if (res.headersSent) return next(err);
-
-  let status = Number.isInteger(err?.status) ? err.status : 500;
-  let message = err?.message || 'Server error';
-  let details;
-
-  // Mongoose cast errors (for example invalid ObjectId) should be client errors.
-  if (err?.name === 'CastError') {
-    status = 400;
-    message = 'Invalid request data';
-  } else if (err?.name === 'ValidationError') {
-    status = 400;
-    message = 'Validation failed';
-    details = Object.fromEntries(
-      Object.entries(err.errors || {}).map(([key, value]) => [key, value?.message || 'Invalid value'])
-    );
-  } else if (err?.code === 11000) {
-    status = 409;
-    message = 'Duplicate value already exists';
-  }
-
-  if (status >= 500) {
-    console.error(err.stack || err);
-  }
-
-  return res.status(status).json({
-    message,
-    details,
-    ...(process.env.NODE_ENV !== 'production' && status >= 500 ? { stack: err.stack } : {})
-  });
-});
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 

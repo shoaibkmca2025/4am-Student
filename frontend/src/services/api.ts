@@ -8,7 +8,7 @@ export interface UserProfile {
   _id?: string;
   name: string;
   email: string;
-  role: 'student' | 'company';
+  role: 'student' | 'company' | 'admin';
   bio?: string;
   phone?: string;
   location?: string;
@@ -142,9 +142,18 @@ export interface CompanyStats {
   totalJobs: number;
   activeJobs: number;
   totalApplications: number;
+  totalApplicants: number;
   applicationsByStatus: Record<string, number>;
   totalStudents: number;
   recentApplications: Application[];
+  jobs: Array<{
+    jobId: string;
+    title: string;
+    isActive: boolean;
+    totalApplicants: number;
+    appliedStudents: string[];
+    statusBreakdown: Record<string, number>;
+  }>;
 }
 
 export interface AchievementBadge {
@@ -253,7 +262,7 @@ export const assessmentService = {
 };
 
 export const authService = {
-  register: async (payload: { name: string; email: string; password: string; role: 'student' | 'company' }): Promise<AuthResponse> => {
+  register: async (payload: { name: string; email: string; password: string; role: 'student' | 'company' | 'admin' }): Promise<AuthResponse> => {
     const response = await api.post('/auth/register', payload);
     return response.data;
   },

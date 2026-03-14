@@ -10,10 +10,10 @@ export const authLimiter = rateLimit({
 
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200,
+  max: 100,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { message: 'Too many requests. Please slow down.' }
+  message: { message: 'Too many requests' }
 });
 
 export const contactLimiter = rateLimit({

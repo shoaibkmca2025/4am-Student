@@ -1,12 +1,14 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import { body } from 'express-validator';
 import User from '../models/User.js';
 import { requireAuth } from '../middleware/auth.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
 import validate from '../middleware/validate.js';
 import { createNotification } from '../utils/notifications.js';
+import { sendPasswordResetEmail } from '../utils/email.js';
 
 const router = express.Router();
 
@@ -19,7 +21,13 @@ const getJwtSecret = () => {
 const signToken = (userId) => {
   const secret = getJwtSecret();
   if (!secret) throw new Error('JWT secret not configured');
-  return jwt.sign({ sub: userId }, secret, { expiresIn: '7d' });
+  return jwt.sign({ sub: userId }, secret, { expiresIn: '1h' });
+};
+
+const createResetToken = () => {
+  const token = crypto.randomBytes(32).toString('hex');
+  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
+  return { token, tokenHash };
 };
 
 const registerValidation = [
@@ -94,7 +102,6 @@ router.get('/me', requireAuth, async (req, res) => {
   return res.json({ user: req.user });
 });
 
-// Password reset request (generates token, in production would send email)
 router.post('/forgot-password', authLimiter, [
   body('email').trim().isEmail().withMessage('Valid email is required').normalizeEmail(),
   validate
@@ -104,14 +111,19 @@ router.post('/forgot-password', authLimiter, [
     // Always return success to prevent email enumeration
     if (!user) return res.json({ message: 'If the email exists, a reset link has been sent.' });
 
-    const secret = getJwtSecret();
-    const resetToken = jwt.sign({ sub: user._id, purpose: 'password-reset' }, secret, { expiresIn: '1h' });
+    const { token, tokenHash } = createResetToken();
+    const resetTokenExpiry = new Date(Date.now() + 15 * 60 * 1000);
 
-    // In production, send email with reset link
-    // For now, store the token on the user (demo purposes)
-    user.resetToken = resetToken;
-    user.resetTokenExpiry = new Date(Date.now() + 60 * 60 * 1000);
+    user.resetTokenHash = tokenHash;
+    user.resetTokenExpiry = resetTokenExpiry;
     await user.save();
+
+    await sendPasswordResetEmail({
+      to: user.email,
+      name: user.name,
+      token,
+      expiresInMinutes: 15
+    });
 
     return res.json({ message: 'If the email exists, a reset link has been sent.' });
   } catch (err) {
@@ -130,26 +142,19 @@ router.post('/reset-password', authLimiter, [
 ], async (req, res, next) => {
   try {
     const { token, password } = req.body;
-    const secret = getJwtSecret();
+    const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
 
-    let payload;
-    try {
-      payload = jwt.verify(token, secret);
-    } catch {
-      return res.status(400).json({ message: 'Invalid or expired reset token' });
-    }
+    const user = await User.findOne({
+      resetTokenHash: tokenHash,
+      resetTokenExpiry: { $gt: new Date() }
+    });
 
-    if (payload.purpose !== 'password-reset') {
-      return res.status(400).json({ message: 'Invalid token' });
-    }
-
-    const user = await User.findById(payload.sub);
-    if (!user || user.resetToken !== token) {
+    if (!user) {
       return res.status(400).json({ message: 'Invalid or expired reset token' });
     }
 
     user.passwordHash = await bcrypt.hash(password, 12);
-    user.resetToken = undefined;
+    user.resetTokenHash = undefined;
     user.resetTokenExpiry = undefined;
     await user.save();
 

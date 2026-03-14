@@ -26,6 +26,9 @@ export const requireAuth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (err) {
+    if (err?.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Token expired' });
+    }
     return res.status(401).json({ message: 'Unauthorized' });
   }
 };
@@ -33,5 +36,12 @@ export const requireAuth = async (req, res, next) => {
 export const requireRole = (roles) => (req, res, next) => {
   const role = req.user?.role;
   if (!role || !roles.includes(role)) return res.status(403).json({ message: 'Forbidden' });
+  next();
+};
+
+export const requireAdmin = (req, res, next) => {
+  if (req.user?.role !== 'admin') {
+    return res.status(403).json({ message: 'Access denied' });
+  }
   next();
 };

@@ -1,8 +1,10 @@
 import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import NotFound from './pages/NotFound';
+import AdminPage from './pages/AdminPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ThemeProvider } from './context/ThemeContext';
@@ -87,7 +89,12 @@ function App() {
                     <AssessmentPage />
                   </ProtectedRoute>
                 } />
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="/admin" element={
+                  <ProtectedRoute requiredRole="admin">
+                    <AdminPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
           </Router>

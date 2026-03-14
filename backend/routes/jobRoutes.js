@@ -30,6 +30,7 @@ router.get('/', [
       filter.$or = [
         { title: searchRegex },
         { companyName: searchRegex },
+        { requirements: { $elemMatch: { $regex: searchRegex } } },
         { description: searchRegex }
       ];
     }

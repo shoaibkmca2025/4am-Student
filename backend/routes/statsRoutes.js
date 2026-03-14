@@ -66,15 +66,19 @@ router.get('/company', requireAuth, requireRole(['company']), async (req, res, n
   try {
     const companyId = req.user._id;
 
-    const jobs = await Job.find({ companyId }).select('_id isActive').lean();
-    const jobIds = jobs.map(j => j._id);
+    const jobs = await Job.find({ companyId })
+      .select('_id title isActive')
+      .populate({
+        path: 'applications',
+        select: 'studentId status createdAt'
+      })
+      .lean();
 
-    const [applicationCounts, recentApplications, totalStudents] = await Promise.all([
-      Application.aggregate([
-        { $match: { jobId: { $in: jobIds } } },
-        { $group: { _id: '$status', count: { $sum: 1 } } }
-      ]),
+    const jobIds = jobs.map((j) => j._id);
+
+    const [recentApplications, totalStudents] = await Promise.all([
       Application.find({ jobId: { $in: jobIds } })
+        .populate('jobId', 'title companyName')
         .sort({ createdAt: -1 })
         .limit(5)
         .lean(),
@@ -84,9 +88,33 @@ router.get('/company', requireAuth, requireRole(['company']), async (req, res, n
     const activeJobs = jobs.filter(j => j.isActive).length;
     const applicationsByStatus = {};
     let totalApplications = 0;
-    for (const { _id, count } of applicationCounts) {
-      applicationsByStatus[_id] = count;
-      totalApplications += count;
+
+    const jobsWithStats = jobs.map((job) => {
+      const applications = Array.isArray(job.applications) ? job.applications : [];
+      const statusBreakdown = {};
+
+      for (const application of applications) {
+        statusBreakdown[application.status] = (statusBreakdown[application.status] || 0) + 1;
+        applicationsByStatus[application.status] = (applicationsByStatus[application.status] || 0) + 1;
+      }
+
+      totalApplications += applications.length;
+
+      return {
+        jobId: job._id,
+        title: job.title,
+        isActive: job.isActive,
+        totalApplicants: applications.length,
+        appliedStudents: applications.map((application) => application.studentId),
+        statusBreakdown
+      };
+    });
+
+    const uniqueStudentIds = new Set();
+    for (const job of jobsWithStats) {
+      for (const studentId of job.appliedStudents) {
+        uniqueStudentIds.add(String(studentId));
+      }
     }
 
     return res.json({
@@ -94,9 +122,11 @@ router.get('/company', requireAuth, requireRole(['company']), async (req, res, n
         totalJobs: jobs.length,
         activeJobs,
         totalApplications,
+        totalApplicants: uniqueStudentIds.size,
         applicationsByStatus,
         totalStudents,
-        recentApplications
+        recentApplications,
+        jobs: jobsWithStats
       }
     });
   } catch (err) {
