@@ -79,8 +79,10 @@ const Login: React.FC = () => {
       if (axios.isAxiosError(err)) {
         if (err.code === 'ECONNABORTED') {
           setError('Request timed out. Please try again.');
+        } else if (err.response?.status === 502 || err.response?.status === 503 || err.response?.status === 504) {
+          setError('Backend service is temporarily unavailable. Please try again in a moment.');
         } else if (!err.response) {
-          setError('Cannot reach the server. Please try again later.');
+          setError('Cannot reach backend service right now (network/CORS gateway issue). Please try again shortly.');
         } else {
           setError(err.response?.data?.message || 'Unable to send reset email right now. Please try again later.');
         }
