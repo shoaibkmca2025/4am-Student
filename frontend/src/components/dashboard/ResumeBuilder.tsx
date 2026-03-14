@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Download, Plus, Trash2, Wand2, Lightbulb, Check, AlertCircle, ArrowRight } from 'lucide-react';
+import { Save, Download, Plus, Trash2, Wand2, Lightbulb, Check, AlertCircle, Eye } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { v4 as uuidv4 } from 'uuid';
 import { resumeService } from '../../services/api';
+import ResumePreview from './ResumePreview';
 
 interface ResumeHeader {
   fullName: string;
@@ -89,6 +90,8 @@ const ResumeBuilder: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [validationError, setValidationError] = useState('');
 
   // Load saved data on mount
   useEffect(() => {
@@ -235,7 +238,19 @@ const ResumeBuilder: React.FC = () => {
     return `<ul>${lines.map((line) => `<li>${escapeHtml(line)}</li>`).join('')}</ul>`;
   };
 
-  const handleExport = () => {
+  const getResumeValidationError = () => {
+    if (!resumeData.header.fullName.trim()) return 'Please fill required fields before generating resume: Name is required.';
+    if (!resumeData.header.email.trim()) return 'Please fill required fields before generating resume: Email is required.';
+    const hasEducation = (resumeData.education || []).some((edu) =>
+      Boolean(edu.school?.trim() || edu.degree?.trim() || edu.field?.trim())
+    );
+    if (!hasEducation) return 'Please fill required fields before generating resume: Add at least one Education entry.';
+    const hasSkills = Boolean(resumeData.skills.technical.trim() || resumeData.skills.soft.trim());
+    if (!hasSkills) return 'Please fill required fields before generating resume: Add Skills.';
+    return '';
+  };
+
+  const buildResumeDocument = () => {
     const safe = {
       fullName: escapeHtml(resumeData.header.fullName || 'Your Name'),
       title: escapeHtml(resumeData.header.title || ''),
@@ -317,32 +332,36 @@ const ResumeBuilder: React.FC = () => {
       .filter(Boolean)
       .join(' | ');
 
-    const html = `
+    return `
       <!doctype html>
       <html>
       <head>
         <meta charset="utf-8" />
         <title>${safe.fullName} Resume</title>
         <style>
-          body { font-family: Arial, Helvetica, sans-serif; color:#111; background:#fff; margin:0; padding:0; }
-          .page { max-width: 800px; margin: 0 auto; padding: 28px; }
-          h1 { margin: 0; font-size: 28px; line-height: 1.2; }
-          h2 { margin: 20px 0 10px; font-size: 14px; letter-spacing: 0.8px; text-transform: uppercase; border-bottom: 1px solid #222; padding-bottom: 4px; }
-          h3 { margin: 0; font-size: 14px; }
-          p { margin: 4px 0; font-size: 12px; line-height: 1.4; }
-          .subtitle { margin-top: 4px; font-weight: 700; font-size: 13px; }
-          .contact { margin-top: 8px; font-size: 12px; }
-          .entry { margin-bottom: 10px; }
+          body { font-family: 'Helvetica Neue', Arial, sans-serif; color:#0f172a; background:#f8fafc; margin:0; padding:24px; }
+          .page { max-width: 820px; margin: 0 auto; background:#ffffff; border:1px solid #dbe2ea; border-radius: 10px; padding: 34px; }
+          header { text-align: center; margin-bottom: 20px; }
+          h1 { margin: 0; font-size: 34px; line-height: 1.15; letter-spacing: 0.1px; }
+          h2 { margin: 24px 0 10px; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid #334155; padding-bottom: 4px; }
+          h3 { margin: 0; font-size: 14px; font-weight: 700; }
+          p { margin: 4px 0; font-size: 12px; line-height: 1.5; }
+          .subtitle { margin-top: 6px; font-weight: 600; font-size: 14px; color:#1e293b; }
+          .contact { margin-top: 8px; font-size: 12px; color:#475569; }
+          .entry { margin-bottom: 12px; }
           .entry-head { display: flex; justify-content: space-between; gap: 16px; align-items: baseline; }
-          .entry-head p { white-space: nowrap; }
-          .meta { margin-top: 4px; }
+          .entry-head p { white-space: nowrap; color:#475569; }
+          .meta { margin-top: 4px; color:#334155; }
           ul { margin: 6px 0 0 18px; padding: 0; }
-          li { margin: 2px 0; font-size: 12px; line-height: 1.35; }
-          @media print { .page { padding: 0; } }
+          li { margin: 3px 0; font-size: 12px; line-height: 1.45; }
+          @media print {
+            body { background:#ffffff; padding:0; }
+            .page { border:0; border-radius:0; padding: 20px; max-width: none; }
+          }
         </style>
       </head>
       <body>
-        <main class="page">
+        <main class="page" id="resume-preview">
           <header>
             <h1>${safe.fullName}</h1>
             ${safe.title ? `<p class="subtitle">${safe.title}</p>` : ''}
@@ -357,6 +376,23 @@ const ResumeBuilder: React.FC = () => {
       </body>
       </html>
     `;
+  };
+
+  const handlePreview = () => {
+    setValidationError('');
+    setIsPreviewOpen(true);
+  };
+
+  const handleExport = () => {
+    const error = getResumeValidationError();
+    if (error) {
+      setValidationError(error);
+      alert('Please fill required fields before generating resume');
+      return;
+    }
+
+    setValidationError('');
+    const html = buildResumeDocument();
 
     const printWindow = window.open('', '_blank', 'width=900,height=1200');
     if (!printWindow) {
@@ -513,7 +549,8 @@ const ResumeBuilder: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-slate-800">Resume Builder</h2>
@@ -533,14 +570,27 @@ const ResumeBuilder: React.FC = () => {
             <span>{isSaving ? 'Saving...' : 'Save Draft'}</span>
           </button>
           <button
+            onClick={handlePreview}
+            className="saas-button-secondary flex items-center space-x-2"
+          >
+            <Eye className="w-4 h-4" />
+            <span>Preview Resume</span>
+          </button>
+          <button
             onClick={handleExport}
             className="saas-button-primary flex items-center space-x-2"
           >
             <Download className="w-4 h-4" />
-            <span>Export PDF</span>
+            <span>Download PDF</span>
           </button>
         </div>
       </div>
+
+      {validationError ? (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm text-red-700">
+          {validationError}
+        </div>
+      ) : null}
 
       <div className="grid lg:grid-cols-12 gap-6">
         {/* Navigation Sidebar */}
@@ -993,7 +1043,13 @@ const ResumeBuilder: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+      <ResumePreview
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        documentHtml={buildResumeDocument()}
+      />
+    </>
   );
 };
 
