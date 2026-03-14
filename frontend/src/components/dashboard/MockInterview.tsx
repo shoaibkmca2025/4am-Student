@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Mic, MicOff, Video as VideoIcon, VideoOff, Settings, 
   MessageSquare, Play, Square, AlertCircle, Loader2,
-  Monitor, RefreshCw, X, ChevronRight
+  Monitor, X, ChevronRight
 } from 'lucide-react';
 import { interviewServiceWrapper as interviewService, Question, SessionState } from '../../services/interviewService';
 import { InterviewHistoryItem } from '../../services/api';
@@ -20,11 +20,19 @@ const MockInterview: React.FC = () => {
   const settingsVideoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const sourceNodeRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const meterRafRef = useRef<number | null>(null);
+  const hasDetectedAudioRef = useRef(false);
+  const isRecordingRef = useRef(false);
+  const recordingStartedAtRef = useRef<number>(0);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [isMicMuted, setIsMicMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const [micLevel, setMicLevel] = useState(0);
 
   // Timer State
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -88,13 +96,87 @@ const MockInterview: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    isRecordingRef.current = isRecording;
+  }, [isRecording]);
+
   const stopMedia = () => {
+    if (meterRafRef.current) {
+      cancelAnimationFrame(meterRafRef.current);
+      meterRafRef.current = null;
+    }
+    if (sourceNodeRef.current) {
+      sourceNodeRef.current.disconnect();
+      sourceNodeRef.current = null;
+    }
+    if (audioContextRef.current) {
+      audioContextRef.current.close().catch(() => {});
+      audioContextRef.current = null;
+    }
+    analyserRef.current = null;
+    setMicLevel(0);
+
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
       setStream(null);
     }
     if (videoRef.current) {
       videoRef.current.srcObject = null;
+    }
+  };
+
+  const startAudioMeter = (mediaStream: MediaStream) => {
+    try {
+      if (meterRafRef.current) {
+        cancelAnimationFrame(meterRafRef.current);
+        meterRafRef.current = null;
+      }
+      if (sourceNodeRef.current) {
+        sourceNodeRef.current.disconnect();
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(() => {});
+      }
+
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioCtx) return;
+
+      const ctx = new AudioCtx();
+      const source = ctx.createMediaStreamSource(mediaStream);
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 1024;
+      analyser.smoothingTimeConstant = 0.85;
+
+      source.connect(analyser);
+      audioContextRef.current = ctx;
+      sourceNodeRef.current = source;
+      analyserRef.current = analyser;
+
+      const dataArray = new Uint8Array(analyser.fftSize);
+      const updateLevel = () => {
+        if (!analyserRef.current) return;
+        analyserRef.current.getByteTimeDomainData(dataArray);
+
+        let sumSquares = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          const normalized = (dataArray[i] - 128) / 128;
+          sumSquares += normalized * normalized;
+        }
+
+        const rms = Math.sqrt(sumSquares / dataArray.length);
+        const level = Math.min(100, Math.round(rms * 220));
+        setMicLevel(level);
+
+        if (isRecordingRef.current && level >= 8) {
+          hasDetectedAudioRef.current = true;
+        }
+
+        meterRafRef.current = requestAnimationFrame(updateLevel);
+      };
+
+      updateLevel();
+    } catch (error) {
+      console.error('Failed to initialize audio meter', error);
     }
   };
 
@@ -108,6 +190,7 @@ const MockInterview: React.FC = () => {
       
       const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       setStream(mediaStream);
+      startAudioMeter(mediaStream);
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
       }
@@ -217,7 +300,18 @@ const MockInterview: React.FC = () => {
 
   // Recording Logic
   const startRecording = () => {
-    if (!stream) return;
+    if (!stream) {
+      setValidationError('Microphone is not available. Please allow microphone access.');
+      return;
+    }
+
+    if (isMicMuted || stream.getAudioTracks().every((track) => !track.enabled)) {
+      setValidationError('Microphone is muted. Please unmute before recording.');
+      return;
+    }
+    setValidationError(null);
+    hasDetectedAudioRef.current = false;
+    recordingStartedAtRef.current = Date.now();
     
     audioChunksRef.current = [];
     const recorder = new MediaRecorder(stream);
@@ -243,6 +337,10 @@ const MockInterview: React.FC = () => {
 
       mediaRecorderRef.current.onstop = () => {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const durationMs = Date.now() - recordingStartedAtRef.current;
+        if (durationMs >= 1200 && !hasDetectedAudioRef.current) {
+          setValidationError('No audio is detected. Please check your microphone and try again.');
+        }
         resolve(audioBlob);
       };
 
@@ -508,8 +606,7 @@ const MockInterview: React.FC = () => {
                 </div>
 
                 {/* Current Question Card */}
-                <div className="p-4 sm:p-5 bg-gradient-to-br from-slate-800 to-sky-50 border border-indigo-500/30 rounded-2xl shadow-lg relative overflow-hidden group">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+                <div className="p-4 sm:p-5 bg-white border border-sky-200 rounded-2xl shadow-lg relative overflow-hidden">
                   <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2 block">
                     Current Question
                   </span>
@@ -528,14 +625,26 @@ const MockInterview: React.FC = () => {
                       className="w-full min-h-[110px] rounded-xl border border-sky-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
                       placeholder="Type your answer here before submitting..."
                     />
+                    <div className="rounded-lg border border-sky-200 bg-sky-50 px-3 py-2">
+                      <div className="flex items-center justify-between text-[11px] font-medium text-slate-600">
+                        <span>Microphone Input</span>
+                        <span>{isRecording ? 'Recording...' : 'Idle'}</span>
+                      </div>
+                      <div className="mt-2 h-2 w-full overflow-hidden rounded bg-slate-100">
+                        <div
+                          className={`h-full transition-all duration-100 ${micLevel >= 8 ? 'bg-emerald-500' : 'bg-amber-400'}`}
+                          style={{ width: `${Math.max(4, micLevel)}%` }}
+                        />
+                      </div>
+                    </div>
                   </div>
                   
-                  <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-white/5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-4 border-t border-sky-100">
                      {!isRecording ? (
                        <button 
                          onClick={startRecording}
                          disabled={isConnecting}
-                         className="flex-1 min-w-[170px] bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2"
+                         className="w-full bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2"
                        >
                          <Mic className="w-4 h-4" />
                          Start Recording
@@ -544,7 +653,7 @@ const MockInterview: React.FC = () => {
                        <button 
                          onClick={stopRecording}
                          disabled={isConnecting}
-                         className="flex-1 min-w-[170px] bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-all shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2 animate-pulse"
+                         className="w-full bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-all shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2 animate-pulse"
                        >
                          <Square className="w-4 h-4 fill-current" />
                          Stop Recording
@@ -553,29 +662,26 @@ const MockInterview: React.FC = () => {
                      <button
                        onClick={handleSubmitAnswer}
                        disabled={isConnecting}
-                       className="flex-1 min-w-[170px] bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 disabled:opacity-60"
+                       className="w-full sm:col-span-2 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 disabled:opacity-60"
                      >
                        {isConnecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <ChevronRight className="w-4 h-4" />}
                        Submit Answer
-                     </button>
-                     <button className="p-2.5 bg-sky-100 hover:bg-sky-200 text-slate-600 hover:text-primary rounded-xl border border-sky-200 transition-colors">
-                       <RefreshCw className="w-4 h-4" />
                      </button>
                   </div>
                 </div>
 
                 {latestFeedback && (
-                  <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+                  <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl space-y-3">
                     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <h4 className="font-bold text-slate-800 text-sm">Latest AI Feedback</h4>
                       <span className="text-sm font-bold text-indigo-700">Score: {latestFeedback.score}/100</span>
                     </div>
-                    <p className="mt-2 text-sm text-slate-700">{latestFeedback.feedback}</p>
+                    <p className="text-sm text-slate-700">{latestFeedback.feedback}</p>
                     {latestFeedback.criteria && (
-                      <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
-                        <div className="rounded-lg bg-white border border-indigo-100 px-3 py-2">Clarity: {latestFeedback.criteria.clarity}</div>
-                        <div className="rounded-lg bg-white border border-indigo-100 px-3 py-2">Relevance: {latestFeedback.criteria.relevance}</div>
-                        <div className="rounded-lg bg-white border border-indigo-100 px-3 py-2">Completeness: {latestFeedback.criteria.completeness}</div>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                        <div className="rounded-lg bg-white border border-indigo-100 px-3 py-2 font-medium text-slate-700">Clarity: {latestFeedback.criteria.clarity}</div>
+                        <div className="rounded-lg bg-white border border-indigo-100 px-3 py-2 font-medium text-slate-700">Relevance: {latestFeedback.criteria.relevance}</div>
+                        <div className="rounded-lg bg-white border border-indigo-100 px-3 py-2 font-medium text-slate-700">Completeness: {latestFeedback.criteria.completeness}</div>
                       </div>
                     )}
                   </div>
