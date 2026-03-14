@@ -51,13 +51,30 @@ const envOrigins = process.env.CORS_ORIGINS
   : [];
 const allowedOrigins = [...new Set([...defaultOrigins, ...envOrigins])];
 
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  if (allowedOrigins.includes(origin)) return true;
+
+  try {
+    const { hostname, protocol } = new URL(origin);
+    if (!protocol.startsWith('http')) return false;
+
+    // Allow Vercel preview/production frontends without changing backend for each preview URL.
+    if (hostname.endsWith('.vercel.app')) return true;
+
+    return false;
+  } catch {
+    return false;
+  }
+};
+
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+    if (isAllowedOrigin(origin)) return callback(null, true);
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
