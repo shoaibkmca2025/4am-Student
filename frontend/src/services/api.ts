@@ -320,6 +320,10 @@ export const assessmentService = {
     const response = await api.post('/assessments', payload);
     return response.data;
   },
+  update: async (id: number, payload: Partial<Assessment>): Promise<Assessment> => {
+    const response = await api.put(`/assessments/${id}`, payload);
+    return response.data;
+  },
   remove: async (id: number): Promise<{ ok: boolean; message: string }> => {
     const response = await api.delete(`/assessments/${id}`);
     return response.data;

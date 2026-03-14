@@ -16,8 +16,10 @@ const AdminPage: React.FC = () => {
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [topStudents, setTopStudents] = useState<TopStudent[]>([]);
   const [form, setForm] = useState(initialForm);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [updating, setUpdating] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -50,6 +52,11 @@ const AdminPage: React.FC = () => {
     loadData();
   }, []);
 
+  const resetForm = () => {
+    setForm(initialForm);
+    setEditingId(null);
+  };
+
   const handleCreateAssessment = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -67,12 +74,54 @@ const AdminPage: React.FC = () => {
       });
 
       setAssessments((prev) => [...prev, created]);
-      setForm(initialForm);
-      setSuccess('Assessment created successfully');
+      resetForm();
+      setSuccess('Skill test created successfully');
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Unable to create assessment');
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleStartEdit = (assessment: Assessment) => {
+    setError('');
+    setSuccess('');
+    setEditingId(assessment.id);
+    setForm({
+      title: assessment.title || '',
+      category: assessment.category || '',
+      duration: assessment.duration || '30 minutes',
+      questionsCount: Number(assessment.questionsCount) || 1,
+      difficulty: (assessment.difficulty || 'Medium') as Difficulty,
+      color: assessment.color || 'blue'
+    });
+  };
+
+  const handleUpdateAssessment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (editingId === null) return;
+
+    try {
+      setUpdating(true);
+      setError('');
+      setSuccess('');
+
+      const updated = await assessmentService.update(editingId, {
+        title: form.title.trim(),
+        category: form.category.trim(),
+        duration: form.duration.trim(),
+        questionsCount: Number(form.questionsCount),
+        difficulty: form.difficulty,
+        color: form.color.trim() || 'blue'
+      });
+
+      setAssessments((prev) => prev.map((item) => (item.id === editingId ? updated : item)));
+      setSuccess('Skill test updated successfully');
+      resetForm();
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Unable to update assessment');
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -87,7 +136,7 @@ const AdminPage: React.FC = () => {
 
       await assessmentService.remove(assessmentId);
       setAssessments((prev) => prev.filter((item) => item.id !== assessmentId));
-      setSuccess('Assessment deleted successfully');
+      setSuccess('Skill test deleted successfully');
       await loadData();
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Unable to delete assessment');
@@ -101,7 +150,7 @@ const AdminPage: React.FC = () => {
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
           <h1 className="text-3xl font-bold text-slate-900">Admin Dashboard</h1>
-          <p className="mt-2 text-slate-600">Manage assessments and track top student performance.</p>
+          <p className="mt-2 text-slate-600">Add and manage skill tests, then track top student performance.</p>
         </div>
 
         {error ? (
@@ -113,14 +162,27 @@ const AdminPage: React.FC = () => {
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
           <section className="rounded-2xl border border-slate-200 bg-white p-6 xl:col-span-1">
-            <h2 className="text-xl font-semibold text-slate-900">Add Assessment</h2>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-xl font-semibold text-slate-900">
+                {editingId === null ? 'Add Skill Test' : `Edit Skill Test #${editingId}`}
+              </h2>
+              {editingId !== null ? (
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+              ) : null}
+            </div>
 
-            <form className="mt-4 space-y-3" onSubmit={handleCreateAssessment}>
+            <form className="mt-4 space-y-3" onSubmit={editingId === null ? handleCreateAssessment : handleUpdateAssessment}>
               <input
                 required
                 value={form.title}
                 onChange={(e) => setForm((prev) => ({ ...prev, title: e.target.value }))}
-                placeholder="Assessment title"
+                placeholder="Skill test title"
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-cyan-500"
               />
               <input
@@ -166,17 +228,17 @@ const AdminPage: React.FC = () => {
 
               <button
                 type="submit"
-                disabled={creating}
+                disabled={creating || updating}
                 className="w-full rounded-lg bg-cyan-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {creating ? 'Adding...' : 'Add Assessment'}
+                {editingId === null ? (creating ? 'Adding...' : 'Add Skill Test') : (updating ? 'Updating...' : 'Update Skill Test')}
               </button>
             </form>
           </section>
 
           <section className="rounded-2xl border border-slate-200 bg-white p-6 xl:col-span-2">
-            <h2 className="text-xl font-semibold text-slate-900">Assessments</h2>
-            <p className="mt-1 text-sm text-slate-500">Create and remove assessments from here.</p>
+            <h2 className="text-xl font-semibold text-slate-900">Manage Skill Tests</h2>
+            <p className="mt-1 text-sm text-slate-500">Edit or remove existing tests from here.</p>
 
             {loading ? (
               <div className="mt-4 text-sm text-slate-500">Loading assessments...</div>
@@ -206,14 +268,23 @@ const AdminPage: React.FC = () => {
                         <td className="px-3 py-3">{item.difficulty}</td>
                         <td className="px-3 py-3">{item.questionsCount}</td>
                         <td className="px-3 py-3">
-                          <button
-                            type="button"
-                            disabled={deletingId === item.id}
-                            onClick={() => handleDeleteAssessment(item.id, item.title)}
-                            className="rounded-md border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
-                          >
-                            {deletingId === item.id ? 'Deleting...' : 'Delete'}
-                          </button>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => handleStartEdit(item)}
+                              className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              disabled={deletingId === item.id}
+                              onClick={() => handleDeleteAssessment(item.id, item.title)}
+                              className="rounded-md border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              {deletingId === item.id ? 'Deleting...' : 'Delete'}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}

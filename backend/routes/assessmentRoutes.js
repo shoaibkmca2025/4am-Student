@@ -72,6 +72,65 @@ router.post('/', requireAuth, requireAdmin, async (req, res, next) => {
   }
 });
 
+// @desc    Update assessment by ID
+// @route   PUT /api/assessments/:id
+// @access  Private (Admin)
+router.put('/:id', requireAuth, requireAdmin, async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return res.status(400).json({ message: 'Invalid ID' });
+
+    const {
+      title,
+      category,
+      duration,
+      questionsCount,
+      difficulty,
+      color,
+      questions
+    } = req.body || {};
+
+    if (!title || !category || !duration || !difficulty) {
+      return res.status(400).json({ message: 'title, category, duration and difficulty are required' });
+    }
+
+    if (!['Easy', 'Medium', 'Hard'].includes(difficulty)) {
+      return res.status(400).json({ message: 'difficulty must be Easy, Medium, or Hard' });
+    }
+
+    const normalizedQuestions = Array.isArray(questions) ? questions : undefined;
+    const hasProvidedCount = Number.isFinite(Number(questionsCount)) && Number(questionsCount) > 0;
+    const resolvedQuestionsCount = hasProvidedCount
+      ? Number(questionsCount)
+      : Array.isArray(normalizedQuestions)
+        ? normalizedQuestions.length
+        : undefined;
+
+    const updatePayload = {
+      title: String(title).trim(),
+      category: String(category).trim(),
+      duration: String(duration).trim(),
+      difficulty,
+      color: String(color || 'blue').trim() || 'blue',
+      ...(Number.isFinite(resolvedQuestionsCount) && resolvedQuestionsCount > 0
+        ? { questionsCount: resolvedQuestionsCount }
+        : {}),
+      ...(Array.isArray(normalizedQuestions) ? { questions: normalizedQuestions } : {})
+    };
+
+    const updated = await Assessment.findOneAndUpdate(
+      { id },
+      updatePayload,
+      { new: true, runValidators: true }
+    );
+
+    if (!updated) return res.status(404).json({ message: 'Assessment not found' });
+    return res.json(updated);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // @desc    Delete assessment by ID
 // @route   DELETE /api/assessments/:id
 // @access  Private (Admin)
