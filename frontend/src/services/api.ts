@@ -260,6 +260,7 @@ api.interceptors.request.use((config) => {
 
 const MAX_RETRIES = 3;
 const RETRY_DELAY_BASE = 1000;
+const NO_RETRY_PATHS = ['/auth/forgot-password'];
 
 api.interceptors.response.use(
   (response) => response,
@@ -275,8 +276,10 @@ api.interceptors.response.use(
       error.code === 'ECONNABORTED' ||
       error.code === 'ERR_NETWORK' ||
       (error.response?.status >= 500 && error.response?.status < 600);
+    const requestUrl = String(config.url || '');
+    const shouldSkipRetry = NO_RETRY_PATHS.some((path) => requestUrl.includes(path));
 
-    if (isRetryable && !config.__usedApiFailover) {
+    if (isRetryable && !config.__usedApiFailover && !shouldSkipRetry) {
       const currentBase = normalizeApiBase(config.baseURL || resolvedBaseURL);
       const failoverBase = FALLBACK_API_BASES.find((base) => normalizeApiBase(base) !== currentBase);
       if (failoverBase) {
@@ -286,7 +289,7 @@ api.interceptors.response.use(
       }
     }
 
-    if (isRetryable && config.__retryCount < MAX_RETRIES) {
+    if (isRetryable && !shouldSkipRetry && config.__retryCount < MAX_RETRIES) {
       config.__retryCount += 1;
       const delay = RETRY_DELAY_BASE * Math.pow(2, config.__retryCount - 1);
       await new Promise((resolve) => setTimeout(resolve, delay));
@@ -341,7 +344,7 @@ export const authService = {
     return response.data;
   },
   forgotPassword: async (email: string): Promise<{ message: string }> => {
-    const response = await api.post('/auth/forgot-password', { email });
+    const response = await api.post('/auth/forgot-password', { email }, { timeout: 30000 });
     return response.data;
   },
   resetPassword: async (token: string, password: string): Promise<{ message: string }> => {

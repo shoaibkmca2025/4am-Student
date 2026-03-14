@@ -30,7 +30,10 @@ const createTransport = () => {
     host,
     port: Number.isFinite(port) ? port : 587,
     secure,
-    auth: { user, pass }
+    auth: { user, pass },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000
   });
 
   return { transporter, reason: '' };

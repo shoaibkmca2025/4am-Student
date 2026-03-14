@@ -77,7 +77,9 @@ const Login: React.FC = () => {
       setInfo(res?.message || 'If the email exists, a reset link has been sent.');
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        if (!err.response) {
+        if (err.code === 'ECONNABORTED') {
+          setError('Request timed out. Please try again.');
+        } else if (!err.response) {
           setError('Cannot reach the server. Please try again later.');
         } else {
           setError(err.response?.data?.message || 'Failed to send reset email. Please try again.');
