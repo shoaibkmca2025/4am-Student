@@ -54,7 +54,7 @@ const StudentDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-sans relative overflow-hidden">
+    <div className="app-shell font-sans relative overflow-hidden">
 
       {/* Background Elements */}
       <div className="fixed inset-0 z-0 pointer-events-none">

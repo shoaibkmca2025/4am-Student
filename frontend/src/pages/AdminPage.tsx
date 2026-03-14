@@ -156,9 +156,9 @@ const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
   };
 
   return (
-    <div className={embedded ? '' : 'min-h-screen bg-slate-100 p-6 sm:p-10'}>
+    <div className={embedded ? '' : 'app-shell p-6 sm:p-10'}>
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
+        <div className="app-panel p-6 sm:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-3xl font-bold text-slate-900">Admin Dashboard</h1>
@@ -182,7 +182,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
         ) : null}
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-          <section ref={addFormRef} className="rounded-2xl border border-slate-200 bg-white p-6 xl:col-span-1">
+          <section ref={addFormRef} className="app-panel p-6 xl:col-span-1">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-xl font-semibold text-slate-900">
                 {editingId === null ? 'Add Skill Test' : `Edit Skill Test #${editingId}`}
@@ -257,7 +257,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
             </form>
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 xl:col-span-2">
+          <section className="app-panel p-6 xl:col-span-2">
             <h2 className="text-xl font-semibold text-slate-900">Manage Skill Tests</h2>
             <p className="mt-1 text-sm text-slate-500">Edit or remove existing tests from here.</p>
 
@@ -315,7 +315,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
             )}
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-6 xl:col-span-3">
+          <section className="app-panel p-6 xl:col-span-3">
             <h2 className="text-xl font-semibold text-slate-900">Top Students</h2>
             <p className="mt-1 text-sm text-slate-500">Students with the best average assessment scores.</p>
 

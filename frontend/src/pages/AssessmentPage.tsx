@@ -189,7 +189,7 @@ const AssessmentPage: React.FC = () => {
 
   if (isLoading || !testMetadata) {
     return (
-      <div className="min-h-screen bg-sky-50 flex items-center justify-center text-slate-900">
+      <div className="app-shell flex items-center justify-center text-slate-900">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-500"></div>
       </div>
     );
@@ -215,7 +215,7 @@ const AssessmentPage: React.FC = () => {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <div className="min-h-screen bg-sky-50 text-slate-900 flex flex-col">
+    <div className="app-shell text-slate-900 flex flex-col">
       {/* Background Elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-200/45 via-sky-50 to-indigo-50/70" />

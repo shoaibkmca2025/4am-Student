@@ -44,7 +44,7 @@ const CompanyDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-sky-50 text-slate-900 font-sans selection:bg-primary/30">
+    <div className="app-shell font-sans selection:bg-primary/30">
 
       {/* Sidebar */}
       <div className="hidden lg:block">
