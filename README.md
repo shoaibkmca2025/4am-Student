@@ -41,6 +41,16 @@ This project is organized into two main directories:
      PORT=5000
      NODE_ENV=development
      JWT_SECRET=your_jwt_secret_here
+
+   # Required for Forgot Password email delivery
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=your-email@gmail.com
+   SMTP_PASS=your-app-password
+   SMTP_FROM="4AM Student Platform <your-email@gmail.com>"
+
+   # Frontend URL used in reset link
+   CLIENT_URL=http://localhost:5173
      ```
    - Frontend: Create `.env.local` file in `frontend/` directory (if needed)
      ```
