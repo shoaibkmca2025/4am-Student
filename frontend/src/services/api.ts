@@ -121,6 +121,8 @@ export interface InterviewSession {
   currentQuestionIndex: number;
   questions: InterviewQuestion[];
   transcript: string[];
+  finalScore?: number;
+  summaryFeedback?: string;
   createdAt: string;
 }
 
@@ -132,8 +134,21 @@ export interface InterviewQuestion {
 
 export interface InterviewFeedback {
   score: number;
+  criteria?: {
+    clarity: number;
+    relevance: number;
+    completeness: number;
+  };
   feedback: string;
   improvements: string[];
+}
+
+export interface InterviewHistoryItem {
+  id: string;
+  date: string;
+  score: number;
+  feedback: string;
+  answersCount: number;
 }
 
 export interface DashboardStats {
@@ -422,6 +437,10 @@ export const applicationService = {
 export const interviewService = {
   getSessions: async (): Promise<{ sessions: InterviewSession[] }> => {
     const response = await api.get('/interviews/sessions');
+    return response.data;
+  },
+  getHistory: async (): Promise<{ interviews: InterviewHistoryItem[] }> => {
+    const response = await api.get('/interviews/history');
     return response.data;
   },
   createSession: async (): Promise<{ session: InterviewSession }> => {

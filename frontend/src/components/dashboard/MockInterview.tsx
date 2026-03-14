@@ -2,10 +2,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Mic, MicOff, Video as VideoIcon, VideoOff, Settings, 
-  MessageSquare, Play, Square, AlertCircle, Loader2, 
-  Volume2, Monitor, ChevronRight, RefreshCw, X
+  MessageSquare, Play, Square, AlertCircle, Loader2,
+  Monitor, RefreshCw, X, ChevronRight
 } from 'lucide-react';
 import { interviewServiceWrapper as interviewService, Question, SessionState } from '../../services/interviewService';
+import { InterviewHistoryItem } from '../../services/api';
 
 const MockInterview: React.FC = () => {
   // Session State
@@ -32,12 +33,26 @@ const MockInterview: React.FC = () => {
   // Transcript Simulation
   const [transcript, setTranscript] = useState<string[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [answerText, setAnswerText] = useState('');
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const [networkError, setNetworkError] = useState<string | null>(null);
+  const [latestFeedback, setLatestFeedback] = useState<{ score: number; feedback: string; improvements: string[]; criteria?: { clarity: number; relevance: number; completeness: number } } | null>(null);
+  const [interviewHistory, setInterviewHistory] = useState<InterviewHistoryItem[]>([]);
 
   const [selectedAudioId, setSelectedAudioId] = useState<string>('');
   const [selectedVideoId, setSelectedVideoId] = useState<string>('');
   const [showSettings, setShowSettings] = useState<'audio' | 'video' | null>(null);
   const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
   const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
+
+  const loadHistory = async () => {
+    try {
+      const rows = await interviewService.getHistory();
+      setInterviewHistory(rows);
+    } catch (error) {
+      console.error('Failed to fetch interview history', error);
+    }
+  };
 
   // Initialize Media Stream (Removed auto-start)
   useEffect(() => {
@@ -57,6 +72,20 @@ const MockInterview: React.FC = () => {
       }
     };
     getDevices();
+    loadHistory();
+  }, []);
+
+  useEffect(() => {
+    const handleOffline = () => setNetworkError('Internet connection lost. Please reconnect.');
+    const handleOnline = () => setNetworkError(null);
+
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+    };
   }, []);
 
   const stopMedia = () => {
@@ -141,6 +170,13 @@ const MockInterview: React.FC = () => {
 
   // Session Management
   const handleStartSession = async () => {
+    if (!navigator.onLine) {
+      setNetworkError('Internet connection lost. Please reconnect.');
+      return;
+    }
+
+    setValidationError(null);
+    setLatestFeedback(null);
     setIsConnecting(true);
     await startMedia(selectedAudioId, selectedVideoId); // Start camera when session starts
     try {
@@ -154,7 +190,7 @@ const MockInterview: React.FC = () => {
       setTranscript(["AI Interviewer: Hello! Let's begin. " + (session.questions[0]?.text || '')]);
     } catch (error) {
       console.error("Failed to start session:", error);
-      alert("Failed to start interview session. Please try again.");
+      setNetworkError('Unable to start interview session. Please check your connection and try again.');
     } finally {
       setIsConnecting(false);
     }
@@ -171,7 +207,11 @@ const MockInterview: React.FC = () => {
       setSessionData(null);
       setCurrentQuestion(null);
       setTranscript([]);
+      setAnswerText('');
+      setValidationError(null);
+      setLatestFeedback(null);
       stopMedia(); // Stop camera when session ends
+      await loadHistory();
     }
   };
 
@@ -214,28 +254,34 @@ const MockInterview: React.FC = () => {
 
   const handleSubmitAnswer = async () => {
     if (!sessionData) return;
-    
+
+    if (!navigator.onLine) {
+      setNetworkError('Internet connection lost. Please reconnect.');
+      return;
+    }
+
+    const trimmedAnswer = answerText.trim();
+    if (!trimmedAnswer) {
+      setValidationError('Answer cannot be empty.');
+      return;
+    }
+
+    setValidationError(null);
+
     // If currently recording, stop first
-    let audioBlob: Blob;
     if (isRecording) {
-      audioBlob = await stopRecording();
-    } else {
-      // If not recording, maybe they already recorded? 
-      // For this simple flow, we require them to be recording or have just finished.
-      // But to simplify, let's assume this button is "Stop & Submit" if recording, 
-      // or "Submit" if we want to allow non-audio answers (but we want audio).
-      // Let's enforce recording for now or just send empty if they didn't record.
-      audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+      await stopRecording();
     }
 
     setIsConnecting(true);
     
     try {
-      // 1. Submit Answer with real audio blob
-      const feedback = await interviewService.submitAnswer(audioBlob);
+      const feedback = await interviewService.submitAnswer(trimmedAnswer);
+      setLatestFeedback(feedback);
       
       // Add to transcript
-      setTranscript(prev => [...prev, `You: (Audio Answer Submitted - ${Math.round(audioBlob.size / 1024)}KB)`]);
+      setTranscript(prev => [...prev, `You: ${trimmedAnswer}`]);
+      setAnswerText('');
       
       // 2. Get Next Question
       const nextQ = await interviewService.getNextQuestion(); 
@@ -248,7 +294,12 @@ const MockInterview: React.FC = () => {
       }
     } catch (error) {
       console.error("Failed to process answer/next question", error);
-      alert("Failed to submit answer. Please try again.");
+      const message = (error as any)?.response?.data?.message || (error as Error)?.message || 'Failed to submit answer. Please try again.';
+      if (String(message).toLowerCase().includes('network') || String(message).toLowerCase().includes('connection')) {
+        setNetworkError('Internet connection lost. Please reconnect.');
+      } else {
+        setValidationError(message);
+      }
     } finally {
       setIsConnecting(false);
       // Reset chunks for next question
@@ -258,11 +309,11 @@ const MockInterview: React.FC = () => {
 
 
   return (
-    <div className="h-[calc(100vh-100px)] flex flex-col p-4 space-y-4">
+    <div className="min-h-[calc(100vh-100px)] flex flex-col p-3 sm:p-4 space-y-4">
       {/* Header Section */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-1">AI Mock Interview</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-1">AI Mock Interview</h2>
           <p className="text-slate-600 text-sm">Practice with our AI interviewer to boost your confidence</p>
         </div>
         {!sessionActive ? (
@@ -285,9 +336,20 @@ const MockInterview: React.FC = () => {
         )}
       </div>
 
-      <div className="flex-1 grid lg:grid-cols-4 gap-4 min-h-0">
+      {networkError && (
+        <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2.5 text-sm text-rose-700">
+          {networkError}
+        </div>
+      )}
+      {validationError && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-700">
+          {validationError}
+        </div>
+      )}
+
+      <div className="flex-1 grid grid-cols-1 xl:grid-cols-4 gap-4 min-h-0">
         {/* Left Column: Video & Controls */}
-        <div className="lg:col-span-3 flex flex-col gap-4">
+        <div className="xl:col-span-3 flex flex-col gap-4 min-h-[360px]">
           {/* Video Container */}
           <div className="flex-1 bg-white rounded-2xl border border-sky-200 relative overflow-hidden shadow-2xl group">
             
@@ -373,8 +435,8 @@ const MockInterview: React.FC = () => {
           </div>
 
           {/* Control Bar */}
-          <div className="h-16 bg-white rounded-2xl border border-sky-200 flex items-center justify-between px-6 shadow-xl">
-            <div className="flex items-center gap-4">
+          <div className="bg-white rounded-2xl border border-sky-200 flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 shadow-xl">
+            <div className="flex items-center gap-3 sm:gap-4">
               <button 
                 onClick={toggleMic}
                 className={`p-2.5 rounded-xl transition-all duration-300 ${
@@ -397,10 +459,10 @@ const MockInterview: React.FC = () => {
               </button>
             </div>
 
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 sm:gap-6">
               <div className="flex flex-col items-end">
                 <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">Session Duration</span>
-                <span className="text-xl font-mono font-bold text-slate-800 tracking-widest tabular-nums">
+                <span className="text-lg sm:text-xl font-mono font-bold text-slate-800 tracking-widest tabular-nums">
                   {formatTime(elapsedTime)}
                 </span>
               </div>
@@ -410,7 +472,7 @@ const MockInterview: React.FC = () => {
         </div>
 
         {/* Right Column: Progress & Chat */}
-        <div className="bg-white rounded-2xl border border-sky-200 flex flex-col overflow-hidden shadow-xl h-full">
+        <div className="bg-white rounded-2xl border border-sky-200 flex flex-col overflow-hidden shadow-xl h-full min-h-[360px]">
           {/* Header */}
           <div className="p-5 border-b border-sky-200 bg-white/50 backdrop-blur-sm">
             <h3 className="font-bold text-slate-900 flex items-center gap-2 text-lg">
@@ -420,7 +482,7 @@ const MockInterview: React.FC = () => {
           </div>
           
           {/* Content */}
-          <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+          <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
             {sessionActive && currentQuestion ? (
               <>
                 {/* Live Transcript / Chat History */}
@@ -446,40 +508,78 @@ const MockInterview: React.FC = () => {
                 </div>
 
                 {/* Current Question Card */}
-                <div className="p-5 bg-gradient-to-br from-slate-800 to-sky-50 border border-indigo-500/30 rounded-2xl shadow-lg relative overflow-hidden group">
+                <div className="p-4 sm:p-5 bg-gradient-to-br from-slate-800 to-sky-50 border border-indigo-500/30 rounded-2xl shadow-lg relative overflow-hidden group">
                   <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
                   <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2 block">
                     Current Question
                   </span>
-                  <p className="text-slate-900 font-medium text-lg leading-relaxed mb-4">
+                  <p className="text-slate-900 font-medium text-base sm:text-lg leading-relaxed mb-4">
                     {currentQuestion.text}
                   </p>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">Your Answer</label>
+                    <textarea
+                      value={answerText}
+                      onChange={(e) => {
+                        setAnswerText(e.target.value);
+                        if (validationError) setValidationError(null);
+                      }}
+                      className="w-full min-h-[110px] rounded-xl border border-sky-200 bg-white px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-400/40"
+                      placeholder="Type your answer here before submitting..."
+                    />
+                  </div>
                   
-                  <div className="flex gap-3 mt-4 pt-4 border-t border-white/5">
+                  <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-white/5">
                      {!isRecording ? (
                        <button 
                          onClick={startRecording}
                          disabled={isConnecting}
-                         className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2"
+                         className="flex-1 min-w-[170px] bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-all shadow-lg shadow-indigo-500/20 flex items-center justify-center gap-2"
                        >
                          <Mic className="w-4 h-4" />
-                         Start Answer
+                         Start Recording
                        </button>
                      ) : (
                        <button 
-                         onClick={handleSubmitAnswer}
+                         onClick={stopRecording}
                          disabled={isConnecting}
-                         className="flex-1 bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-all shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2 animate-pulse"
+                         className="flex-1 min-w-[170px] bg-rose-600 hover:bg-rose-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-all shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2 animate-pulse"
                        >
-                         {isConnecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Square className="w-4 h-4 fill-current" />}
-                         Stop & Submit
+                         <Square className="w-4 h-4 fill-current" />
+                         Stop Recording
                        </button>
                      )}
+                     <button
+                       onClick={handleSubmitAnswer}
+                       disabled={isConnecting}
+                       className="flex-1 min-w-[170px] bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 disabled:opacity-60"
+                     >
+                       {isConnecting ? <Loader2 className="w-4 h-4 animate-spin" /> : <ChevronRight className="w-4 h-4" />}
+                       Submit Answer
+                     </button>
                      <button className="p-2.5 bg-sky-100 hover:bg-sky-200 text-slate-600 hover:text-primary rounded-xl border border-sky-200 transition-colors">
                        <RefreshCw className="w-4 h-4" />
                      </button>
                   </div>
                 </div>
+
+                {latestFeedback && (
+                  <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                      <h4 className="font-bold text-slate-800 text-sm">Latest AI Feedback</h4>
+                      <span className="text-sm font-bold text-indigo-700">Score: {latestFeedback.score}/100</span>
+                    </div>
+                    <p className="mt-2 text-sm text-slate-700">{latestFeedback.feedback}</p>
+                    {latestFeedback.criteria && (
+                      <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                        <div className="rounded-lg bg-white border border-indigo-100 px-3 py-2">Clarity: {latestFeedback.criteria.clarity}</div>
+                        <div className="rounded-lg bg-white border border-indigo-100 px-3 py-2">Relevance: {latestFeedback.criteria.relevance}</div>
+                        <div className="rounded-lg bg-white border border-indigo-100 px-3 py-2">Completeness: {latestFeedback.criteria.completeness}</div>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* AI Tip */}
                 <div className="p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl flex items-start gap-3">
@@ -493,14 +593,44 @@ const MockInterview: React.FC = () => {
                 </div>
               </>
             ) : (
-              <div className="h-full flex flex-col items-center justify-center text-center p-8 opacity-50">
-                <div className="w-16 h-16 bg-sky-100 rounded-2xl flex items-center justify-center mb-4 border border-sky-200 rotate-3">
-                  <MessageSquare className="w-8 h-8 text-slate-500" />
+              <div className="space-y-5">
+                <div className="flex flex-col items-center justify-center text-center p-6 sm:p-8 opacity-70">
+                  <div className="w-16 h-16 bg-sky-100 rounded-2xl flex items-center justify-center mb-4 border border-sky-200 rotate-3">
+                    <MessageSquare className="w-8 h-8 text-slate-500" />
+                  </div>
+                  <h4 className="text-lg font-bold text-slate-700 mb-2">Waiting to Start</h4>
+                  <p className="text-slate-500 text-sm max-w-[260px]">
+                    Start a session to see interview questions and receive real-time AI feedback.
+                  </p>
                 </div>
-                <h4 className="text-lg font-bold text-slate-700 mb-2">Waiting to Start</h4>
-                <p className="text-slate-500 text-sm max-w-[200px]">
-                  Start a session to see interview questions and receive real-time AI feedback.
-                </p>
+
+                <div className="rounded-xl border border-sky-200 bg-sky-50 p-4">
+                  <div className="flex items-center justify-between gap-3">
+                    <h4 className="text-sm font-bold text-slate-800">Interview History</h4>
+                    <button
+                      onClick={loadHistory}
+                      className="text-xs px-2.5 py-1.5 rounded-md border border-sky-200 bg-white text-slate-600 hover:bg-sky-100"
+                    >
+                      Refresh
+                    </button>
+                  </div>
+
+                  {interviewHistory.length === 0 ? (
+                    <p className="mt-3 text-xs text-slate-500">No previous interview sessions yet.</p>
+                  ) : (
+                    <div className="mt-3 space-y-2">
+                      {interviewHistory.slice(0, 6).map((item) => (
+                        <div key={item.id} className="rounded-lg border border-sky-200 bg-white px-3 py-2.5">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="font-semibold text-slate-700">{new Date(item.date).toLocaleDateString()}</span>
+                            <span className="font-bold text-indigo-700">{item.score}/100</span>
+                          </div>
+                          <p className="mt-1 text-xs text-slate-600">{item.feedback}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

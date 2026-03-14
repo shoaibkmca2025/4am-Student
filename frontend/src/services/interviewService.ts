@@ -1,5 +1,5 @@
 
-import { interviewService as interviewApi } from './api';
+import { interviewService as interviewApi, InterviewHistoryItem } from './api';
 
 export interface Question {
   id: string;
@@ -9,6 +9,11 @@ export interface Question {
 
 export interface Feedback {
   score: number;
+  criteria?: {
+    clarity: number;
+    relevance: number;
+    completeness: number;
+  };
   feedback: string;
   improvements: string[];
 }
@@ -24,6 +29,11 @@ export interface SessionState {
 
 class InterviewService {
   private session: SessionState | null = null;
+
+  async getHistory(): Promise<InterviewHistoryItem[]> {
+    const response = await interviewApi.getHistory();
+    return response.interviews || [];
+  }
 
   async startSession(): Promise<SessionState> {
     try {
@@ -46,10 +56,13 @@ class InterviewService {
     }
   }
 
-  async submitAnswer(audioBlob: Blob): Promise<Feedback> {
+  async submitAnswer(answerText: string): Promise<Feedback> {
     if (!this.session) throw new Error("No active session");
 
-    const transcriptText = "User answer (audio processed)"; 
+    const transcriptText = answerText.trim();
+    if (!transcriptText) {
+      throw new Error('Answer cannot be empty.');
+    }
 
     try {
       const response = await interviewApi.submitAnswer(this.session.id, transcriptText);
