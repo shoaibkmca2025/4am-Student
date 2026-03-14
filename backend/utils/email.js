@@ -14,22 +14,25 @@ const getClientUrl = () => {
   return 'http://localhost:5173';
 };
 
-const createTransport = () => {
+const createTransportCandidates = () => {
   const host = getEnv('SMTP_HOST', 'EMAIL_HOST', 'MAIL_HOST');
   const user = getEnv('SMTP_USER', 'EMAIL_USER', 'MAIL_USER', 'GMAIL_USER');
   const pass = getEnv('SMTP_PASS', 'EMAIL_PASS', 'MAIL_PASS', 'GMAIL_APP_PASSWORD', 'GOOGLE_APP_PASSWORD', 'APP_PASSWORD');
   const port = Number(getEnv('SMTP_PORT', 'EMAIL_PORT', 'MAIL_PORT') || 587);
   const secureEnv = getEnv('SMTP_SECURE', 'EMAIL_SECURE', 'MAIL_SECURE').toLowerCase();
-  const secure = secureEnv ? secureEnv === 'true' : port === 465;
+  const secure = secureEnv ? secureEnv === 'true' : Number.isFinite(port) && port === 465;
 
   if (!user || !pass) {
-    return { transporter: null, reason: 'Missing SMTP user/pass' };
+    return { candidates: [], reason: 'Missing SMTP user/pass' };
   }
 
-  // If host is not provided and this is a Gmail account, use Gmail service config.
   const isGmailUser = /@gmail\.com$/i.test(user);
-  const transporter = host
-    ? nodemailer.createTransport({
+  const candidates = [];
+
+  if (host) {
+    candidates.push({
+      name: `smtp:${host}:${Number.isFinite(port) ? port : 587}`,
+      transporter: nodemailer.createTransport({
         host,
         port: Number.isFinite(port) ? port : 587,
         secure,
@@ -38,21 +41,53 @@ const createTransport = () => {
         greetingTimeout: 15000,
         socketTimeout: 30000
       })
-    : isGmailUser
-      ? nodemailer.createTransport({
-          service: 'gmail',
-          auth: { user, pass },
-          connectionTimeout: 15000,
-          greetingTimeout: 15000,
-          socketTimeout: 30000
-        })
-      : null;
-
-  if (!transporter) {
-    return { transporter: null, reason: 'Missing SMTP host (or use a Gmail account with app password)' };
+    });
   }
 
-  return { transporter, reason: '' };
+  if (isGmailUser) {
+    candidates.push({
+      name: 'gmail-service',
+      transporter: nodemailer.createTransport({
+        service: 'gmail',
+        auth: { user, pass },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 30000
+      })
+    });
+
+    candidates.push({
+      name: 'gmail-smtp-587',
+      transporter: nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: { user, pass },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 30000
+      })
+    });
+
+    candidates.push({
+      name: 'gmail-smtp-465',
+      transporter: nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
+        auth: { user, pass },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 30000
+      })
+    });
+  }
+
+  if (!candidates.length) {
+    return { candidates: [], reason: 'Missing SMTP host (or use a Gmail account with app password)' };
+  }
+
+  return { candidates, reason: '' };
 };
 
 export const sendPasswordResetEmail = async ({ to, name, token, expiresInMinutes = 15 }) => {
@@ -81,8 +116,8 @@ export const sendPasswordResetEmail = async ({ to, name, token, expiresInMinutes
     <p>If you did not request this, you can ignore this email.</p>
   `;
 
-  const { transporter, reason } = createTransport();
-  if (!transporter) {
+  const { candidates, reason } = createTransportCandidates();
+  if (!candidates.length) {
     const mode = (process.env.NODE_ENV || 'development').toLowerCase();
     if (mode !== 'production') {
       console.warn(`[email-disabled] ${reason}. Password reset email to ${to}: ${resetLink}`);
@@ -92,5 +127,16 @@ export const sendPasswordResetEmail = async ({ to, name, token, expiresInMinutes
     throw new Error('Email service is not configured. Set SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS and SMTP_FROM.');
   }
 
-  await transporter.sendMail({ from, to, subject, text, html });
+  let lastError = null;
+  for (const candidate of candidates) {
+    try {
+      await candidate.transporter.sendMail({ from, to, subject, text, html });
+      return;
+    } catch (err) {
+      lastError = err;
+      console.error(`[email-send-failed:${candidate.name}]`, err?.message || err);
+    }
+  }
+
+  throw new Error(lastError?.message || 'All email transport attempts failed');
 };
