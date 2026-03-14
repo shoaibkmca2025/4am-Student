@@ -126,7 +126,7 @@ router.post('/forgot-password', authLimiter, [
           token,
           expiresInMinutes: 15
         }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error('Email send timeout')), 12000))
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Email send timeout')), 30000))
       ]);
       return res.json({ message: 'If the email exists, a reset link has been sent.' });
     } catch (emailErr) {

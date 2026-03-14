@@ -49,6 +49,10 @@ This project is organized into two main directories:
    SMTP_PASS=your-app-password
    SMTP_FROM="4AM Student Platform <your-email@gmail.com>"
 
+  # Optional aliases also supported by backend
+  GMAIL_USER=your-email@gmail.com
+  GMAIL_APP_PASSWORD=your-app-password
+
    # Frontend URL used in reset link
    CLIENT_URL=http://localhost:5173
      ```

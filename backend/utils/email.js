@@ -16,25 +16,41 @@ const getClientUrl = () => {
 
 const createTransport = () => {
   const host = getEnv('SMTP_HOST', 'EMAIL_HOST', 'MAIL_HOST');
-  const user = getEnv('SMTP_USER', 'EMAIL_USER', 'MAIL_USER');
-  const pass = getEnv('SMTP_PASS', 'EMAIL_PASS', 'MAIL_PASS');
+  const user = getEnv('SMTP_USER', 'EMAIL_USER', 'MAIL_USER', 'GMAIL_USER');
+  const pass = getEnv('SMTP_PASS', 'EMAIL_PASS', 'MAIL_PASS', 'GMAIL_APP_PASSWORD', 'GOOGLE_APP_PASSWORD', 'APP_PASSWORD');
   const port = Number(getEnv('SMTP_PORT', 'EMAIL_PORT', 'MAIL_PORT') || 587);
   const secureEnv = getEnv('SMTP_SECURE', 'EMAIL_SECURE', 'MAIL_SECURE').toLowerCase();
   const secure = secureEnv ? secureEnv === 'true' : port === 465;
 
-  if (!host || !user || !pass) {
-    return { transporter: null, reason: 'Missing SMTP host/user/pass' };
+  if (!user || !pass) {
+    return { transporter: null, reason: 'Missing SMTP user/pass' };
   }
 
-  const transporter = nodemailer.createTransport({
-    host,
-    port: Number.isFinite(port) ? port : 587,
-    secure,
-    auth: { user, pass },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000
-  });
+  // If host is not provided and this is a Gmail account, use Gmail service config.
+  const isGmailUser = /@gmail\.com$/i.test(user);
+  const transporter = host
+    ? nodemailer.createTransport({
+        host,
+        port: Number.isFinite(port) ? port : 587,
+        secure,
+        auth: { user, pass },
+        connectionTimeout: 15000,
+        greetingTimeout: 15000,
+        socketTimeout: 30000
+      })
+    : isGmailUser
+      ? nodemailer.createTransport({
+          service: 'gmail',
+          auth: { user, pass },
+          connectionTimeout: 15000,
+          greetingTimeout: 15000,
+          socketTimeout: 30000
+        })
+      : null;
+
+  if (!transporter) {
+    return { transporter: null, reason: 'Missing SMTP host (or use a Gmail account with app password)' };
+  }
 
   return { transporter, reason: '' };
 };
