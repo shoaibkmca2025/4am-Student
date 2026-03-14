@@ -100,9 +100,10 @@ export const sendPasswordResetEmail = async ({ to, name, token, expiresInMinutes
   const resetLink = `${getClientUrl()}/reset-password?token=${encodeURIComponent(token)}`;
   const configuredFrom = getEnv('SMTP_FROM', 'EMAIL_FROM', 'MAIL_FROM', 'MAILER_FROM');
   const authUser = getEnv('SMTP_USER', 'SMTP_USERNAME', 'EMAIL_USER', 'MAIL_USER', 'GMAIL_USER', 'MAIL_USERNAME');
+  const appName = getEnv('APP_NAME', 'MAIL_APP_NAME', 'EMAIL_APP_NAME') || '4AM Student Platform';
   const from = isValidFromValue(configuredFrom)
     ? configuredFrom
-    : (authUser || 'no-reply@4amglobalmedia.com');
+    : (authUser ? `${appName} <${authUser}>` : 'no-reply@4amglobalmedia.com');
 
   const subject = 'Reset your password';
   const text = [
