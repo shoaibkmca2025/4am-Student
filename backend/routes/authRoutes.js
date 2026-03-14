@@ -118,19 +118,26 @@ router.post('/forgot-password', authLimiter, [
     user.resetTokenExpiry = resetTokenExpiry;
     await user.save();
 
-    // Respond immediately so frontend does not timeout while SMTP server responds.
-    res.json({ message: 'If the email exists, a reset link has been sent.' });
+    try {
+      await Promise.race([
+        sendPasswordResetEmail({
+          to: user.email,
+          name: user.name,
+          token,
+          expiresInMinutes: 15
+        }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Email send timeout')), 12000))
+      ]);
+      return res.json({ message: 'If the email exists, a reset link has been sent.' });
+    } catch (emailErr) {
+      // Reset token should not remain active if email dispatch failed.
+      user.resetTokenHash = undefined;
+      user.resetTokenExpiry = undefined;
+      await user.save();
 
-    sendPasswordResetEmail({
-      to: user.email,
-      name: user.name,
-      token,
-      expiresInMinutes: 15
-    }).catch((error) => {
-      console.error('Failed to send password reset email:', error?.message || error);
-    });
-
-    return;
+      console.error('Failed to send password reset email:', emailErr?.message || emailErr);
+      return res.status(503).json({ message: 'Unable to send reset email right now. Please try again later.' });
+    }
   } catch (err) {
     next(err);
   }

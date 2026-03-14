@@ -82,10 +82,10 @@ const Login: React.FC = () => {
         } else if (!err.response) {
           setError('Cannot reach the server. Please try again later.');
         } else {
-          setError(err.response?.data?.message || 'Failed to send reset email. Please try again.');
+          setError(err.response?.data?.message || 'Unable to send reset email right now. Please try again later.');
         }
       } else {
-        setError('Failed to send reset email. Please try again.');
+        setError('Unable to send reset email right now. Please try again later.');
       }
     } finally {
       setForgotLoading(false);
