@@ -17,6 +17,9 @@ const Navbar: React.FC = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
           setIsScrolled(window.scrollY > 20);
+          if (isMobileMenuOpen) {
+            setIsMobileMenuOpen(false);
+          }
           ticking = false;
         });
         ticking = true;
@@ -24,7 +27,36 @@ const Navbar: React.FC = () => {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('keydown', handleEscape);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [isMobileMenuOpen]);
+
+  useEffect(() => {
+    document.body.style.overflow = isMobileMenuOpen ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isMobileMenuOpen]);
 
   const scrollToSection = (e: React.MouseEvent, id: string) => {
     e.preventDefault();
@@ -36,9 +68,9 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled
-      ? 'bg-white/80 dark:bg-slate-900/90 backdrop-blur-xl border-b border-black/5 dark:border-white/5 py-3'
-      : 'bg-transparent py-5'
+    <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled || isMobileMenuOpen
+      ? 'bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-black/5 dark:border-white/10 py-3 shadow-sm'
+      : 'bg-white/70 dark:bg-slate-900/70 backdrop-blur-md py-4'
       }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
@@ -149,7 +181,14 @@ const Navbar: React.FC = () => {
       </div>
 
       {/* Mobile menu */}
-      <div className={`md:hidden absolute top-full left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-black/5 dark:border-white/5 transition-all duration-500 ease-in-out overflow-hidden ${isMobileMenuOpen ? 'max-h-[28rem] py-6 opacity-100' : 'max-h-0 py-0 opacity-0 pointer-events-none'
+      <button
+        type="button"
+        aria-label="Close mobile menu"
+        onClick={() => setIsMobileMenuOpen(false)}
+        className={`md:hidden fixed inset-0 top-[61px] bg-slate-900/25 dark:bg-black/45 backdrop-blur-[1px] transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+      />
+      <div className={`md:hidden absolute top-full left-0 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-black/5 dark:border-white/10 transition-all duration-300 ease-out overflow-hidden ${isMobileMenuOpen ? 'max-h-[28rem] py-6 opacity-100' : 'max-h-0 py-0 opacity-0 pointer-events-none'
         }`}>
         <div className="flex flex-col space-y-1 px-4">
           {NAV_LINKS.map((link) => (
@@ -166,7 +205,7 @@ const Navbar: React.FC = () => {
             <>
               <button
                 onClick={() => navigate('/dashboard')}
-                className="text-gray-300 text-base font-medium hover:text-cyan-400 py-3 border-b border-white/5 text-left focus:outline-none"
+                className="text-slate-600 dark:text-gray-300 text-base font-medium hover:text-primary py-3 border-b border-black/5 dark:border-white/5 text-left focus:outline-none transition-colors"
               >
                 Dashboard
               </button>
@@ -176,7 +215,7 @@ const Navbar: React.FC = () => {
                   navigate('/');
                   window.location.reload();
                 }}
-                className="text-red-400 text-base font-medium py-3 border-b border-white/5 text-left focus:outline-none"
+                className="text-red-500 dark:text-red-400 text-base font-medium py-3 border-b border-black/5 dark:border-white/5 text-left focus:outline-none"
               >
                 Logout
               </button>
@@ -184,7 +223,7 @@ const Navbar: React.FC = () => {
           ) : (
             <button
               onClick={() => navigate('/login')}
-              className="text-gray-300 text-base font-medium hover:text-cyan-400 py-3 border-b border-white/5 text-left focus:outline-none"
+              className="text-slate-600 dark:text-gray-300 text-base font-medium hover:text-primary py-3 border-b border-black/5 dark:border-white/5 text-left focus:outline-none transition-colors"
             >
               Login
             </button>

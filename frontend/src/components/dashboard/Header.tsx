@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Search, Bell, User, ChevronDown, Menu, X, Sun, Moon, HelpCircle,
   ExternalLink, Mail, FileText, MessageCircle, LayoutDashboard,
@@ -38,6 +38,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
 
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
+  const notificationPanelRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -66,6 +67,37 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
     fetchStats();
     fetchNotifications();
   }, []);
+
+  useEffect(() => {
+    if (!showNotifications) return;
+
+    const closeNotifications = () => setShowNotifications(false);
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node;
+      if (!notificationPanelRef.current?.contains(target)) {
+        closeNotifications();
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closeNotifications();
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown, { passive: true });
+    document.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('scroll', closeNotifications, { passive: true });
+    window.addEventListener('resize', closeNotifications);
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('scroll', closeNotifications);
+      window.removeEventListener('resize', closeNotifications);
+    };
+  }, [showNotifications]);
 
   const handleNotificationClick = async (id: string) => {
     try {
@@ -219,7 +251,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
           </button>
 
           {/* Notifications */}
-          <div className="relative">
+          <div className="relative" ref={notificationPanelRef}>
             <button
               className="relative flex items-center justify-center w-9 h-9 rounded-md text-gray-500 hover:text-cyan-400 transition-colors"
               onClick={() => setShowNotifications(!showNotifications)}
@@ -233,8 +265,17 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
               )}
             </button>
 
+            {showNotifications && (
+              <button
+                type="button"
+                aria-label="Close notifications"
+                onClick={() => setShowNotifications(false)}
+                className="fixed inset-0 z-40 bg-transparent cursor-default"
+              />
+            )}
+
             {/* Notification Dropdown */}
-            <div className={`absolute right-0 top-full mt-2 w-80 rounded-lg shadow-xl transition-all duration-200 z-50 overflow-hidden bg-white dark:bg-slate-800 border border-black/10 dark:border-white/10 ${showNotifications ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2'}`}>
+            <div className={`absolute right-0 top-full mt-2 w-[min(22rem,calc(100vw-1rem))] rounded-lg shadow-xl transition-all duration-200 z-50 overflow-hidden bg-white dark:bg-slate-800 border border-black/10 dark:border-white/10 ${showNotifications ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2'}`}>
               <div className="flex items-center justify-between p-3 border-b border-black/5 dark:border-white/5 bg-slate-50 dark:bg-white/5">
                 <h4 className="text-sm font-semibold text-slate-900 dark:text-white">Notifications</h4>
                 {notifications.length > 0 && (
@@ -242,6 +283,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
                     onClick={(e) => {
                       e.stopPropagation();
                       notificationService.markAllRead().then(() => setNotifications(prev => prev.map(n => ({ ...n, read: true }))));
+                      setShowNotifications(false);
                     }}
                     className="text-xs hover:underline text-primary"
                   >
@@ -254,7 +296,10 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
                   notifications.map(notification => (
                     <button
                       key={notification._id}
-                      onClick={() => handleNotificationClick(notification._id)}
+                      onClick={() => {
+                        handleNotificationClick(notification._id);
+                        setShowNotifications(false);
+                      }}
                       className={`w-full text-left p-3 cursor-pointer transition-colors border-b border-black/5 dark:border-white/5 hover:bg-slate-50 dark:hover:bg-white/5 ${notification.read ? 'opacity-50' : 'opacity-100'}`}
                     >
                       <div className="flex items-start gap-3">

@@ -85,21 +85,21 @@ const Contact: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-start">
           {/* Left — Contact info */}
-          <div className="space-y-4">
+          <div className="space-y-4 min-w-0">
             {contactInfo.map((info, idx) => (
               <div
                 key={info.label}
-                className="glass-card p-5 flex items-center gap-4 animate-on-scroll"
+                className="glass-card p-4 sm:p-5 flex items-center gap-3 sm:gap-4 animate-on-scroll min-w-0"
                 style={{ transitionDelay: `${0.1 * idx}s` }}
               >
                 <div className="icon-box shrink-0" style={{ color: '#22d3ee' }}>
                   {info.icon}
                 </div>
-                <div>
-                  <div className="text-xs text-gray-500">{info.label}</div>
-                  <div className="text-sm font-semibold text-slate-900 dark:text-white">{info.value}</div>
+                <div className="min-w-0">
+                  <div className="text-xs text-slate-600 dark:text-gray-400">{info.label}</div>
+                  <div className="text-sm font-semibold text-slate-900 dark:text-white break-words">{info.value}</div>
                 </div>
               </div>
             ))}
@@ -115,10 +115,10 @@ const Contact: React.FC = () => {
           </div>
 
           {/* Right — Form */}
-          <form onSubmit={handleSubmit} className="space-y-4 animate-on-scroll" style={{ transitionDelay: '0.2s' }}>
+          <form onSubmit={handleSubmit} className="space-y-4 animate-on-scroll min-w-0" style={{ transitionDelay: '0.2s' }}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-gray-400 mb-1.5">Full Name</label>
+                <label className="block text-xs text-slate-600 dark:text-gray-400 mb-1.5">Full Name</label>
                 <input
                   type="text"
                   name="name"
@@ -130,7 +130,7 @@ const Contact: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-400 mb-1.5">Email Address</label>
+                <label className="block text-xs text-slate-600 dark:text-gray-400 mb-1.5">Email Address</label>
                 <input
                   type="email"
                   name="email"
@@ -144,7 +144,7 @@ const Contact: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs text-gray-400 mb-1.5">Interest</label>
+              <label className="block text-xs text-slate-600 dark:text-gray-400 mb-1.5">Interest</label>
               <select
                 name="interest"
                 value={formData.interest}
@@ -163,7 +163,7 @@ const Contact: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs text-gray-400 mb-1.5">Message</label>
+              <label className="block text-xs text-slate-600 dark:text-gray-400 mb-1.5">Message</label>
               <textarea
                 name="message"
                 value={formData.message}

@@ -16,8 +16,8 @@ const LandingPage: React.FC = () => {
 
       {/* Background gradients */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute -top-1/3 -right-1/3 w-[70vw] h-[70vw] rounded-full bg-cyan-900/20 blur-[120px]" />
-        <div className="absolute -bottom-1/3 -left-1/3 w-[70vw] h-[70vw] rounded-full bg-blue-900/20 blur-[120px]" />
+        <div className="absolute -top-1/3 -right-1/3 w-[70vw] h-[70vw] rounded-full bg-cyan-300/30 dark:bg-cyan-900/20 blur-[120px]" />
+        <div className="absolute -bottom-1/3 -left-1/3 w-[70vw] h-[70vw] rounded-full bg-sky-300/30 dark:bg-blue-900/20 blur-[120px]" />
       </div>
 
       <div className="relative z-10">
