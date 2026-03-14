@@ -1,7 +1,6 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { 
-  LayoutDashboard, FileText, Users, MessageSquare, Briefcase, 
+  LayoutDashboard, Users, MessageSquare, Briefcase, 
   Settings, LogOut, ChevronLeft, ChevronRight, Building, Code
 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -18,12 +17,10 @@ interface SidebarProps {
 const CompanySidebar: React.FC<SidebarProps> = ({ 
   activeTab, setActiveTab, handleLogout, isCollapsed, setIsCollapsed 
 }) => {
-  const navigate = useNavigate();
-
   const menuItems = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
     { id: 'post-job', label: 'Post a Job', icon: Briefcase },
-    { id: 'admin-skill-tests', label: 'Add Assessments', icon: Code, route: '/admin' },
+    { id: 'admin-skill-tests', label: 'Add Assessments', icon: Code },
     { id: 'candidates', label: 'Candidates', icon: Users },
     { id: 'interviews', label: 'Interviews', icon: MessageSquare },
     { id: 'profile', label: 'Company Profile', icon: Building },
@@ -78,13 +75,7 @@ const CompanySidebar: React.FC<SidebarProps> = ({
           return (
             <button
               key={item.id}
-              onClick={() => {
-                if ('route' in item && item.route) {
-                  navigate(item.route);
-                  return;
-                }
-                setActiveTab(item.id);
-              }}
+              onClick={() => setActiveTab(item.id)}
               className={`
                 relative w-full flex items-center p-3 rounded-xl transition-all duration-200 group overflow-hidden
                 ${isActive 

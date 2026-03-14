@@ -10,6 +10,7 @@ import CompanyOverview from '../components/dashboard/CompanyOverview';
 import Settings from '../components/dashboard/Settings';
 import PostJob from '../components/dashboard/PostJob';
 import ManageApplications from '../components/dashboard/ManageApplications';
+import AdminPage from './AdminPage';
 
 const CompanyDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -33,6 +34,8 @@ const CompanyDashboard: React.FC = () => {
         return <PostJob />;
       case 'candidates':
         return <ManageApplications />;
+      case 'admin-skill-tests':
+        return <AdminPage embedded />;
       case 'settings':
         return <Settings userName={userName} userEmail={user?.email || ''} />;
       default:

@@ -12,7 +12,11 @@ const initialForm = {
   color: 'blue'
 };
 
-const AdminPage: React.FC = () => {
+interface AdminPageProps {
+  embedded?: boolean;
+}
+
+const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
   const addFormRef = useRef<HTMLElement | null>(null);
   const [assessments, setAssessments] = useState<Assessment[]>([]);
   const [topStudents, setTopStudents] = useState<TopStudent[]>([]);
@@ -152,7 +156,7 @@ const AdminPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 p-6 sm:p-10">
+    <div className={embedded ? '' : 'min-h-screen bg-slate-100 p-6 sm:p-10'}>
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

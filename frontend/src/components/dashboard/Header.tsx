@@ -123,6 +123,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
   const companySearchData: SearchResult[] = [
     { id: 'overview', title: 'Overview', type: 'page', subtitle: 'Dashboard Home', icon: LayoutDashboard, action: () => setActiveTab('overview') },
     { id: 'post-job', title: 'Post a Job', type: 'page', subtitle: 'Create new listing', icon: Briefcase, action: () => setActiveTab('post-job') },
+    { id: 'admin-skill-tests', title: 'Add Assessments', type: 'page', subtitle: 'Manage skill tests', icon: Code, action: () => setActiveTab('admin-skill-tests') },
     { id: 'candidates', title: 'Candidates', type: 'page', subtitle: 'Search talent', icon: Users, action: () => setActiveTab('candidates') },
     { id: 'interviews', title: 'Interviews', type: 'page', subtitle: 'Schedule & manage', icon: MessageSquare, action: () => setActiveTab('interviews') },
     { id: 'profile', title: 'Company Profile', type: 'page', subtitle: 'Branding & info', icon: Building, action: () => setActiveTab('profile') },
