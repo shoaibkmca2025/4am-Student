@@ -95,6 +95,15 @@ export interface AssessmentQuestion {
   explanation?: string;
 }
 
+export interface TopStudent {
+  userId: string;
+  name: string;
+  email: string;
+  averageScore: number;
+  bestScore: number;
+  completedAssessments: number;
+}
+
 export interface UserAssessment {
   _id: string;
   userId: string;
@@ -258,6 +267,18 @@ export const assessmentService = {
   getById: async (id: number): Promise<Assessment> => {
     const response = await api.get(`/assessments/${id}`);
     return response.data;
+  },
+  create: async (payload: Partial<Assessment>): Promise<Assessment> => {
+    const response = await api.post('/assessments', payload);
+    return response.data;
+  },
+  remove: async (id: number): Promise<{ ok: boolean; message: string }> => {
+    const response = await api.delete(`/assessments/${id}`);
+    return response.data;
+  },
+  getTopStudents: async (limit = 5): Promise<TopStudent[]> => {
+    const response = await api.get('/assessments/top-students', { params: { limit } });
+    return response.data.students || [];
   }
 };
 
