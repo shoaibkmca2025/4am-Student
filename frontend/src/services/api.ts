@@ -235,6 +235,13 @@ const resolvedBaseURL =
   normalizeApiBase((import.meta as any).env?.VITE_API_URL) ||
   inferFallbackBaseUrl();
 
+const FALLBACK_API_BASES = Array.from(
+  new Set([
+    inferFallbackBaseUrl(),
+    'https://fouram-student-backend.onrender.com/api'
+  ].filter(Boolean))
+);
+
 const api = axios.create({
   baseURL: resolvedBaseURL,
   timeout: 15000,
@@ -261,12 +268,23 @@ api.interceptors.response.use(
     if (!config) return Promise.reject(error);
 
     config.__retryCount = config.__retryCount || 0;
+    config.__usedApiFailover = config.__usedApiFailover || false;
 
     const isRetryable =
       !error.response ||
       error.code === 'ECONNABORTED' ||
       error.code === 'ERR_NETWORK' ||
       (error.response?.status >= 500 && error.response?.status < 600);
+
+    if (isRetryable && !config.__usedApiFailover) {
+      const currentBase = normalizeApiBase(config.baseURL || resolvedBaseURL);
+      const failoverBase = FALLBACK_API_BASES.find((base) => normalizeApiBase(base) !== currentBase);
+      if (failoverBase) {
+        config.__usedApiFailover = true;
+        config.baseURL = failoverBase;
+        return api(config);
+      }
+    }
 
     if (isRetryable && config.__retryCount < MAX_RETRIES) {
       config.__retryCount += 1;
