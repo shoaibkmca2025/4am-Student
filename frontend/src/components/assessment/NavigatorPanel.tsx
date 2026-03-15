@@ -32,7 +32,7 @@ const NavigatorPanel: React.FC<NavigatorPanelProps> = ({
       initial={{ x: '100%' }}
       animate={{ x: isOpen ? 0 : '100%' }}
       transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-      className="fixed top-0 right-0 h-full w-80 bg-white/95 backdrop-blur-xl border-l border-sky-200 z-50 p-6 shadow-2xl overflow-y-auto"
+      className="fixed top-0 right-0 h-full w-full sm:w-80 bg-white/95 backdrop-blur-xl border-l border-sky-200 z-50 p-4 sm:p-6 shadow-2xl overflow-y-auto"
     >
       <div className="flex justify-between items-center mb-8">
         <h3 className="text-lg font-bold text-slate-800 tracking-tight">Question Map</h3>

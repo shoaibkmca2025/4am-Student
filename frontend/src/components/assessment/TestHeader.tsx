@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Timer, ArrowLeft, MoreVertical, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface TestHeaderProps {
   title: string;
-  duration: string;
+  timeLeft: string;
+  isTimeUp: boolean;
   totalQuestions: number;
   currentQuestion: number;
   onExit: () => void;
@@ -12,12 +13,12 @@ interface TestHeaderProps {
 
 const TestHeader: React.FC<TestHeaderProps> = ({ 
   title, 
-  duration, 
+  timeLeft,
+  isTimeUp,
   totalQuestions, 
   currentQuestion, 
   onExit 
 }) => {
-  const [timeLeft, setTimeLeft] = useState(duration); 
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -61,15 +62,15 @@ const TestHeader: React.FC<TestHeaderProps> = ({
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2.5 bg-sky-100/80 px-4 py-2 rounded-lg border border-sky-200 shadow-sm">
+      <div className="flex items-center gap-2 sm:gap-4">
+        <div className={`flex items-center gap-2.5 px-3 sm:px-4 py-2 rounded-lg border shadow-sm ${isTimeUp ? 'bg-red-100 border-red-200' : 'bg-sky-100/80 border-sky-200'}`}>
           <div className="relative">
-            <div className="absolute inset-0 bg-indigo-500 blur-sm opacity-20 animate-pulse"></div>
-            <Timer className="w-4 h-4 text-indigo-400 relative z-10" />
+            <div className={`absolute inset-0 blur-sm opacity-20 animate-pulse ${isTimeUp ? 'bg-red-500' : 'bg-indigo-500'}`}></div>
+            <Timer className={`w-4 h-4 relative z-10 ${isTimeUp ? 'text-red-500' : 'text-indigo-400'}`} />
           </div>
-          <span className="text-sm font-mono font-bold text-slate-800 tracking-wider">{timeLeft}</span>
+          <span className={`text-sm font-mono font-bold tracking-wider ${isTimeUp ? 'text-red-600' : 'text-slate-800'}`}>{timeLeft}</span>
         </div>
-        <button className="p-2 hover:bg-sky-100 rounded-lg text-slate-600 hover:text-primary transition-colors">
+        <button className="hidden sm:inline-flex p-2 hover:bg-sky-100 rounded-lg text-slate-600 hover:text-primary transition-colors">
           <MoreVertical className="w-5 h-5" />
         </button>
       </div>

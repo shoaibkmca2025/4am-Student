@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu } from 'lucide-react';
@@ -25,30 +25,147 @@ const AssessmentPage: React.FC = () => {
   const [isNavigatorOpen, setIsNavigatorOpen] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Timer State
-  const [startTime] = useState<number>(Date.now());
+  const [startTime, setStartTime] = useState<number>(Date.now());
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [timeLeftSeconds, setTimeLeftSeconds] = useState(0);
+  const [isTimeUp, setIsTimeUp] = useState(false);
 
   // Gamification State
   const [streak, setStreak] = useState(0);
   const [showXP, setShowXP] = useState(false);
   const [xpGained, setXpGained] = useState(0);
+  const hasSubmittedRef = useRef(false);
 
-  // Elapsed timer — ticks every second while assessment is active
-  useEffect(() => {
-    if (showResult) return;
-    const timer = setInterval(() => {
-      setElapsedSeconds(Math.floor((Date.now() - startTime) / 1000));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [startTime, showResult]);
+  const parseDurationToSeconds = (duration: string): number => {
+    const raw = (duration || '').toLowerCase().trim();
+    if (!raw) return 30 * 60;
+
+    const withUnits = raw.match(/(\d+)\s*(h|hr|hrs|hour|hours|m|min|mins|minute|minutes|s|sec|secs|second|seconds)/g);
+    if (withUnits && withUnits.length > 0) {
+      return withUnits.reduce((total, part) => {
+        const piece = part.match(/(\d+)\s*(.*)/);
+        if (!piece) return total;
+        const value = Number(piece[1]);
+        const unit = piece[2];
+        if (unit.startsWith('h')) return total + value * 3600;
+        if (unit.startsWith('m')) return total + value * 60;
+        return total + value;
+      }, 0);
+    }
+
+    const plainNumber = raw.match(/\d+/);
+    if (plainNumber) {
+      return Number(plainNumber[0]) * 60;
+    }
+
+    return 30 * 60;
+  };
+
+  const formatTimer = (totalSec: number): string => {
+    const safeSec = Math.max(totalSec, 0);
+    const h = Math.floor(safeSec / 3600);
+    const m = Math.floor((safeSec % 3600) / 60);
+    const s = safeSec % 60;
+
+    if (h > 0) {
+      return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
+  const durationSeconds = useMemo(
+    () => parseDurationToSeconds(testMetadata?.duration || ''),
+    [testMetadata?.duration]
+  );
 
   const formatElapsed = (totalSec: number): string => {
     const m = Math.floor(totalSec / 60);
     const s = totalSec % 60;
     return `${m}m ${s.toString().padStart(2, '0')}s`;
   };
+
+  const calculateScore = useCallback(() => {
+    let correctCount = 0;
+    questions.forEach((q, index) => {
+      const answer = answers[index];
+      if (q.type === 'code-challenge' || q.type === 'text-input') {
+        // For manual grading types, we assume correct if not empty for now (simulation)
+        if (answer && answer.toString().trim().length > 10) {
+          correctCount++;
+        }
+      } else {
+        // MCQ
+        if (answer === q.correct) {
+          correctCount++;
+        }
+      }
+    });
+    return correctCount;
+  }, [answers, questions]);
+
+  const handleSubmit = useCallback(async () => {
+    if (hasSubmittedRef.current || isSubmitting || questions.length === 0) {
+      return;
+    }
+
+    hasSubmittedRef.current = true;
+    setIsSubmitting(true);
+
+    const finalScore = calculateScore();
+    const percentage = Math.round((finalScore / questions.length) * 100);
+    
+    try {
+      await userAssessmentService.upsertMe(testId, {
+        status: 'Completed',
+        score: `${percentage}%`,
+        timestamp: new Date().toISOString(),
+        timeTaken: formatElapsed(elapsedSeconds)
+      });
+      setShowResult(true);
+    } catch (err) {
+      hasSubmittedRef.current = false;
+      console.error("Failed to save assessment to backend", err);
+      alert("Failed to save assessment result. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [isSubmitting, questions.length, testId, elapsedSeconds, calculateScore]);
+
+  // Countdown timer — when it reaches 0, auto-submit once.
+  useEffect(() => {
+    if (!testMetadata || showResult || isSubmitting || questions.length === 0) return;
+
+    const now = Date.now();
+    const elapsed = Math.floor((now - startTime) / 1000);
+    const nextLeft = Math.max(durationSeconds - elapsed, 0);
+    setElapsedSeconds(elapsed);
+    setTimeLeftSeconds(nextLeft);
+
+    const timer = setInterval(() => {
+      setElapsedSeconds((prevElapsed) => {
+        const updatedElapsed = prevElapsed + 1;
+        const next = Math.max(durationSeconds - updatedElapsed, 0);
+        setTimeLeftSeconds(next);
+
+        if (next <= 0) {
+          setIsTimeUp(true);
+          clearInterval(timer);
+        }
+        return updatedElapsed;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [durationSeconds, isSubmitting, questions.length, showResult, startTime, testMetadata]);
+
+  useEffect(() => {
+    if (isTimeUp && !showResult) {
+      handleSubmit();
+    }
+  }, [isTimeUp, showResult, handleSubmit]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,6 +186,9 @@ const AssessmentPage: React.FC = () => {
         }
 
         setTestMetadata(assessment);
+        setStartTime(Date.now());
+        setIsTimeUp(false);
+        hasSubmittedRef.current = false;
         
         // Shuffle questions with a seed based on current session so retakes get different order
         if (assessment.questions) {
@@ -113,6 +233,8 @@ const AssessmentPage: React.FC = () => {
   }, [testId, navigate]);
 
   const handleAnswer = (answer: number | string) => {
+    if (isTimeUp || isSubmitting) return;
+
     setAnswers(prev => ({
       ...prev,
       [currentQuestionIndex]: answer
@@ -127,6 +249,7 @@ const AssessmentPage: React.FC = () => {
   };
 
   const handleNext = () => {
+    if (isTimeUp || isSubmitting) return;
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
       setShowXP(false); // Hide previous XP popup
@@ -134,12 +257,15 @@ const AssessmentPage: React.FC = () => {
   };
 
   const handlePrevious = () => {
+    if (isTimeUp || isSubmitting) return;
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
     }
   };
 
   const toggleMarkForReview = () => {
+    if (isTimeUp || isSubmitting) return;
+
     setMarkedQuestions(prev => {
       if (prev.includes(currentQuestionIndex)) {
         return prev.filter(i => i !== currentQuestionIndex);
@@ -147,44 +273,6 @@ const AssessmentPage: React.FC = () => {
         return [...prev, currentQuestionIndex];
       }
     });
-  };
-
-  const calculateScore = () => {
-    let correctCount = 0;
-    questions.forEach((q, index) => {
-      const answer = answers[index];
-      if (q.type === 'code-challenge' || q.type === 'text-input') {
-        // For manual grading types, we assume correct if not empty for now (simulation)
-        if (answer && answer.toString().trim().length > 10) {
-          correctCount++;
-        }
-      } else {
-        // MCQ
-        if (answer === q.correct) {
-          correctCount++;
-        }
-      }
-    });
-    return correctCount;
-  };
-
-  const handleSubmit = async () => {
-    const finalScore = calculateScore();
-    const percentage = Math.round((finalScore / questions.length) * 100);
-    
-    // Save to backend
-    try {
-      await userAssessmentService.upsertMe(testId, {
-        status: 'Completed',
-        score: `${percentage}%`,
-        timestamp: new Date().toISOString(),
-        timeTaken: formatElapsed(elapsedSeconds)
-      });
-      setShowResult(true);
-    } catch (err) {
-      console.error("Failed to save assessment to backend", err);
-      alert("Failed to save assessment result. Please try again.");
-    }
   };
 
   if (isLoading || !testMetadata) {
@@ -225,13 +313,14 @@ const AssessmentPage: React.FC = () => {
 
       <TestHeader 
         title={testMetadata.title}
-        duration={testMetadata.duration}
+        timeLeft={formatTimer(timeLeftSeconds)}
+        isTimeUp={isTimeUp}
         totalQuestions={questions.length}
         currentQuestion={currentQuestionIndex}
         onExit={() => navigate('/dashboard')}
       />
 
-      <div className="flex-1 relative z-10 pt-20 pb-24 px-4 md:px-8 max-w-5xl mx-auto w-full">
+      <div className="flex-1 relative z-10 pt-20 pb-36 md:pb-28 px-3 sm:px-4 md:px-8 max-w-5xl mx-auto w-full overflow-x-hidden">
         {/* Mobile Navigator Toggle */}
         <button 
           onClick={() => setIsNavigatorOpen(true)}
@@ -255,6 +344,7 @@ const AssessmentPage: React.FC = () => {
               selectedOption={answers[currentQuestionIndex] ?? null}
               onSelect={handleAnswer}
               codeSnippet={currentQuestion?.codeSnippet}
+              disabled={isTimeUp || isSubmitting}
             />
           </motion.div>
         </AnimatePresence>
@@ -269,6 +359,8 @@ const AssessmentPage: React.FC = () => {
         isLast={currentQuestionIndex === questions.length - 1}
         isMarked={markedQuestions.includes(currentQuestionIndex)}
         canNext={answers[currentQuestionIndex] !== undefined} // Require answer to proceed? Optional.
+        isDisabled={isTimeUp || isSubmitting}
+        isSubmitting={isSubmitting}
       />
 
       <NavigatorPanel 
@@ -277,6 +369,7 @@ const AssessmentPage: React.FC = () => {
         answers={answers}
         markedQuestions={markedQuestions}
         onNavigate={(idx) => {
+          if (isTimeUp || isSubmitting) return;
           setCurrentQuestionIndex(idx);
           setIsNavigatorOpen(false);
         }}

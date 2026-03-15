@@ -57,8 +57,8 @@ const OptionCard: React.FC<OptionCardProps> = ({
       onClick={onSelect}
       disabled={disabled}
       className={`
-        w-full p-4 md:p-5 rounded-xl border transition-all duration-300 
-        flex items-center gap-4 text-left group relative overflow-hidden
+        w-full p-3 sm:p-4 md:p-5 rounded-xl border transition-all duration-300 
+        flex items-start sm:items-center gap-3 sm:gap-4 text-left group relative overflow-hidden
         ${styles.container}
         ${disabled ? 'cursor-not-allowed opacity-80' : 'cursor-pointer'}
       `}
@@ -78,8 +78,8 @@ const OptionCard: React.FC<OptionCardProps> = ({
       </div>
 
       {/* Content */}
-      <div className="flex-1 z-10">
-        <span className={`text-base md:text-lg font-medium transition-colors duration-200 ${styles.text}`}>
+      <div className="flex-1 z-10 min-w-0">
+        <span className={`text-sm sm:text-base md:text-lg font-medium transition-colors duration-200 ${styles.text} break-words`}>
           {option}
         </span>
       </div>
