@@ -1,7 +1,8 @@
 import express from 'express';
+import { isValidObjectId } from 'mongoose';
 import Assessment from '../models/Assessment.js';
 import UserAssessment from '../models/UserAssessment.js';
-import { requireAdmin, requireAuth, requireRole } from '../middleware/auth.js';
+import { requireAuth, requireRole } from '../middleware/auth.js';
 
 const requireAssessmentManager = requireRole(['admin', 'company']);
 
@@ -138,13 +139,23 @@ router.put('/:id', requireAuth, requireAssessmentManager, async (req, res, next)
 // @access  Private (Admin, Company)
 router.delete('/:id', requireAuth, requireAssessmentManager, async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
-    if (!Number.isFinite(id)) return res.status(400).json({ message: 'Invalid ID' });
+    const rawId = String(req.params.id || '').trim();
+    const numericId = Number(rawId);
 
-    const deleted = await Assessment.findOneAndDelete({ id });
+    let deleted = null;
+    if (Number.isFinite(numericId)) {
+      deleted = await Assessment.findOneAndDelete({ id: numericId });
+    }
+
+    if (!deleted && isValidObjectId(rawId)) {
+      deleted = await Assessment.findByIdAndDelete(rawId);
+    }
+
     if (!deleted) return res.status(404).json({ message: 'Assessment not found' });
 
-    await UserAssessment.deleteMany({ assessmentId: id });
+    if (Number.isFinite(deleted.id)) {
+      await UserAssessment.deleteMany({ assessmentId: deleted.id });
+    }
 
     return res.json({ ok: true, message: 'Assessment deleted' });
   } catch (err) {

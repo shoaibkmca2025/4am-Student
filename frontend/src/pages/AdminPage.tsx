@@ -9,7 +9,8 @@ const initialForm = {
   duration: '30 minutes',
   questionsCount: 10,
   difficulty: 'Medium' as Difficulty,
-  color: 'blue'
+  color: 'blue',
+  questionsJson: '[]'
 };
 
 interface AdminPageProps {
@@ -33,6 +34,66 @@ const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
     () => [...assessments].sort((a, b) => a.id - b.id),
     [assessments]
   );
+
+  const parseQuestions = (): any[] => {
+    const raw = form.questionsJson.trim();
+    if (!raw) return [];
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      throw new Error('Questions must be valid JSON.');
+    }
+
+    if (!Array.isArray(parsed)) {
+      throw new Error('Questions JSON must be an array.');
+    }
+
+    const normalized = parsed.map((item: any, index: number) => {
+      const type = item?.type || 'multiple-choice';
+      if (!item?.question || typeof item.question !== 'string') {
+        throw new Error(`Question ${index + 1} must include a valid question text.`);
+      }
+
+      const base = {
+        id: Number.isFinite(Number(item?.id)) ? Number(item.id) : index + 1,
+        type,
+        question: item.question.trim(),
+        explanation: typeof item?.explanation === 'string' ? item.explanation : undefined
+      };
+
+      if (type === 'multiple-choice') {
+        if (!Array.isArray(item?.options) || item.options.length < 2) {
+          throw new Error(`MCQ question ${index + 1} must include at least 2 options.`);
+        }
+        if (!Number.isFinite(Number(item?.correct))) {
+          throw new Error(`MCQ question ${index + 1} must include a numeric correct index.`);
+        }
+
+        return {
+          ...base,
+          options: item.options.map((opt: any) => String(opt)),
+          correct: Number(item.correct)
+        };
+      }
+
+      if (type === 'code-challenge') {
+        return {
+          ...base,
+          codeSnippet: typeof item?.codeSnippet === 'string' ? item.codeSnippet : '',
+          correctAnswer: typeof item?.correctAnswer === 'string' ? item.correctAnswer : ''
+        };
+      }
+
+      return {
+        ...base,
+        correctAnswer: typeof item?.correctAnswer === 'string' ? item.correctAnswer : ''
+      };
+    });
+
+    return normalized;
+  };
 
   const loadData = async () => {
     try {
@@ -91,13 +152,16 @@ const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
       setError('');
       setSuccess('');
 
+      const questions = parseQuestions();
+
       const created = await assessmentService.create({
         title: form.title.trim(),
         category: form.category.trim(),
         duration: form.duration.trim(),
-        questionsCount: Number(form.questionsCount),
+        questionsCount: questions.length > 0 ? questions.length : Number(form.questionsCount),
         difficulty: form.difficulty,
-        color: form.color.trim() || 'blue'
+        color: form.color.trim() || 'blue',
+        questions
       });
 
       setAssessments((prev) => [...prev, created]);
@@ -110,18 +174,32 @@ const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
     }
   };
 
-  const handleStartEdit = (assessment: Assessment) => {
-    setError('');
-    setSuccess('');
-    setEditingId(assessment.id);
-    setForm({
-      title: assessment.title || '',
-      category: assessment.category || '',
-      duration: assessment.duration || '30 minutes',
-      questionsCount: Number(assessment.questionsCount) || 1,
-      difficulty: (assessment.difficulty || 'Medium') as Difficulty,
-      color: assessment.color || 'blue'
-    });
+  const handleStartEdit = async (assessment: Assessment) => {
+    const lookupId = assessment.id ?? assessment._id;
+    if (!lookupId) {
+      setError('Assessment identifier missing.');
+      return;
+    }
+
+    try {
+      setError('');
+      setSuccess('');
+
+      const details = await assessmentService.getById(Number(assessment.id));
+      setEditingId(details.id);
+      setForm({
+        title: details.title || '',
+        category: details.category || '',
+        duration: details.duration || '30 minutes',
+        questionsCount: Number(details.questionsCount) || 1,
+        difficulty: (details.difficulty || 'Medium') as Difficulty,
+        color: details.color || 'blue',
+        questionsJson: JSON.stringify(details.questions || [], null, 2)
+      });
+      addFormRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Unable to load assessment questions');
+    }
   };
 
   const handleUpdateAssessment = async (e: React.FormEvent) => {
@@ -133,13 +211,16 @@ const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
       setError('');
       setSuccess('');
 
+      const questions = parseQuestions();
+
       const updated = await assessmentService.update(editingId, {
         title: form.title.trim(),
         category: form.category.trim(),
         duration: form.duration.trim(),
-        questionsCount: Number(form.questionsCount),
+        questionsCount: questions.length > 0 ? questions.length : Number(form.questionsCount),
         difficulty: form.difficulty,
-        color: form.color.trim() || 'blue'
+        color: form.color.trim() || 'blue',
+        questions
       });
 
       setAssessments((prev) => prev.map((item) => (item.id === editingId ? updated : item)));
@@ -152,17 +233,24 @@ const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
     }
   };
 
-  const handleDeleteAssessment = async (assessmentId: number, title: string) => {
-    const shouldDelete = window.confirm(`Delete assessment "${title}" (ID: ${assessmentId})?`);
+  const handleDeleteAssessment = async (assessment: Assessment) => {
+    const lookupId = assessment.id ?? assessment._id;
+    if (!lookupId) {
+      setError('Assessment identifier missing. Unable to delete.');
+      return;
+    }
+
+    const label = assessment.id ? `ID: ${assessment.id}` : `Doc ID: ${assessment._id}`;
+    const shouldDelete = window.confirm(`Delete assessment "${assessment.title}" (${label})?`);
     if (!shouldDelete) return;
 
     try {
-      setDeletingId(assessmentId);
+      setDeletingId(Number(assessment.id) || -1);
       setError('');
       setSuccess('');
 
-      await assessmentService.remove(assessmentId);
-      setAssessments((prev) => prev.filter((item) => item.id !== assessmentId));
+      await assessmentService.remove(lookupId);
+      setAssessments((prev) => prev.filter((item) => item.id !== assessment.id && item._id !== assessment._id));
       setSuccess('Skill test deleted successfully');
       await loadData();
     } catch (err: any) {
@@ -264,6 +352,22 @@ const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
                 className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-cyan-500"
               />
 
+              <div>
+                <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Questions JSON
+                </label>
+                <textarea
+                  value={form.questionsJson}
+                  onChange={(e) => setForm((prev) => ({ ...prev, questionsJson: e.target.value }))}
+                  rows={10}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 text-xs font-mono outline-none transition focus:border-cyan-500"
+                  placeholder='[{"id":1,"type":"multiple-choice","question":"...","options":["A","B"],"correct":0}]'
+                />
+                <p className="mt-1 text-xs text-slate-500">
+                  Use valid JSON array. Supported types: multiple-choice, code-challenge, text-input.
+                </p>
+              </div>
+
               <button
                 type="submit"
                 disabled={creating || updating}
@@ -299,8 +403,8 @@ const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
                   </thead>
                   <tbody>
                     {sortedAssessments.map((item) => (
-                      <tr key={item.id} className="border-b border-slate-100 text-slate-700">
-                        <td className="px-3 py-3">{item.id}</td>
+                      <tr key={item.id ?? item._id} className="border-b border-slate-100 text-slate-700">
+                        <td className="px-3 py-3">{item.id ?? '-'}</td>
                         <td className="px-3 py-3 font-medium text-slate-900">{item.title}</td>
                         <td className="px-3 py-3">{item.category}</td>
                         <td className="px-3 py-3">{item.difficulty}</td>
@@ -317,7 +421,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
                             <button
                               type="button"
                               disabled={deletingId === item.id}
-                              onClick={() => handleDeleteAssessment(item.id, item.title)}
+                              onClick={() => handleDeleteAssessment(item)}
                               className="rounded-md border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
                             >
                               {deletingId === item.id ? 'Deleting...' : 'Delete'}
