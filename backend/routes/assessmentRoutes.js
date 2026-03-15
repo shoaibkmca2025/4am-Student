@@ -1,7 +1,9 @@
 import express from 'express';
 import Assessment from '../models/Assessment.js';
 import UserAssessment from '../models/UserAssessment.js';
-import { requireAdmin, requireAuth } from '../middleware/auth.js';
+import { requireAdmin, requireAuth, requireRole } from '../middleware/auth.js';
+
+const requireAssessmentManager = requireRole(['admin', 'company']);
 
 const router = express.Router();
 
@@ -19,8 +21,8 @@ router.get('/', requireAuth, async (req, res, next) => {
 
 // @desc    Create a new assessment
 // @route   POST /api/assessments
-// @access  Private (Admin)
-router.post('/', requireAuth, requireAdmin, async (req, res, next) => {
+// @access  Private (Admin, Company)
+router.post('/', requireAuth, requireAssessmentManager, async (req, res, next) => {
   try {
     const {
       id: providedId,
@@ -74,8 +76,8 @@ router.post('/', requireAuth, requireAdmin, async (req, res, next) => {
 
 // @desc    Update assessment by ID
 // @route   PUT /api/assessments/:id
-// @access  Private (Admin)
-router.put('/:id', requireAuth, requireAdmin, async (req, res, next) => {
+// @access  Private (Admin, Company)
+router.put('/:id', requireAuth, requireAssessmentManager, async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) return res.status(400).json({ message: 'Invalid ID' });
@@ -133,8 +135,8 @@ router.put('/:id', requireAuth, requireAdmin, async (req, res, next) => {
 
 // @desc    Delete assessment by ID
 // @route   DELETE /api/assessments/:id
-// @access  Private (Admin)
-router.delete('/:id', requireAuth, requireAdmin, async (req, res, next) => {
+// @access  Private (Admin, Company)
+router.delete('/:id', requireAuth, requireAssessmentManager, async (req, res, next) => {
   try {
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) return res.status(400).json({ message: 'Invalid ID' });
@@ -152,8 +154,8 @@ router.delete('/:id', requireAuth, requireAdmin, async (req, res, next) => {
 
 // @desc    Get top students by average assessment score
 // @route   GET /api/assessments/top-students
-// @access  Private (Admin)
-router.get('/top-students', requireAuth, requireAdmin, async (req, res, next) => {
+// @access  Private (Admin, Company)
+router.get('/top-students', requireAuth, requireAssessmentManager, async (req, res, next) => {
   try {
     const limit = Math.min(Math.max(Number(req.query.limit) || 5, 1), 50);
 

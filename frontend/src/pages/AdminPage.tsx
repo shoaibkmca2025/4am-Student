@@ -38,14 +38,31 @@ const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
     try {
       setLoading(true);
       setError('');
+      setSuccess('');
 
-      const [assessmentRows, topStudentRows] = await Promise.all([
+      const [assessmentResult, topStudentsResult] = await Promise.allSettled([
         assessmentService.getAll(),
         assessmentService.getTopStudents(5)
       ]);
 
-      setAssessments(assessmentRows || []);
-      setTopStudents(topStudentRows || []);
+      if (assessmentResult.status === 'fulfilled') {
+        setAssessments(assessmentResult.value || []);
+      } else {
+        setAssessments([]);
+        setError(
+          assessmentResult.reason?.response?.data?.message ||
+          'Failed to load assessments data'
+        );
+      }
+
+      if (topStudentsResult.status === 'fulfilled') {
+        setTopStudents(topStudentsResult.value || []);
+      } else {
+        setTopStudents([]);
+        if (assessmentResult.status === 'fulfilled') {
+          setSuccess('Assessments loaded. Student rankings are currently unavailable.');
+        }
+      }
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Failed to load admin dashboard data');
     } finally {
