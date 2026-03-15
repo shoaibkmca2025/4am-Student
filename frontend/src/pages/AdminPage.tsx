@@ -175,8 +175,7 @@ const AdminPage: React.FC<AdminPageProps> = ({ embedded = false }) => {
   };
 
   const handleStartEdit = async (assessment: Assessment) => {
-    const lookupId = assessment.id ?? assessment._id;
-    if (!lookupId) {
+    if (!Number.isFinite(Number(assessment.id))) {
       setError('Assessment identifier missing.');
       return;
     }
