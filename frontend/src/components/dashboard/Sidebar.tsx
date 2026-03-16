@@ -1,8 +1,9 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, FileText, Code, MessageSquare, TrendingUp,
   Briefcase, Settings, LogOut, ChevronLeft, ChevronRight, Award,
-  Zap
+  Zap, Sparkles, Blocks, Wrench
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import logoImage from '../../4am-logo.jpeg';
@@ -19,6 +20,8 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({
   activeTab, setActiveTab, handleLogout, isCollapsed, setIsCollapsed
 }) => {
+  const navigate = useNavigate();
+
   const menuItems = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
     { id: 'resume', label: 'Resume Builder', icon: FileText },
@@ -39,6 +42,12 @@ const Sidebar: React.FC<SidebarProps> = ({
     setXp(xp);
     setMaxXp(1000);
   }, []);
+
+  const extensionItems = [
+    { id: 'feature-hub', label: 'Features Hub', icon: Sparkles, path: '/features' },
+    { id: 'modules', label: 'Modules', icon: Blocks, path: '/modules' },
+    { id: 'tools', label: 'Tools', icon: Wrench, path: '/tools' }
+  ];
 
   return (
     <motion.aside
@@ -120,6 +129,37 @@ const Sidebar: React.FC<SidebarProps> = ({
             </button>
           );
         })}
+
+        <div className={`pt-4 mt-4 border-t border-black/5 dark:border-white/5 ${isCollapsed ? 'space-y-1' : 'space-y-1'}`}>
+          {!isCollapsed && (
+            <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-gray-500">
+              Extensions
+            </p>
+          )}
+          {extensionItems.map((item) => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                onClick={() => navigate(item.path)}
+                className={`relative w-full flex items-center p-3 rounded-xl transition-all duration-300 group overflow-hidden border-transparent hover:bg-primary/5 ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
+              >
+                <Icon className="w-5 h-5 flex-shrink-0 text-slate-500 group-hover:text-primary transition-colors" />
+                {!isCollapsed && (
+                  <span className="text-sm font-medium text-slate-600 dark:text-gray-400 group-hover:text-primary dark:group-hover:text-primary">
+                    {item.label}
+                  </span>
+                )}
+                {isCollapsed && (
+                  <div className="absolute left-full ml-4 px-3 py-1.5 text-slate-900 dark:text-white text-xs font-medium rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl z-50 bg-white dark:bg-slate-800 border border-black/10 dark:border-primary/20">
+                    {item.label}
+                    <div className="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 w-2 h-2 rotate-45 bg-white dark:bg-slate-800 border-l border-b border-black/10 dark:border-primary/20" />
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Bottom Section (XP/Profile/Logout) */}
