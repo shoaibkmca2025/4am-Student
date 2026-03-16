@@ -42,6 +42,10 @@ const MockInterview: React.FC = () => {
   const [transcript, setTranscript] = useState<string[]>([]);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [answerText, setAnswerText] = useState('');
+  const answerTextRef = useRef('');
+  const recognitionRef = useRef<any>(null);
+  const recordingBaseAnswerRef = useRef('');
+  const finalizedSpeechRef = useRef('');
   const [validationError, setValidationError] = useState<string | null>(null);
   const [networkError, setNetworkError] = useState<string | null>(null);
   const [latestFeedback, setLatestFeedback] = useState<{ score: number; feedback: string; improvements: string[]; criteria?: { clarity: number; relevance: number; completeness: number } } | null>(null);
@@ -65,6 +69,14 @@ const MockInterview: React.FC = () => {
   // Initialize Media Stream (Removed auto-start)
   useEffect(() => {
     return () => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {
+          // Ignore cleanup errors.
+        }
+        recognitionRef.current = null;
+      }
       stopMedia();
     };
   }, []);
@@ -99,6 +111,10 @@ const MockInterview: React.FC = () => {
   useEffect(() => {
     isRecordingRef.current = isRecording;
   }, [isRecording]);
+
+  useEffect(() => {
+    answerTextRef.current = answerText;
+  }, [answerText]);
 
   const stopMedia = () => {
     if (meterRafRef.current) {
@@ -286,11 +302,21 @@ const MockInterview: React.FC = () => {
       } catch (error) {
         console.error("Failed to end session cleanly", error);
       }
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {
+          // Ignore stop errors if recognition is already stopped.
+        }
+        recognitionRef.current = null;
+      }
       setSessionActive(false);
       setSessionData(null);
       setCurrentQuestion(null);
       setTranscript([]);
       setAnswerText('');
+      answerTextRef.current = '';
+      finalizedSpeechRef.current = '';
       setValidationError(null);
       setLatestFeedback(null);
       stopMedia(); // Stop camera when session ends
@@ -312,6 +338,8 @@ const MockInterview: React.FC = () => {
     setValidationError(null);
     hasDetectedAudioRef.current = false;
     recordingStartedAtRef.current = Date.now();
+    recordingBaseAnswerRef.current = answerTextRef.current.trim();
+    finalizedSpeechRef.current = '';
     
     audioChunksRef.current = [];
     const recorder = new MediaRecorder(stream);
@@ -326,10 +354,72 @@ const MockInterview: React.FC = () => {
     recorder.start();
     setIsRecording(true);
     setIsSpeaking(true);
+
+    const SpeechRecognitionCtor =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (SpeechRecognitionCtor) {
+      const recognition = new SpeechRecognitionCtor();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+
+      recognition.onresult = (event: any) => {
+        let finalChunk = '';
+        let interimChunk = '';
+
+        for (let i = event.resultIndex; i < event.results.length; i += 1) {
+          const transcriptChunk = (event.results[i][0]?.transcript || '').trim();
+          if (!transcriptChunk) continue;
+
+          if (event.results[i].isFinal) {
+            finalChunk += `${transcriptChunk} `;
+          } else {
+            interimChunk += `${transcriptChunk} `;
+          }
+        }
+
+        if (finalChunk.trim()) {
+          finalizedSpeechRef.current = `${finalizedSpeechRef.current} ${finalChunk}`.trim();
+        }
+
+        const mergedAnswer = [
+          recordingBaseAnswerRef.current,
+          finalizedSpeechRef.current,
+          interimChunk.trim()
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .trim();
+
+        setAnswerText(mergedAnswer);
+        if (validationError) setValidationError(null);
+      };
+
+      recognition.onerror = () => {
+        // Keep recording active even if speech recognition fails.
+      };
+
+      recognitionRef.current = recognition;
+      try {
+        recognition.start();
+      } catch {
+        recognitionRef.current = null;
+      }
+    }
   };
 
   const stopRecording = (): Promise<Blob> => {
     return new Promise((resolve) => {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {
+          // Ignore double-stop errors from browser recognition engines.
+        }
+        recognitionRef.current = null;
+      }
+
       if (!mediaRecorderRef.current) {
         resolve(new Blob([], { type: 'audio/webm' }));
         return;
@@ -358,18 +448,18 @@ const MockInterview: React.FC = () => {
       return;
     }
 
-    const trimmedAnswer = answerText.trim();
+    // If currently recording, stop first
+    if (isRecording) {
+      await stopRecording();
+    }
+
+    const trimmedAnswer = answerTextRef.current.trim();
     if (!trimmedAnswer) {
       setValidationError('Answer cannot be empty.');
       return;
     }
 
     setValidationError(null);
-
-    // If currently recording, stop first
-    if (isRecording) {
-      await stopRecording();
-    }
 
     setIsConnecting(true);
     

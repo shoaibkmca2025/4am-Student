@@ -93,8 +93,8 @@ const AnimatedNumber = ({ value }: { value: string | number }) => {
 const StatsCard: React.FC<StatsCardProps> = ({ 
   title, value, icon: Icon, trend, trendUp, color, progress, tooltip, data, variant = 'default'
 }) => {
-  // Use provided data or empty array (no random data)
-  const sparklineData = data || Array.from({ length: 10 }).map((_, i) => ({ value: 0 }));
+  const hasSparklineData = Array.isArray(data) && data.length > 0;
+  const sparklineData = hasSparklineData ? data : [];
 
   // Helper to get progress percentage
   const getProgress = () => {
@@ -228,7 +228,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
                   </div>
                   
                   {/* Sparkline Area - Only for chart variant or default with data */}
-                  {(variant === 'chart' || (variant === 'default' && data)) && (
+                  {((variant === 'chart' && hasSparklineData) || (variant === 'default' && hasSparklineData)) && (
                    <div className="h-12 mt-4 -mx-2 opacity-60 group-hover:opacity-100 transition-opacity duration-300">
                       <ResponsiveContainer width="100%" height="100%">
                          <AreaChart data={sparklineData}>

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Timer, ArrowLeft, MoreVertical, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 

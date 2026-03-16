@@ -14,9 +14,27 @@ const tokenize = (value) =>
     .split(/\s+/)
     .filter(Boolean);
 
+const hasLetters = (token) => /[a-z]/.test(token);
+
+const isLikelyGibberishToken = (token) => {
+  const normalized = (token || '').toLowerCase();
+  if (!normalized) return true;
+  if (/\d/.test(normalized)) return true;
+  if (!hasLetters(normalized)) return true;
+
+  const vowels = normalized.match(/[aeiou]/g)?.length || 0;
+  if (vowels === 0) return true;
+
+  return /[bcdfghjklmnpqrstvwxyz]{5,}/.test(normalized);
+};
+
 const scoreAnswer = (answerText, expectedKeyPoints = []) => {
   const trimmed = (answerText || '').trim();
   const words = tokenize(trimmed);
+  const lexicalWords = words.filter(hasLetters);
+  const likelyGibberishWords = lexicalWords.filter(isLikelyGibberishToken);
+  const meaningfulWordsCount = lexicalWords.length - likelyGibberishWords.length;
+  const meaningfulRatio = words.length ? meaningfulWordsCount / words.length : 0;
   const lowered = trimmed.toLowerCase();
 
   const keyPoints = expectedKeyPoints.filter(Boolean);
@@ -25,18 +43,30 @@ const scoreAnswer = (answerText, expectedKeyPoints = []) => {
 
   const sentenceCount = trimmed.split(/[.!?]+/).map((s) => s.trim()).filter(Boolean).length;
   const hasFillerOveruse = /\b(um|uh|like|you know)\b/g.test(lowered);
-  const clarityRaw = Math.min(100, 40 + words.length * 1.2 + sentenceCount * 6 - (hasFillerOveruse ? 10 : 0));
+  const clarityRaw = Math.min(100, 15 + words.length * 1.3 + sentenceCount * 8 - (hasFillerOveruse ? 10 : 0));
 
   const hasSituation = /\b(problem|challenge|situation|task)\b/.test(lowered);
   const hasAction = /\b(action|implemented|built|designed|led|developed|resolved)\b/.test(lowered);
   const hasResult = /\b(result|impact|improved|increased|reduced|learned|outcome|%)\b/.test(lowered);
   const starCoverage = [hasSituation, hasAction, hasResult].filter(Boolean).length;
-  const completenessRaw = Math.min(100, 35 + Math.min(words.length, 140) * 0.45 + starCoverage * 15);
+  const completenessRaw = Math.min(100, 10 + Math.min(words.length, 140) * 0.5 + starCoverage * 18);
 
   const clarity = clampScore(clarityRaw);
   const relevance = clampScore(relevanceRaw);
   const completeness = clampScore(completenessRaw);
-  const score = clampScore(clarity * 0.3 + relevance * 0.4 + completeness * 0.3);
+
+  let qualityPenalty = 0;
+  if (words.length >= 4 && meaningfulRatio < 0.6) {
+    qualityPenalty += Math.round((0.6 - meaningfulRatio) * 40);
+  }
+  if (likelyGibberishWords.length >= 2) {
+    qualityPenalty += Math.min(15, likelyGibberishWords.length * 2);
+  }
+  if (relevance < 20 && meaningfulRatio < 0.55) {
+    qualityPenalty += 18;
+  }
+
+  const score = clampScore(clarity * 0.3 + relevance * 0.4 + completeness * 0.3 - qualityPenalty);
 
   const strengths = [];
   const improvements = [];
@@ -49,6 +79,8 @@ const scoreAnswer = (answerText, expectedKeyPoints = []) => {
 
   if (completeness >= 70) strengths.push('Good completeness and structure');
   else improvements.push('Use STAR structure: Situation, Action, Result');
+
+  if (meaningfulRatio < 0.6) improvements.push('Use clear, real words and concrete examples instead of random text');
 
   if (words.length < 25) improvements.push('Add more details and examples to strengthen your answer');
 
