@@ -12,6 +12,9 @@ import { AuthProvider as AuthContextProvider } from './context/AuthContext';
 
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const AssessmentPage = React.lazy(() => import('./pages/AssessmentPage'));
+const FeatureHubPage = React.lazy(() => import('./features/FeatureHubPage'));
+const StudyModulesPage = React.lazy(() => import('./modules/StudyModulesPage'));
+const LearningToolsPage = React.lazy(() => import('./tools/LearningToolsPage'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
@@ -87,6 +90,21 @@ function App() {
                 <Route path="/assessment/:id" element={
                   <ProtectedRoute>
                     <AssessmentPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/features" element={
+                  <ProtectedRoute>
+                    <FeatureHubPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/modules" element={
+                  <ProtectedRoute>
+                    <StudyModulesPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/tools" element={
+                  <ProtectedRoute>
+                    <LearningToolsPage />
                   </ProtectedRoute>
                 } />
                 <Route path="/admin" element={

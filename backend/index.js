@@ -22,6 +22,7 @@ import careerRoutes from './routes/careerRoutes.js';
 import achievementRoutes from './routes/achievementRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import statsRoutes from './routes/statsRoutes.js';
+import extensionRoutes from './routes/extensionRoutes.js';
 
 dotenv.config();
 
@@ -103,6 +104,7 @@ app.use('/api/career', careerRoutes);
 app.use('/api/achievements', achievementRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/extensions', extensionRoutes);
 
 // 404 handler
 app.use((req, res) => {
