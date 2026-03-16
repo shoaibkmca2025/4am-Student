@@ -25,15 +25,15 @@ const JobMatches: React.FC<JobMatchesProps> = ({ jobs = [], onApply }) => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 }}
-      className="bg-white/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 h-full flex flex-col"
+      className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 h-full flex flex-col"
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+        <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
           <Briefcase className="w-5 h-5 text-indigo-400" />
           Top Job Matches
         </h3>
         {hasJobs && (
-            <button className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors bg-indigo-500/10 px-2 py-1 rounded border border-indigo-500/20">
+            <button className="text-xs text-indigo-400 hover:text-indigo-300 font-medium transition-colors bg-indigo-500/10 px-2 py-1 rounded border border-indigo-500/20 dark:border-indigo-500/30">
             View All
             </button>
         )}
@@ -41,12 +41,12 @@ const JobMatches: React.FC<JobMatchesProps> = ({ jobs = [], onApply }) => {
 
       {!hasJobs ? (
         <div className="flex flex-col items-center justify-center h-full text-center space-y-4 py-8">
-            <div className="w-16 h-16 bg-sky-100/50 rounded-full flex items-center justify-center mb-2 border border-sky-200">
-                <Briefcase className="w-8 h-8 text-slate-500" />
+            <div className="w-16 h-16 bg-sky-100/50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mb-2 border border-sky-200 dark:border-white/10">
+                <Briefcase className="w-8 h-8 text-slate-500 dark:text-gray-400" />
             </div>
             <div>
-                <h4 className="text-slate-800 font-bold text-sm">No Job Matches Yet</h4>
-                <p className="text-slate-600 text-xs mt-1 max-w-[200px] mx-auto leading-relaxed">
+                <h4 className="text-slate-800 dark:text-white font-bold text-sm">No Job Matches Yet</h4>
+                <p className="text-slate-600 dark:text-gray-400 text-xs mt-1 max-w-[200px] mx-auto leading-relaxed">
                     Complete your profile skills and experience to unlock personalized job matches.
                 </p>
             </div>
@@ -60,7 +60,7 @@ const JobMatches: React.FC<JobMatchesProps> = ({ jobs = [], onApply }) => {
           <motion.div 
             key={idx}
             whileHover={{ scale: 1.02 }}
-            className="group relative p-4 rounded-xl border border-sky-200 bg-white/50 hover:bg-sky-100 hover:border-sky-200 transition-all duration-300 overflow-hidden"
+            className="group relative p-4 rounded-xl border border-sky-200 dark:border-white/10 bg-white/50 dark:bg-slate-700/50 hover:bg-sky-100 dark:hover:bg-slate-700/80 hover:border-sky-200 dark:hover:border-white/20 transition-all duration-300 overflow-hidden"
           >
             {/* Hover Glow */}
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
@@ -71,10 +71,10 @@ const JobMatches: React.FC<JobMatchesProps> = ({ jobs = [], onApply }) => {
                   {job.logo}
                 </div>
                 <div>
-                  <h4 className="font-bold text-slate-800 text-sm group-hover:text-primary transition-colors">
+                  <h4 className="font-bold text-slate-800 dark:text-white text-sm group-hover:text-primary transition-colors">
                     {job.role}
                   </h4>
-                  <p className="text-slate-600 text-xs font-medium">{job.company}</p>
+                  <p className="text-slate-600 dark:text-gray-400 text-xs font-medium">{job.company}</p>
                 </div>
               </div>
               
@@ -91,7 +91,7 @@ const JobMatches: React.FC<JobMatchesProps> = ({ jobs = [], onApply }) => {
             {/* Match Reasons - Transparency */}
             <div className="pl-[52px] mb-3 space-y-1">
                {job.reasons.positive.slice(0, 2).map((reason, i) => (
-                  <div key={`pos-${i}`} className="flex items-center gap-1.5 text-[10px] text-slate-600">
+                  <div key={`pos-${i}`} className="flex items-center gap-1.5 text-[10px] text-slate-600 dark:text-gray-400">
                      <div className="w-3 h-3 rounded-full bg-emerald-500/20 flex items-center justify-center">
                         <svg className="w-2 h-2 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                      </div>
@@ -99,7 +99,7 @@ const JobMatches: React.FC<JobMatchesProps> = ({ jobs = [], onApply }) => {
                   </div>
                ))}
                {job.reasons.negative.slice(0, 1).map((reason, i) => (
-                  <div key={`neg-${i}`} className="flex items-center gap-1.5 text-[10px] text-slate-600">
+                  <div key={`neg-${i}`} className="flex items-center gap-1.5 text-[10px] text-slate-600 dark:text-gray-400">
                      <div className="w-3 h-3 rounded-full bg-red-500/20 flex items-center justify-center">
                         <svg className="w-2 h-2 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" /></svg>
                      </div>
@@ -108,7 +108,7 @@ const JobMatches: React.FC<JobMatchesProps> = ({ jobs = [], onApply }) => {
                ))}
             </div>
 
-            <div className="flex items-center gap-4 text-[11px] text-slate-500 font-medium pl-[52px] border-t border-sky-200/50 pt-2">
+            <div className="flex items-center gap-4 text-[11px] text-slate-500 dark:text-gray-400 font-medium pl-[52px] border-t border-sky-200/50 dark:border-white/10 pt-2">
               <span className="flex items-center gap-1">
                 <MapPin className="w-3 h-3" />
                 {job.type}
@@ -122,7 +122,7 @@ const JobMatches: React.FC<JobMatchesProps> = ({ jobs = [], onApply }) => {
             <motion.button 
               whileTap={{ scale: 0.95 }}
               onClick={() => onApply && job.id && onApply(job.id)}
-              className="mt-4 w-full py-2 bg-sky-100 hover:bg-indigo-600 text-slate-700 hover:text-primary text-xs font-bold rounded-lg border border-sky-200 hover:border-indigo-500 transition-all flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-indigo-500/20"
+              className="mt-4 w-full py-2 bg-sky-100 dark:bg-slate-800 hover:bg-indigo-600 dark:hover:bg-indigo-600 text-slate-700 dark:text-gray-300 hover:text-primary dark:hover:text-white text-xs font-bold rounded-lg border border-sky-200 dark:border-white/10 hover:border-indigo-500 transition-all flex items-center justify-center gap-2 group-hover:shadow-lg group-hover:shadow-indigo-500/20"
             >
               Apply Now <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
             </motion.button>

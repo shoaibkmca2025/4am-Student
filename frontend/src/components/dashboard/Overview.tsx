@@ -213,7 +213,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white/60 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl relative overflow-hidden group"
+        className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/10 shadow-2xl rounded-3xl relative overflow-hidden group"
       >
         {/* Animated Background Mesh */}
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-blue-500/10 opacity-30 group-hover:opacity-50 transition-opacity duration-1000"></div>
@@ -236,30 +236,30 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
               )}
             </div>
             
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
               {greeting}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">{userName}</span>
             </h1>
             
-            <p className="text-slate-700 text-sm leading-relaxed max-w-xl font-medium">
+            <p className="text-slate-700 dark:text-gray-300 text-sm leading-relaxed max-w-xl font-medium">
               {motivation}
             </p>
 
             <div className="flex flex-wrap items-center gap-3 pt-1">
-               <div className="flex items-center gap-2 bg-sky-100/50 p-1 pr-2.5 rounded-full border border-sky-200/50 backdrop-blur-sm">
+               <div className="flex items-center gap-2 bg-sky-100/50 dark:bg-cyan-500/10 p-1 pr-2.5 rounded-full border border-sky-200/50 dark:border-cyan-500/20 backdrop-blur-sm">
                   <div className="p-1 bg-amber-500/20 rounded-full text-amber-400">
                     <Flame className="w-3.5 h-3.5 fill-amber-500/20" />
                   </div>
                   <div>
-                    <p className="text-[9px] text-slate-600 uppercase tracking-wider font-semibold">Streak</p>
-                    <p className="text-[11px] font-bold text-slate-900">{streak} Days</p>
+                    <p className="text-[9px] text-slate-600 dark:text-gray-400 uppercase tracking-wider font-semibold">Streak</p>
+                    <p className="text-[11px] font-bold text-slate-900 dark:text-white">{streak} Days</p>
                   </div>
                </div>
                
-               <div className="h-5 w-px bg-sky-200/50 hidden sm:block"></div>
+               <div className="h-5 w-px bg-sky-200/50 dark:bg-white/10 hidden sm:block"></div>
                
                <div className="flex items-center gap-2">
-                  <span className="text-slate-600 text-[11px]">Level:</span>
-                  <div className="w-20 h-1.5 bg-sky-100 rounded-full overflow-hidden">
+                  <span className="text-slate-600 dark:text-gray-400 text-[11px]">Level:</span>
+                  <div className="w-20 h-1.5 bg-sky-100 dark:bg-slate-700 rounded-full overflow-hidden">
                     <motion.div 
                       initial={{ width: 0 }}
                       animate={{ width: `${Math.min(skillPoints / 10, 100)}%` }}
@@ -298,7 +298,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
         {/* Career Readiness Breakdown - Spans 2 Columns */}
         <TiltCard 
-          className="col-span-1 md:col-span-2 lg:col-span-2 bg-white/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 relative overflow-hidden group"
+          className="col-span-1 md:col-span-2 lg:col-span-2 bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 relative overflow-hidden group"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
@@ -312,8 +312,8 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
                        <TrendingUp className="w-4 h-4" />
                     </div>
                     <div>
-                       <h3 className="text-base font-bold text-slate-800 group-hover:text-primary transition-colors">Career Readiness</h3>
-                       <p className="text-[10px] text-slate-600">AI-Calculated Probability</p>
+                       <h3 className="text-base font-bold text-slate-800 dark:text-white group-hover:text-primary transition-colors">Career Readiness</h3>
+                       <p className="text-[10px] text-slate-600 dark:text-gray-400">AI-Calculated Probability</p>
                     </div>
                  </div>
                  <div className="flex items-center gap-1 text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded-lg text-[10px] font-medium group-hover:scale-105 transition-transform duration-300">
@@ -326,12 +326,12 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
                  {/* Main Circular Score */}
                  <div className="relative w-24 h-24 flex-shrink-0 group-hover:scale-110 transition-transform duration-500" style={{ transform: 'translateZ(30px)' }}>
                      <svg className="w-full h-full transform -rotate-90">
-                        <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-slate-800" />
+                        <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-slate-200 dark:text-slate-700" />
                         <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="6" fill="transparent" strokeDasharray="251" strokeDashoffset={251 - (251 * (careerReadiness / 100))} strokeLinecap="round" className="text-indigo-500 transition-all duration-1000 ease-out" />
                      </svg>
                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-2xl font-bold text-slate-900">{careerReadiness}%</span>
-                        <span className="text-[9px] text-slate-600 uppercase tracking-wider font-semibold">{careerReadiness > 70 ? 'Ready' : careerReadiness > 40 ? 'Learning' : 'Starter'}</span>
+                        <span className="text-2xl font-bold text-slate-900 dark:text-white">{careerReadiness}%</span>
+                        <span className="text-[9px] text-slate-600 dark:text-gray-400 uppercase tracking-wider font-semibold">{careerReadiness > 70 ? 'Ready' : careerReadiness > 40 ? 'Learning' : 'Starter'}</span>
                      </div>
                  </div>
 
@@ -344,12 +344,12 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
                     ].map((metric, idx) => (
                        <div key={idx} className="group/metric relative cursor-help">
                           <div className="flex justify-between text-[10px] mb-1">
-                             <span className="text-slate-700 flex items-center gap-1.5 font-medium">
+                             <span className="text-slate-700 dark:text-gray-300 flex items-center gap-1.5 font-medium">
                                 <metric.icon className="w-3 h-3 text-slate-500" /> {metric.label}
                              </span>
-                             <span className="text-slate-800 font-bold">{metric.value}%</span>
+                             <span className="text-slate-800 dark:text-white font-bold">{metric.value}%</span>
                           </div>
-                          <div className="h-1.5 w-full bg-sky-100 rounded-full overflow-hidden">
+                          <div className="h-1.5 w-full bg-sky-100 dark:bg-slate-700 rounded-full overflow-hidden">
                              <motion.div 
                                 initial={{ width: 0 }}
                                 animate={{ width: `${metric.value}%` }}
@@ -359,7 +359,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
                           </div>
                           
                           {/* Hover Tooltip */}
-                          <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-max max-w-[150px] p-2 bg-white/95 backdrop-blur-md border border-sky-200/50 rounded-lg text-[10px] text-slate-700 opacity-0 invisible group-hover/metric:opacity-100 group-hover/metric:visible transition-all duration-200 z-50 pointer-events-none shadow-xl">
+                          <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-max max-w-[150px] p-2 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-sky-200/50 dark:border-white/10 rounded-lg text-[10px] text-slate-700 dark:text-gray-300 opacity-0 invisible group-hover/metric:opacity-100 group-hover/metric:visible transition-all duration-200 z-50 pointer-events-none shadow-xl">
                              {metric.tip}
                              <div className="absolute left-1/2 -translate-x-1/2 top-full w-2 h-2 bg-white/95 transform rotate-45 border-r border-b border-sky-200/50"></div>
                           </div>
@@ -371,7 +371,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
               {/* AI Insight Footer */}
               <div className="mt-3 pt-2.5 border-t border-white/5 flex items-start gap-2 bg-gradient-to-r from-amber-500/5 to-transparent -mx-5 -mb-5 p-3">
                  <Sparkles className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 mt-0.5 animate-pulse" />
-                 <p className="text-xs text-slate-700 leading-snug">
+                 <p className="text-xs text-slate-700 dark:text-gray-300 leading-snug">
                     <span className="text-amber-400 font-bold">AI Insight:</span> {careerReadiness === 0 ? "Complete your first assessment to unlock personalized career insights." : "Keep learning to increase your career readiness score."}
                  </p>
               </div>

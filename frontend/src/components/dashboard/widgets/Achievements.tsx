@@ -68,7 +68,7 @@ const Achievements: React.FC<{ streak?: number }> = ({ streak: streakProp = 0 })
 
   if (loading) {
     return (
-      <div className="bg-white/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 h-full flex flex-col items-center justify-center">
+      <div className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 h-full flex flex-col items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
@@ -81,10 +81,10 @@ const Achievements: React.FC<{ streak?: number }> = ({ streak: streakProp = 0 })
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6 }}
-        className="bg-white/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 h-full flex flex-col relative z-0"
+        className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 h-full flex flex-col relative z-0"
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
             <Trophy className="w-5 h-5 text-amber-400" />
             Gamification
           </h3>
@@ -103,10 +103,10 @@ const Achievements: React.FC<{ streak?: number }> = ({ streak: streakProp = 0 })
         {/* XP Progress */}
         <div className="mb-6">
           <div className="flex justify-between items-end mb-2">
-            <span className="text-xs text-slate-600 font-medium uppercase tracking-wider">Current XP</span>
-            <span className="text-sm text-slate-800 font-bold">{xp} <span className="text-slate-500">/ {maxXp}</span></span>
+            <span className="text-xs text-slate-600 dark:text-gray-400 font-medium uppercase tracking-wider">Current XP</span>
+            <span className="text-sm text-slate-800 dark:text-white font-bold">{xp} <span className="text-slate-500 dark:text-gray-500">/ {maxXp}</span></span>
           </div>
-          <div className="h-2 w-full bg-sky-100 rounded-full overflow-hidden relative group cursor-pointer" onClick={triggerConfetti}>
+          <div className="h-2 w-full bg-sky-100 dark:bg-slate-700 rounded-full overflow-hidden relative group cursor-pointer" onClick={triggerConfetti}>
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${(xp / maxXp) * 100}%` }}
@@ -119,7 +119,7 @@ const Achievements: React.FC<{ streak?: number }> = ({ streak: streakProp = 0 })
 
         {/* Badges Grid */}
         <div className="flex-1">
-          <h4 className="text-xs font-semibold text-slate-600 mb-3 uppercase tracking-wider">Recent Badges</h4>
+          <h4 className="text-xs font-semibold text-slate-600 dark:text-gray-400 mb-3 uppercase tracking-wider">Recent Badges</h4>
           <div className="grid grid-cols-4 gap-3">
             {visibleBadges.slice(0, 4).map((badge, idx) => (
               <motion.div
@@ -127,18 +127,18 @@ const Achievements: React.FC<{ streak?: number }> = ({ streak: streakProp = 0 })
                 whileHover={{ scale: 1.05, y: -2 }}
                 className={`aspect-square rounded-lg flex flex-col items-center justify-center p-2 text-center gap-1 border transition-all cursor-pointer relative group ${badge.unlocked
                     ? badge.color
-                    : 'bg-sky-100/50 border-sky-200 text-slate-600 grayscale opacity-50'
+                    : 'bg-sky-100/50 dark:bg-slate-700/50 border-sky-200 dark:border-white/10 text-slate-600 dark:text-gray-500 grayscale opacity-50'
                   }`}
               >
                 <span className="text-xl drop-shadow-lg">{badge.icon}</span>
                 {badge.unlocked && (
-                  <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-sky-200 shadow-[0_0_8px_rgba(16,185,129,0.6)]"></div>
+                  <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-sky-200 dark:border-slate-800 shadow-[0_0_8px_rgba(16,185,129,0.6)]"></div>
                 )}
 
                 {/* Tooltip */}
-                <div className="absolute bottom-full mb-2 w-max px-3 py-1.5 bg-white text-xs text-slate-800 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-nowrap shadow-xl border border-sky-200">
-                  <p className="font-bold text-slate-900 mb-0.5">{badge.title}</p>
-                  <p className="text-[10px] text-slate-600">{badge.desc}</p>
+                <div className="absolute bottom-full mb-2 w-max px-3 py-1.5 bg-white dark:bg-slate-800 text-xs text-slate-800 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 whitespace-nowrap shadow-xl border border-sky-200 dark:border-white/10">
+                  <p className="font-bold text-slate-900 dark:text-white mb-0.5">{badge.title}</p>
+                  <p className="text-[10px] text-slate-600 dark:text-gray-400">{badge.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -148,7 +148,7 @@ const Achievements: React.FC<{ streak?: number }> = ({ streak: streakProp = 0 })
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={() => setShowAll(true)}
-          className="mt-6 w-full saas-button-secondary flex items-center justify-center gap-2 hover:bg-sky-100 hover:text-primary transition-colors"
+          className="mt-6 w-full saas-button-secondary flex items-center justify-center gap-2 hover:bg-sky-100 dark:hover:bg-slate-700 hover:text-primary transition-colors"
         >
           View All Achievements <Award className="w-3 h-3" />
         </motion.button>
@@ -157,26 +157,26 @@ const Achievements: React.FC<{ streak?: number }> = ({ streak: streakProp = 0 })
       {/* Full Achievements Modal */}
       <AnimatePresence>
         {showAll && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sky-50/80 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-sky-50/80 dark:bg-slate-900/80 backdrop-blur-sm">
             <motion.div
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white border border-sky-200 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl"
+              className="bg-white dark:bg-slate-900 border border-sky-200 dark:border-white/10 rounded-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden flex flex-col shadow-2xl"
             >
-              <div className="p-6 border-b border-sky-200 flex items-center justify-between sticky top-0 bg-white z-10">
+              <div className="p-6 border-b border-sky-200 dark:border-white/10 flex items-center justify-between sticky top-0 bg-white dark:bg-slate-900 z-10">
                 <div>
-                  <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <Trophy className="w-5 h-5 text-amber-400" />
                     All Achievements
                   </h2>
-                  <p className="text-sm text-slate-600 mt-1">
+                  <p className="text-sm text-slate-600 dark:text-gray-400 mt-1">
                     You've unlocked <span className="text-emerald-600 dark:text-emerald-400 font-bold">{badges.filter(b => b.unlocked).length}</span> out of {badges.length} badges
                   </p>
                 </div>
                 <button
                   onClick={() => setShowAll(false)}
-                  className="p-2 hover:bg-sky-100 rounded-full text-slate-600 hover:text-primary transition-colors"
+                  className="p-2 hover:bg-sky-100 dark:hover:bg-slate-800 rounded-full text-slate-600 dark:text-gray-400 hover:text-primary transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -191,26 +191,26 @@ const Achievements: React.FC<{ streak?: number }> = ({ streak: streakProp = 0 })
                     transition={{ delay: idx * 0.05 }}
                     className={`aspect-square rounded-xl flex flex-col items-center justify-center p-4 text-center gap-2 border transition-all relative group ${badge.unlocked
                         ? `${badge.color} hover:scale-105 shadow-lg`
-                        : 'bg-sky-100/30 border-sky-200 text-slate-600 grayscale'
+                        : 'bg-sky-100/30 dark:bg-slate-800/50 border-sky-200 dark:border-white/10 text-slate-600 dark:text-gray-500 grayscale'
                       }`}
                   >
                     <span className="text-3xl drop-shadow-md mb-1">{badge.icon}</span>
-                    <h4 className={`text-sm font-bold ${badge.unlocked ? 'text-slate-900' : 'text-slate-500'}`}>
+                    <h4 className={`text-sm font-bold ${badge.unlocked ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-gray-500'}`}>
                       {badge.title}
                     </h4>
 
                     {!badge.unlocked && (
-                      <div className="absolute top-2 right-2 text-slate-600">
+                      <div className="absolute top-2 right-2 text-slate-600 dark:text-gray-500">
                         <Lock className="w-3 h-3" />
                       </div>
                     )}
 
                     {/* Hover Info */}
-                    <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center p-4 text-center opacity-0 group-hover:opacity-100 transition-opacity rounded-xl">
+                    <div className="absolute inset-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4 text-center opacity-0 group-hover:opacity-100 transition-opacity rounded-xl">
                       <div>
-                        <p className="text-xs font-bold text-slate-900 mb-1">{badge.title}</p>
-                        <p className="text-[10px] text-slate-600 leading-tight">{badge.desc}</p>
-                        <div className={`mt-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block ${badge.unlocked ? 'bg-emerald-500/20 text-emerald-400' : 'bg-sky-200 text-slate-600'
+                        <p className="text-xs font-bold text-slate-900 dark:text-white mb-1">{badge.title}</p>
+                        <p className="text-[10px] text-slate-600 dark:text-gray-400 leading-tight">{badge.desc}</p>
+                        <div className={`mt-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full inline-block ${badge.unlocked ? 'bg-emerald-500/20 text-emerald-400' : 'bg-sky-200 dark:bg-slate-700 text-slate-600 dark:text-gray-400'
                           }`}>
                           {badge.unlocked ? 'Unlocked' : 'Locked'}
                         </div>

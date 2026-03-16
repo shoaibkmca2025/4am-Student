@@ -21,7 +21,7 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ activityData = [] }) 
       case 3: return 'bg-emerald-500/70';
       case 2: return 'bg-emerald-500/30';
       case 1: return 'bg-emerald-900/50';
-      default: return 'bg-sky-100/50';
+      default: return 'bg-sky-100/50 dark:bg-slate-700/50';
     }
   };
 
@@ -41,16 +41,16 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ activityData = [] }) 
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
-      className="bg-white/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 relative overflow-hidden group"
+      className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 relative overflow-hidden group"
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+        <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
           <Flame className="w-5 h-5 text-emerald-400" />
           Learning Activity
         </h3>
-        <div className="flex items-center gap-2 text-xs text-slate-600 bg-sky-100/50 px-3 py-1.5 rounded-full border border-sky-200/50">
+        <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-gray-400 bg-sky-100/50 dark:bg-slate-700/50 px-3 py-1.5 rounded-full border border-sky-200/50 dark:border-white/10">
           <span>Less</span>
-          <div className="w-2.5 h-2.5 bg-sky-100/50 rounded-sm"></div>
+          <div className="w-2.5 h-2.5 bg-sky-100/50 dark:bg-slate-700/50 rounded-sm"></div>
           <div className="w-2.5 h-2.5 bg-emerald-500/30 rounded-sm"></div>
           <div className="w-2.5 h-2.5 bg-emerald-500/70 rounded-sm"></div>
           <div className="w-2.5 h-2.5 bg-emerald-500 rounded-sm shadow-[0_0_4px_rgba(16,185,129,0.4)]"></div>
@@ -87,16 +87,16 @@ const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ activityData = [] }) 
         </div>
       </div>
       
-      <div className="mt-5 flex items-center justify-between text-sm border-t border-sky-200 pt-4">
+      <div className="mt-5 flex items-center justify-between text-sm border-t border-sky-200 dark:border-white/10 pt-4">
         <div className="flex flex-col">
-            <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Total Contributions</span>
-            <span className="text-slate-800 font-bold text-lg">{totalContributions}</span>
+            <span className="text-xs text-slate-500 dark:text-gray-400 font-medium uppercase tracking-wider">Total Contributions</span>
+            <span className="text-slate-800 dark:text-white font-bold text-lg">{totalContributions}</span>
         </div>
         
-        <div className="h-8 w-px bg-sky-100"></div>
+        <div className="h-8 w-px bg-sky-100 dark:bg-white/10"></div>
 
         <div className="flex flex-col items-end">
-            <span className="text-xs text-slate-500 font-medium uppercase tracking-wider">Current Streak</span>
+            <span className="text-xs text-slate-500 dark:text-gray-400 font-medium uppercase tracking-wider">Current Streak</span>
             <span className="text-emerald-400 font-bold text-lg flex items-center gap-1">
                 <Flame className="w-4 h-4 fill-emerald-400/20" /> {currentStreak} Days
             </span>

@@ -132,7 +132,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
         <div className={`pt-4 mt-4 border-t border-black/5 dark:border-white/5 ${isCollapsed ? 'space-y-1' : 'space-y-1'}`}>
           {!isCollapsed && (
-            <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-gray-500">
+            <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Extensions
             </p>
           )}
@@ -144,9 +144,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => navigate(item.path)}
                 className={`relative w-full flex items-center p-3 rounded-xl transition-all duration-300 group overflow-hidden border-transparent hover:bg-primary/5 ${isCollapsed ? 'justify-center' : 'space-x-3'}`}
               >
-                <Icon className="w-5 h-5 flex-shrink-0 text-slate-500 group-hover:text-primary transition-colors" />
+                <Icon className="w-5 h-5 flex-shrink-0 text-slate-500 dark:text-slate-300 group-hover:text-primary transition-colors" />
                 {!isCollapsed && (
-                  <span className="text-sm font-medium text-slate-600 dark:text-gray-400 group-hover:text-primary dark:group-hover:text-primary">
+                  <span className="text-sm font-medium text-slate-600 dark:text-slate-200 group-hover:text-primary dark:group-hover:text-primary">
                     {item.label}
                   </span>
                 )}

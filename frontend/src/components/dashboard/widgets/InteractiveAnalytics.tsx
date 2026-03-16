@@ -86,9 +86,9 @@ function buildChartData(completedTests: any[], range: string) {
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white border border-sky-200 p-3 rounded-lg shadow-xl">
-        <p className="text-slate-600 text-xs mb-1">{label}</p>
-        <p className="text-slate-900 font-bold text-sm flex items-center gap-2">
+      <div className="bg-white dark:bg-slate-800 border border-sky-200 dark:border-white/10 p-3 rounded-lg shadow-xl">
+        <p className="text-slate-600 dark:text-gray-400 text-xs mb-1">{label}</p>
+        <p className="text-slate-900 dark:text-white font-bold text-sm flex items-center gap-2">
           Score: {payload[0].value}
         </p>
       </div>
@@ -107,26 +107,26 @@ const InteractiveAnalytics: React.FC<InteractiveAnalyticsProps> = ({ completedTe
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="bg-white/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 h-full flex flex-col"
+      className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 h-full flex flex-col"
     >
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
             <TrendingUp className="w-5 h-5 text-emerald-400" />
             Career Growth
           </h3>
-          <p className="text-xs text-slate-600 font-medium mt-1">Readiness score over time</p>
+          <p className="text-xs text-slate-600 dark:text-gray-400 font-medium mt-1">Readiness score over time</p>
         </div>
         
-        <div className="flex bg-white/50 rounded-lg p-1 border border-sky-200">
+        <div className="flex bg-white/50 dark:bg-slate-700/50 rounded-lg p-1 border border-sky-200 dark:border-white/10">
           {['Week', 'Month', 'Year'].map((range) => (
             <button
               key={range}
               onClick={() => setTimeRange(range)}
               className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${
                 timeRange === range 
-                  ? 'bg-sky-200 text-slate-900 shadow-sm ring-1 ring-sky-300' 
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-sky-100'
+                  ? 'bg-sky-200 dark:bg-primary/20 text-slate-900 dark:text-white shadow-sm ring-1 ring-sky-300 dark:ring-primary/30' 
+                  : 'text-slate-500 hover:text-slate-700 dark:hover:text-white hover:bg-sky-100 dark:hover:bg-white/5'
               }`}
             >
               {range}
@@ -138,11 +138,11 @@ const InteractiveAnalytics: React.FC<InteractiveAnalyticsProps> = ({ completedTe
       <div className="flex-1 min-h-[250px] w-full relative">
         {data.every(d => d.score === 0) ? (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-             <div className="w-12 h-12 bg-sky-100/50 rounded-full flex items-center justify-center mb-3 border border-sky-200">
+             <div className="w-12 h-12 bg-sky-100/50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mb-3 border border-sky-200 dark:border-white/10">
                 <TrendingUp className="w-6 h-6 text-slate-500" />
              </div>
-             <h4 className="text-slate-800 font-bold text-sm">No Activity Data</h4>
-             <p className="text-slate-600 text-xs mt-1 max-w-[200px]">
+             <h4 className="text-slate-800 dark:text-white font-bold text-sm">No Activity Data</h4>
+             <p className="text-slate-600 dark:text-gray-400 text-xs mt-1 max-w-[200px]">
                 Complete assessments and track your progress to see career growth analytics.
              </p>
           </div>

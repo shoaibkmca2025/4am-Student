@@ -43,10 +43,10 @@ const UpcomingTasks: React.FC = () => {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.7 }}
-      className="bg-white/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 h-full flex flex-col"
+      className="bg-white/60 dark:bg-slate-800/60 backdrop-blur-xl border border-white/10 shadow-xl rounded-2xl p-5 h-full flex flex-col"
     >
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2">
+        <h3 className="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
           <Calendar className="w-5 h-5 text-orange-400" />
           Pending Tasks
         </h3>
@@ -58,11 +58,11 @@ const UpcomingTasks: React.FC = () => {
         </div>
       ) : tasks.length === 0 ? (
         <div className="space-y-3 flex-1 flex flex-col items-center justify-center text-center">
-          <div className="w-12 h-12 bg-sky-100/50 rounded-full flex items-center justify-center mb-3 border border-sky-200">
-             <Calendar className="w-6 h-6 text-slate-500" />
+          <div className="w-12 h-12 bg-sky-100/50 dark:bg-slate-700/50 rounded-full flex items-center justify-center mb-3 border border-sky-200 dark:border-white/10">
+             <Calendar className="w-6 h-6 text-slate-500 dark:text-gray-400" />
           </div>
-          <h4 className="text-slate-800 font-bold text-sm">No Pending Tasks</h4>
-          <p className="text-slate-600 text-xs mt-1 max-w-[200px]">
+          <h4 className="text-slate-800 dark:text-white font-bold text-sm">No Pending Tasks</h4>
+          <p className="text-slate-600 dark:text-gray-400 text-xs mt-1 max-w-[200px]">
              Your schedule is clear. Start a new assessment to challenge yourself!
           </p>
           <button 
@@ -75,14 +75,14 @@ const UpcomingTasks: React.FC = () => {
       ) : (
         <div className="space-y-3 overflow-y-auto max-h-[200px] pr-1 custom-scrollbar">
           {tasks.map((task, idx) => (
-            <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-sky-100/40 border border-sky-200/50 hover:bg-sky-100/60 transition-colors group cursor-pointer" onClick={() => navigate(`/assessment/${task.id}`)}>
+            <div key={idx} className="flex items-center gap-3 p-3 rounded-xl bg-sky-100/40 dark:bg-slate-700/40 border border-sky-200/50 dark:border-white/10 hover:bg-sky-100/60 dark:hover:bg-slate-700/80 transition-colors group cursor-pointer" onClick={() => navigate(`/assessment/${task.id}`)}>
               <div className={`p-2 rounded-lg ${task.color}`}>
                 <task.icon className="w-4 h-4" />
               </div>
               <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-semibold text-slate-800 truncate group-hover:text-primary transition-colors">{task.title}</h4>
+                <h4 className="text-sm font-semibold text-slate-800 dark:text-white truncate group-hover:text-primary transition-colors">{task.title}</h4>
                 <div className="flex items-center gap-2 mt-0.5">
-                   <span className="text-[10px] text-slate-600 flex items-center gap-1">
+                   <span className="text-[10px] text-slate-600 dark:text-gray-400 flex items-center gap-1">
                      <Clock className="w-3 h-3" /> {task.due}
                    </span>
                 </div>

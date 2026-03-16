@@ -1,9 +1,9 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 
 const defaultLimiterOptions = {
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => req.ip,
+  keyGenerator: (req) => ipKeyGenerator(req.ip),
   handler: (req, res, _next, options) => {
     res.status(options.statusCode || 429).json({ message: options.message?.message || 'Too many requests' });
   }

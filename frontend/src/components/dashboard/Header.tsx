@@ -432,7 +432,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
                 </div>
 
                 <div className="pt-4" style={{ borderTop: '1px solid rgba(34,211,238,0.1)' }}>
-                  <h4 className="text-sm font-medium text-gray-300 mb-2">Frequently Asked Questions</h4>
+                  <h4 className="text-sm font-medium text-slate-600 dark:text-gray-400 mb-2">Frequently Asked Questions</h4>
                   <div className="space-y-2">
                     {[
                       '• How do I reset my password?',
@@ -449,7 +449,7 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar, isSidebarOpen, userName,
                 </div>
               </div>
 
-              <div className="p-4 flex justify-end" style={{ borderTop: '1px solid var(--border)', background: 'rgba(15,23,42,0.5)' }}>
+              <div className="p-4 flex justify-end bg-slate-100 dark:bg-slate-900/50" style={{ borderTop: '1px solid var(--border)' }}>
                 <button
                   onClick={() => setShowHelp(false)}
                   className="btn-primary px-6 py-2 text-sm"
