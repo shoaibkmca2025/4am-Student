@@ -15,6 +15,21 @@ const router = express.Router();
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const startOfDay = (date) => new Date(new Date(date).setHours(0, 0, 0, 0));
+const updateStreak = (profile, referenceDate = new Date()) => {
+  const today = startOfDay(referenceDate);
+  const last = profile.lastStudyDate ? startOfDay(profile.lastStudyDate) : null;
+
+  if (!last) {
+    profile.streakDays = Math.max(profile.streakDays || 0, 1);
+  } else {
+    const diffDays = (today - last) / (1000 * 60 * 60 * 24);
+    if (diffDays === 1) profile.streakDays += 1;
+    else if (diffDays > 1) profile.streakDays = 1;
+  }
+
+  // Always record the latest day we touched the streak so it persists across logins.
+  profile.lastStudyDate = today;
+};
 
 const WEEKLY_CHALLENGES = [
   { challengeId: 'study-300', title: 'Study 300 minutes this week', target: 300, rewardPoints: 60 },
@@ -82,6 +97,8 @@ router.use(requireAuth, requireRole(['student']));
 router.get('/gamified/overview', async (req, res, next) => {
   try {
     const profile = await ensureProfile(req.user._id);
+    updateStreak(profile);
+    await profile.save();
 
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
@@ -154,13 +171,7 @@ router.post('/gamified/study-log', async (req, res, next) => {
     await log.save();
 
     const profile = await ensureProfile(req.user._id);
-    const today = startOfDay(new Date());
-    const last = profile.lastStudyDate ? startOfDay(profile.lastStudyDate) : null;
-
-    if (!last || (today - last) / (1000 * 60 * 60 * 24) > 1) profile.streakDays = 1;
-    else if ((today - last) / (1000 * 60 * 60 * 24) === 1) profile.streakDays += 1;
-
-    profile.lastStudyDate = new Date();
+    updateStreak(profile);
     profile.totalPoints += Math.max(5, Math.round(minutes / 5));
     profile.level = Math.max(1, Math.floor(profile.totalPoints / 100) + 1);
 
