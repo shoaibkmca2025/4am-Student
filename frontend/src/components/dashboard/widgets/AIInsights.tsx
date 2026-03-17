@@ -2,13 +2,24 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Sparkles, Lightbulb, ArrowUpRight, TrendingUp, CheckCircle } from 'lucide-react';
 
-const AIInsights: React.FC = () => {
-  const insights: any[] = [
-    // { text: "Your readiness improved 18% due to mock interviews.", type: "positive", icon: TrendingUp },
-    // { text: "Improve React to unlock 23% more job matches.", type: "action", icon: ArrowUpRight },
-    // { text: "Your resume is in the top 10% for layout.", type: "positive", icon: CheckCircle },
-    // { text: "Add 'TypeScript' to your skills to boost visibility.", type: "suggestion", icon: Lightbulb },
-  ];
+type Insight = {
+  text: string;
+  type: 'positive' | 'action' | 'suggestion';
+};
+
+const iconByType: Record<Insight['type'], any> = {
+  positive: CheckCircle,
+  action: TrendingUp,
+  suggestion: Lightbulb
+};
+
+const colorByType: Record<Insight['type'], string> = {
+  positive: 'bg-success/10 text-success border-success/20',
+  action: 'bg-primary/10 text-primary border-primary/20',
+  suggestion: 'bg-warning/10 text-warning border-warning/20'
+};
+
+const AIInsights: React.FC<{ insights?: Insight[] }> = ({ insights = [] }) => {
 
   return (
     <div className="w-full">
@@ -27,7 +38,10 @@ const AIInsights: React.FC = () => {
         </div>
       ) : (
       <div className="flex overflow-x-auto space-x-4 pb-4 scrollbar-hide snap-x">
-        {insights.map((insight, idx) => (
+        {insights.map((insight, idx) => {
+          const Icon = iconByType[insight.type] || Lightbulb;
+          const chipColor = colorByType[insight.type] || colorByType.suggestion;
+          return (
           <motion.div 
             key={idx}
             initial={{ opacity: 0, x: 20 }}
@@ -41,11 +55,8 @@ const AIInsights: React.FC = () => {
             }`}></div>
             
             <div className="flex items-start gap-3">
-              <div className={`p-2 rounded-lg border ${
-                insight.type === 'positive' ? 'bg-success/10 text-success border-success/20' : 
-                insight.type === 'action' ? 'bg-primary/10 text-primary border-primary/20' : 'bg-warning/10 text-warning border-warning/20'
-              }`}>
-                <insight.icon className="w-4 h-4" />
+              <div className={`p-2 rounded-lg border ${chipColor}`}>
+                <Icon className="w-4 h-4" />
               </div>
               <div>
                 <p className="text-sm text-slate-700 dark:text-gray-300 font-medium leading-snug group-hover:text-slate-800 dark:group-hover:text-white transition-colors">
@@ -57,7 +68,8 @@ const AIInsights: React.FC = () => {
               </div>
             </div>
           </motion.div>
-        ))}
+        );
+        })}
         
         {/* View All Card */}
         <motion.div 

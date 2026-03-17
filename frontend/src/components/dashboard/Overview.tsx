@@ -37,6 +37,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
   const [interviewConfidence, setInterviewConfidence] = useState(0);
   const [jobMatchScore, setJobMatchScore] = useState(0);
   const [resumeScore, setResumeScore] = useState(0);
+  const [insights, setInsights] = useState<any[]>([]);
   const [activityData, setActivityData] = useState<number[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
   const [completedTests, setCompletedTests] = useState<any[]>([]);
@@ -176,6 +177,40 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
         } else {
             setMotivation("Ready to start your journey? Take your first skill assessment!");
         }
+
+        // Build AI insights based on current data
+        const nextInsights: any[] = [];
+        if (resumeScore > 0) {
+          nextInsights.push({
+            text: `Resume strength at ${resumeScore}%. Add more projects or skills to reach 90%.`,
+            type: 'suggestion'
+          });
+        }
+        if (careerReadiness > 0) {
+          nextInsights.push({
+            text: `Career readiness at ${careerReadiness}%. Completing one more assessment can boost it by ~5%.`,
+            type: 'action'
+          });
+        }
+        if (interviewConfidence > 0) {
+          nextInsights.push({
+            text: `Interview readiness improving. Schedule another mock to push confidence above ${Math.min(100, (interviewConfidence + 1) * 20)}%.`,
+            type: 'positive'
+          });
+        }
+        if (applicationsCount === 0 && jobMatchScore === 0) {
+          nextInsights.push({
+            text: 'Apply to at least one tailored job this week to unlock match insights.',
+            type: 'action'
+          });
+        }
+        if (nextInsights.length === 0 && fetchedTests.length === 0) {
+          nextInsights.push({
+            text: 'Take your first assessment to unlock personalized insights.',
+            type: 'action'
+          });
+        }
+        setInsights(nextInsights);
 
       } catch (error) {
         console.error("Overview data fetch error", error);
@@ -444,7 +479,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
       </div>
 
       {/* 3. AI Insights Strip */}
-      <AIInsights />
+      <AIInsights insights={insights} />
 
       {/* 4. Analytics Section */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
