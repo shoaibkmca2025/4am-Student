@@ -15,7 +15,7 @@ import SmartActions from './widgets/SmartActions';
 import InteractiveAnalytics from './widgets/InteractiveAnalytics';
 import Achievements from './widgets/Achievements';
 import UpcomingTasks from './widgets/UpcomingTasks';
-import { jobService, userAssessmentService, applicationService, interviewService, careerService } from '../../services/api';
+import { jobService, userAssessmentService, applicationService, interviewService, careerService, resumeService } from '../../services/api';
 
 interface OverviewProps {
   userName: string;
@@ -36,6 +36,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
   const [applicationsCount, setApplicationsCount] = useState(0);
   const [interviewConfidence, setInterviewConfidence] = useState(0);
   const [jobMatchScore, setJobMatchScore] = useState(0);
+  const [resumeScore, setResumeScore] = useState(0);
   const [activityData, setActivityData] = useState<number[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
   const [completedTests, setCompletedTests] = useState<any[]>([]);
@@ -94,7 +95,27 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
           console.warn("Failed to fetch applications count", e);
         }
 
-        // 7. Fetch Interview Confidence
+        // 7. Fetch Resume & score completeness
+        try {
+          const resumeResp = await resumeService.getMe();
+          const resume = resumeResp?.resume || {};
+          const sections = [
+            Boolean(resume.summary || resume.objective || resume.headline),
+            Array.isArray(resume.experience) && resume.experience.length > 0,
+            Array.isArray(resume.education) && resume.education.length > 0,
+            Array.isArray(resume.skills) && resume.skills.length > 3,
+            Array.isArray(resume.projects) && resume.projects.length > 0,
+            Boolean(resume.contact || resume.email || resume.phone)
+          ];
+          const filled = sections.filter(Boolean).length;
+          const score = Math.min(100, Math.round((filled / sections.length) * 100));
+          setResumeScore(score);
+        } catch (e) {
+          console.warn("Failed to fetch resume", e);
+          setResumeScore(0);
+        }
+
+        // 8. Fetch Interview Confidence
         try {
           const sessionData = await interviewService.getSessions();
           if (sessionData && sessionData.sessions) {
@@ -106,7 +127,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
           console.warn("Failed to fetch interview sessions", e);
         }
 
-        // 8. Fetch Career Goals (Roadmap)
+        // 9. Fetch Career Goals (Roadmap)
         try {
           const roadmapData = await careerService.getRoadmap();
           if (roadmapData && roadmapData.roadmap) {
@@ -125,7 +146,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
            console.warn("Failed to fetch career roadmap", e);
         }
 
-        // 9. Calculate Activity Heatmap
+        // 10. Calculate Activity Heatmap
         const activityMap = new Array(52 * 7).fill(0);
         const today = new Date();
         const startDate = new Date(today);
@@ -163,7 +184,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
 
     fetchData();
 
-    // 9. Fetch Jobs (Separate call)
+    // 10. Fetch Jobs (Separate call)
     const fetchJobs = async () => {
       try {
         const data = await jobService.list();
@@ -338,7 +359,7 @@ const Overview: React.FC<OverviewProps> = ({ userName, setActiveTab }) => {
                  {/* Breakdown Metrics */}
                  <div className="flex-1 w-full space-y-2">
                     {[
-                       { label: 'Resume Quality', value: 0, color: 'bg-emerald-500', icon: FileText, tip: 'Upload a resume to get your quality score.' },
+                       { label: 'Resume Quality', value: resumeScore, color: 'bg-emerald-500', icon: FileText, tip: resumeScore > 0 ? 'Based on your resume sections.' : 'Upload or complete your resume to get a score.' },
                        { label: 'Skills Match', value: skillsData.length > 0 ? Math.min(Math.round(skillsData.reduce((acc: number, s: any) => acc + (s.A || 0), 0) / skillsData.length), 100) : 0, color: 'bg-blue-500', icon: Code, tip: 'Based on your completed assessments.' },
                        { label: 'Interview Readiness', value: interviewConfidence > 0 ? interviewConfidence * 20 : 0, color: 'bg-purple-500', icon: MessageSquare, tip: 'Complete mock interviews to improve.' },
                     ].map((metric, idx) => (
