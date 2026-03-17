@@ -113,6 +113,12 @@ const Navbar: React.FC = () => {
                 {!isAdmin ? (
                   <>
                     <button
+                      onClick={() => navigate('/coding')}
+                      className="nav-link focus:outline-none"
+                    >
+                      Coding
+                    </button>
+                    <button
                       onClick={() => navigate('/modules')}
                       className="nav-link focus:outline-none"
                     >
@@ -248,6 +254,15 @@ const Navbar: React.FC = () => {
               </button>
               {!isAdmin ? (
                 <>
+                  <button
+                    onClick={() => {
+                      navigate('/coding');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="text-slate-600 dark:text-gray-300 text-base font-medium hover:text-primary py-3 border-b border-black/5 dark:border-white/5 text-left focus:outline-none transition-colors"
+                  >
+                    Coding
+                  </button>
                   <button
                     onClick={() => {
                       navigate('/modules');

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, FileText, Code, MessageSquare, TrendingUp,
   Briefcase, Settings, LogOut, ChevronLeft, ChevronRight, Award,
-  Zap, Blocks, Wrench
+  Zap, Blocks, Wrench, Code2
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import logoImage from '../../4am-logo.jpeg';
@@ -44,6 +44,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   }, []);
 
   const extensionItems = [
+    { id: 'coding', label: 'Coding Challenges', icon: Code2, path: '/coding' },
     { id: 'modules', label: 'Modules', icon: Blocks, path: '/modules' },
     { id: 'tools', label: 'Tools', icon: Wrench, path: '/tools' }
   ];

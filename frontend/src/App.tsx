@@ -14,6 +14,7 @@ const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const AssessmentPage = React.lazy(() => import('./pages/AssessmentPage'));
 const StudyModulesPage = React.lazy(() => import('./modules/StudyModulesPage'));
 const LearningToolsPage = React.lazy(() => import('./tools/LearningToolsPage'));
+const CodingChallengesPage = React.lazy(() => import('./pages/CodingChallengesPage'));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
@@ -99,6 +100,11 @@ function App() {
                 <Route path="/tools" element={
                   <ProtectedRoute>
                     <LearningToolsPage />
+                  </ProtectedRoute>
+                } />
+                <Route path="/coding" element={
+                  <ProtectedRoute>
+                    <CodingChallengesPage />
                   </ProtectedRoute>
                 } />
                 <Route path="/admin" element={
