@@ -12,7 +12,6 @@ import { AuthProvider as AuthContextProvider } from './context/AuthContext';
 
 const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const AssessmentPage = React.lazy(() => import('./pages/AssessmentPage'));
-const FeatureHubPage = React.lazy(() => import('./features/FeatureHubPage'));
 const StudyModulesPage = React.lazy(() => import('./modules/StudyModulesPage'));
 const LearningToolsPage = React.lazy(() => import('./tools/LearningToolsPage'));
 
@@ -90,11 +89,6 @@ function App() {
                 <Route path="/assessment/:id" element={
                   <ProtectedRoute>
                     <AssessmentPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="/features" element={
-                  <ProtectedRoute>
-                    <FeatureHubPage />
                   </ProtectedRoute>
                 } />
                 <Route path="/modules" element={

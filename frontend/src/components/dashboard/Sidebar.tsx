@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, FileText, Code, MessageSquare, TrendingUp,
   Briefcase, Settings, LogOut, ChevronLeft, ChevronRight, Award,
-  Zap, Sparkles, Blocks, Wrench
+  Zap, Blocks, Wrench
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import logoImage from '../../4am-logo.jpeg';
@@ -44,7 +44,6 @@ const Sidebar: React.FC<SidebarProps> = ({
   }, []);
 
   const extensionItems = [
-    { id: 'feature-hub', label: 'Features Hub', icon: Sparkles, path: '/features' },
     { id: 'modules', label: 'Modules', icon: Blocks, path: '/modules' },
     { id: 'tools', label: 'Tools', icon: Wrench, path: '/tools' }
   ];
