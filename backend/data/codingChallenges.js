@@ -1,16 +1,4 @@
-export type CodingChallenge = {
-  id: string;
-  title: string;
-  difficulty: 'Easy' | 'Medium' | 'Hard';
-  description: string;
-  starterCode: string;
-  functionName: string;
-  tags: string[];
-  testCases: { id: string; args: any[]; expected: any; hint?: string }[];
-  constraints: string[];
-};
-
-export const codingChallenges: CodingChallenge[] = [
+const codingChallenges = [
   {
     id: 'two-sum',
     title: 'Two Sum',
@@ -29,9 +17,9 @@ export const codingChallenges: CodingChallenge[] = [
       'Return indices in any order'
     ],
     testCases: [
-      { id: 'a', args: [[2,7,11,15], 9], expected: [0,1] },
-      { id: 'b', args: [[3,2,4], 6], expected: [1,2] },
-      { id: 'c', args: [[3,3], 6], expected: [0,1] }
+      { id: 'a', args: [[2, 7, 11, 15], 9], expected: [0, 1] },
+      { id: 'b', args: [[3, 2, 4], 6], expected: [1, 2] },
+      { id: 'c', args: [[3, 3], 6], expected: [0, 1] }
     ]
   },
   {
@@ -78,3 +66,5 @@ export const codingChallenges: CodingChallenge[] = [
     ]
   }
 ];
+
+export default codingChallenges;

@@ -23,6 +23,7 @@ import achievementRoutes from './routes/achievementRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import statsRoutes from './routes/statsRoutes.js';
 import extensionRoutes from './routes/extensionRoutes.js';
+import codingChallengeRoutes from './routes/codingChallengeRoutes.js';
 
 dotenv.config();
 
@@ -105,6 +106,7 @@ app.use('/api/achievements', achievementRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/extensions', extensionRoutes);
+app.use('/api/coding', codingChallengeRoutes);
 
 // 404 handler
 app.use((req, res) => {
